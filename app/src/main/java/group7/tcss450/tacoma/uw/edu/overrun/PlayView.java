@@ -1,13 +1,18 @@
 package group7.tcss450.tacoma.uw.edu.overrun;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
-public class PlayView extends AppCompatActivity {
+import android.content.Context;
+import android.os.Bundle;
+import android.view.SurfaceView;
+
+public class PlayView extends SurfaceView implements Runnable{
+
+    public PlayView(Context context) {
+        super(context);
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_play_view);
+    public void run() {
+
     }
 }
