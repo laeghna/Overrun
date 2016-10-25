@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Overrun</string>
+    <string name="start_description">Start Game</string>
+    <string name="options_description">Options</string>
+</resources>
