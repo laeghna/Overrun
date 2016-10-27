@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+import android.widget.EditText;
+
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 public class StartMenuActivity extends AppCompatActivity {
 
@@ -14,8 +16,11 @@ public class StartMenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_start_menu);
     }
 
-    public void goToSignIn(View view) {
-        Intent intent = new Intent(this, SignInActivity.class);
+
+    public void startGameClicked(View view) {
+        // Crates an intent which will create a new activity PlayView.class
+        Intent intent = new Intent(this, PlayView.class);
+
         startActivity(intent);
     }
 }
