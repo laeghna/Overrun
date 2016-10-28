@@ -4,11 +4,8 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
 
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
-
-public class StartMenuActivity extends AppCompatActivity {
+public class StartMenuActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +22,6 @@ public class StartMenuActivity extends AppCompatActivity {
     }
 
     public void testLogout(View view) {
-        //SignInActivity.LogOut(this);
+        signOut();
     }
 }
