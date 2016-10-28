@@ -23,4 +23,8 @@ public class StartMenuActivity extends AppCompatActivity {
 
         startActivity(intent);
     }
+
+    public void testLogout(View view) {
+        //SignInActivity.LogOut(this);
+    }
 }
