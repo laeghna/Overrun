@@ -6,13 +6,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.support.v4.view.VelocityTrackerCompat;
+import android.graphics.Rect;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.VelocityTracker;
 import android.view.WindowManager;
 
 /** This class is intended for use in the game Overrun. A fun and fast-paced survival
@@ -40,7 +39,13 @@ public class PlayView extends SurfaceView implements Runnable{
     /** The holder for this surface view. */
     private SurfaceHolder mHolder;
 
-    
+    /** The player's weapon. */
+    private Weapon mWeapon;
+
+    /** True if the player is shooting a weapon, false otherwise. */
+    private boolean mIsShooting;
+
+
 
     /** Constructor for the PlayView class. */
     public PlayView(Context context) {
@@ -49,15 +54,14 @@ public class PlayView extends SurfaceView implements Runnable{
         Display d = wm.getDefaultDisplay();
         Point screenSize = new Point();
         d.getSize(screenSize);
-
         // create survivor object
         mSurvivor = new Survivor(context, screenSize);
         // create paint object for rendering
         mPaintBrush = new Paint();
         //create holder for view
         mHolder = getHolder();
-
-
+        mWeapon = new Weapon(1, 1, screenSize, context);
+        mIsShooting = false;
     }
 
     /**
@@ -79,7 +83,7 @@ public class PlayView extends SurfaceView implements Runnable{
 
     /** Updates the frame for the PlayView. */
     private void updateFrame(){
-        drawFrame();
+        mWeapon.updateBulletPositions();
     }
 
     /** Draws the frame for the PlayView. */
@@ -91,6 +95,11 @@ public class PlayView extends SurfaceView implements Runnable{
             mBackground.drawColor(Color.BLACK); // color the background black
             mBackground.drawBitmap(mSurvivor.getmBmap(), mSurvivor.getmX(),
                     mSurvivor.getmY(), mPaintBrush);
+            if(!(mWeapon.getmShotsFired()).isEmpty()) {
+                for(Weapon.Bullet b: mWeapon.getmShotsFired()) {
+                    mBackground.drawBitmap(b.getmBMP(), b.getmX(), b.getmY(), mPaintBrush);
+                }
+            }
             mHolder.unlockCanvasAndPost(mBackground); // drawing done -> unlock background
         }
     }
@@ -127,16 +136,23 @@ public class PlayView extends SurfaceView implements Runnable{
         int action = mEvent.getActionMasked();
         int ptrID = mEvent.getPointerId(actionIndex);
         int theX = (int) mEvent.getX(ptrID);
+        int theY = (int) mEvent.getY(ptrID);
+        Rect touchBox = new Rect(theX, theY, 100, 100);
         switch(action) {
             case MotionEvent.ACTION_DOWN:
+                mIsShooting = true;
                 break;
             case MotionEvent.ACTION_MOVE:
+                mIsShooting = false;
                 mSurvivor.move(theX);
-                updateFrame();
                 break;
             case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
+                if(mIsShooting) {
+                    mWeapon.shootWeapon(mSurvivor.getmX(), mSurvivor.getmY() + mSurvivor.getmCollisionDetect().getmDimensions().height());
+                }
 
+                break;
+            case MotionEvent.ACTION_CANCEL:
                 break;
         }
         return true;
