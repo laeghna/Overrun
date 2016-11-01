@@ -3,6 +3,7 @@ package group7.tcss450.tacoma.uw.edu.overrun;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 public class StartMenuActivity extends BaseActivity {
@@ -21,6 +22,7 @@ public class StartMenuActivity extends BaseActivity {
         startActivity(intent);
     }
 
+    // TODO: logout button needs to be implemented.
     public void testLogout(View view) {
         signOut();
     }

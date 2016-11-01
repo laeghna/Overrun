@@ -1,10 +1,8 @@
 package group7.tcss450.tacoma.uw.edu.overrun;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
