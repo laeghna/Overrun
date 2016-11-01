@@ -4,10 +4,15 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
 
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
-
+/**
+ * This is the main activity that runs when the game app is started.
+ * It provides buttons to either play the game or view other options.
+ *
+ * @author Lisa Taylor
+ * @author Leslie Pedro
+ * @version 23 Oct 2016
+ */
 public class StartMenuActivity extends AppCompatActivity {
 
     @Override
@@ -18,7 +23,7 @@ public class StartMenuActivity extends AppCompatActivity {
 
 
     public void startGameClicked(View view) {
-        // Crates an intent which will create a new activity PlayView.class
+        // Creates an intent which will create a new activity PlayView.class
         Intent intent = new Intent(this, PlayView.class);
 
         startActivity(intent);
