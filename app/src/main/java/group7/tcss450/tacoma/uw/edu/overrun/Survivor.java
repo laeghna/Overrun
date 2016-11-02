@@ -23,17 +23,26 @@ public class Survivor implements GameCharacter{
     private int mY; // y- coordinate
 
     /** The move speed of the survivor. */
-    private int mSpeed;
+    private double mSpeed;
+
+    private boolean mIsRunning;
+
+    private Point mScreen;
+
+    private int mPadBott = 175;
+    private int mPadTop = 5;
 
     /** The collision detector for the survivor.*/
     private CollisionDetector mCollisionDetect;
+
 
     /**
      * Contructor for Survivor class.
      * @param context - the context for the application this game is played from
      */
     public Survivor(Context context, Point screenSize) {
-        mSpeed = 5; // test speed may need to adjust
+        mScreen = screenSize;
+        mSpeed = 1; // test speed may need to adjust
         //resize the bitmap
         float w_scale = ((float) screenSize.y) / 20; // Swap x and y due to forced landscape view
         float h_scale = ((float) screenSize.x) / 20;
@@ -44,9 +53,18 @@ public class Survivor implements GameCharacter{
         mBmap = getResizedBmp(w_scale, h_scale);
         Log.d("OVERRUN: SURVIVOR", "After Resize: (" +  mBmap.getWidth() +","+ mBmap.getHeight() + ")");
         mX = mBmap.getWidth();
-        mY = screenSize.y - mBmap.getHeight() * 3;
+        mY = screenSize.y - (mBmap.getHeight() + mPadBott);
         mCollisionDetect = new CollisionDetector(mBmap.getHeight(), mBmap.getWidth(), mX, mY);
+        mIsRunning = false;
         //TODO: replace with correct graphics
+    }
+
+    public boolean getmIsRunning() {
+        return mIsRunning;
+    }
+
+    public void setmIsRunning(boolean mIsRunning) {
+        this.mIsRunning = mIsRunning;
     }
 
     /**
@@ -63,6 +81,14 @@ public class Survivor implements GameCharacter{
      */
     public int getmX() {
         return mX;
+    }
+
+    /**
+     * Sets the position of the survivor to the new x location on the screen.
+     * @param x - the new x position.
+     */
+    public void setmX(int x) {
+        mX = x;
     }
 
     /**
@@ -85,36 +111,10 @@ public class Survivor implements GameCharacter{
      * Gets the survivor's move speed.
      * @return mSpeed - the survivor's move speed.
      */
-    public int getmSpeed() {
+    public double getmSpeed() {
         return mSpeed;
     }
 
-    public void move(int newX) {
-        if(mX < newX) {
-            moveRight(newX);
-        } else if (mX > newX) {
-            moveLeft(newX);
-        }
-        mCollisionDetect.setmPosition(new Point(mX, mY));
-    }
-
-    /**
-     * Updates the survivor's position when the player moves right.
-     */
-    public void moveRight(int newX) {
-        while(mX < newX) {
-            mX += mSpeed;
-        }
-    }
-
-    /**
-     * Updates the survivor's position when the player moves left.
-     */
-    public void moveLeft(int newX) {
-        while( mX > newX) {
-            mX -= mSpeed;
-        }
-    }
 
     /**
      * Resizes the bitmap for the Survivor to the proper size for the screen in use.
