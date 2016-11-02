@@ -1,42 +1,43 @@
 package group7.tcss450.tacoma.uw.edu.overrun;
 
-import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 /**
- * The activity that launches the Overrun game.
+ * This is the activity for the actual game play.
+ * It handles the game's lifecycle by calling GameView's
+ * methods when prompted by the OS.
+ *
+ * @author Leslie Pedro
+ * @author Lisa Taylor
+ * @version 1 Nov 2016
  */
 public class GameActivity extends AppCompatActivity {
 
-    /** The view for playing the game. */
+    //The game's play view
     private PlayView mPlayView;
 
-    /**
-     * Summoned upon creation of an instance of the game.
-     * @param savedInstanceState - the saved instance state.
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        setContentView(R.layout.activity_game);
+
+        //Initialize the play view object
         mPlayView = new PlayView(this);
+
+        //add play view to ContentView
         setContentView(mPlayView);
+
         mPlayView.run();
     }
 
-    /**
-     * Called when the game is paused.
-     */
     @Override
     protected void onPause() {
         super.onPause();
-        mPlayView.pause();
+        mPlayView.pauseGame();
     }
 
-    /**
-     * Called to resume the game from a paused state.
-     */
+    @Override
     protected void onResume() {
         super.onResume();
         mPlayView.resumeGame();
