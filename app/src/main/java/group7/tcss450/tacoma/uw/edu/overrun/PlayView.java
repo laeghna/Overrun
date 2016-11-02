@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -17,17 +16,19 @@ import android.view.WindowManager;
 /** This class is intended for use in the game Overrun. A fun and fast-paced survival
  * game. This class holds the view for the in-app gameplay.
  *
- * Author: Leslie Pedro
+ * @author Leslie Pedro
+ * @author Lisa Taylor
+ * @version 1 Nov 2016
  */
 public class PlayView extends SurfaceView implements Runnable{
 
     /** A volatile boolean for controlling multithreaded play. */
-    volatile boolean mIsPlaying; // True when game is in-play, false otherwise
+    private volatile boolean mIsPlaying; // True when game is in-play, false otherwise
 
     /** The thread for the playing the game. */
     private Thread mGameThread;
 
-    /** The survivor (player character) of the game. */
+    /** The player's character of the game. */
     private Survivor mSurvivor;
 
     /** The paint object for use in drawing. */
@@ -114,7 +115,7 @@ public class PlayView extends SurfaceView implements Runnable{
     }
 
     /** Pauses the game. */
-    public void pause() {
+    public void pauseGame() {
         mIsPlaying = false;
         try {
             mGameThread.join();
