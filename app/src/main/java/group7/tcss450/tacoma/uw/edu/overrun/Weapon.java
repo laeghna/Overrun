@@ -18,20 +18,14 @@ public class Weapon {
     /** The amt of damage the weapon does with each hit. */
     private int mDamage;
 
-    /** The amt of bullets in the weapon. */
-    private int mAmmo;
-
-    /** The number of bullets released with each shot fired. */
-    private int mBursts;
-
     /** The context for the bullet. */
     private Context mContext;
 
     /** The size of the screen. */
     private Point mScreenSize;
 
-    /** The shots recently fired. */
-    private ArrayList<Bullet> mShotsFired;
+    /** The weapon's bullet. */
+    private Bullet mBullet;
 
     /**
      * Public constructor for the Weapon class.
@@ -43,28 +37,8 @@ public class Weapon {
     public Weapon(int dmg, int capacity, Point screenSize, Context context) {
         mContext = context;
         mScreenSize = screenSize;
-        mShotsFired = new ArrayList<>();
-        mShotsFired.add(new Bullet(150, 500));
-        mShotsFired.add(new Bullet(250, 500));
         mDamage = dmg;
-        mAmmo = capacity;
-        mBursts = 1;
-    }
-
-    /**
-     * Gets the damage per hit.
-     * @return the damage the weapon does per hit.
-     */
-    public int getmDamage() {
-        return mDamage;
-    }
-
-    /**
-     * Gets the amount of ammo in the weapon.
-     * @return the amount of ammo in the weapon.
-     */
-    public int getCapacity() {
-        return mAmmo;
+        mBullet = new Bullet();
     }
 
     /**
@@ -73,37 +47,15 @@ public class Weapon {
      * @param startY - the y coordinate of the bullet fired.
      */
     public void shootWeapon(int theX, int startY) {
-        for(int i = 0; i < mBursts; i++) {
-            mShotsFired.add(new Bullet(theX, startY));
-        }
-
-    }
-
-    /**
-     * Updates the position for all bullets recently fired (aka moves them up the screen).
-     */
-    public void updateBulletPositions() {
-        if(!mShotsFired.isEmpty()) {
-            for (Bullet b : mShotsFired) {
-                int currY = b.getmY();
-                if (currY > 0) {
-                    b.setmY(currY -= 1);
-
-                } else if (currY <= 0) {
-                    mShotsFired.remove(mShotsFired.indexOf(b));
-                }
-            }
+        if(!mBullet.getmIsActive()) {
+            mBullet.setmX(theX);
+            mBullet.setmY(startY);
+            mBullet.setmIsActive(true);
         }
     }
 
-    /**
-     * Gets the list of bullets recently fired.
-     * @return - the list of recently fired bullets.
-     */
-    public ArrayList<Bullet> getmShotsFired() {
-        return mShotsFired;
-    }
 
+    public Bullet getmBullet() {return mBullet;}
 
     /**
      * Inner class for weapon containing the properties of the weapon's ammo.
@@ -122,20 +74,15 @@ public class Weapon {
         /** CollisionDetector for the bullet. */
         private CollisionDetector mDetector;
 
+        private boolean mIsActive;
+
 
         /**
          * Public Bullet constructor.
-         * @param theX - the x position of the bullet.
-         * @param startY - the y position for the bullet to start at.
          */
-        public Bullet(int theX, int startY) {
-            float w_scale = ((float) mScreenSize.y) / 40; // Swap x and y due to forced landscape view
-            float h_scale = ((float) mScreenSize.x) / 40;
+        public Bullet() {
             mBMP = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.bullets); // a placeholder graphic
-//            mBMP = getResizedBmp(w_scale, h_scale); //TODO: update graphics
-            mX = theX;
-            mY = startY;
-            mDetector = new CollisionDetector(mBMP.getHeight(), mBMP.getWidth(), mX, mY);
+            mIsActive = false;
         }
 
         /**
@@ -160,7 +107,7 @@ public class Weapon {
          */
         public void setmX(int mX) {
             this.mX = mX;
-            mDetector.setmPosition(new Point(mX, mY));
+//            mDetector.setmPosition(new Point(mX, mY));
         }
 
         /**
@@ -177,7 +124,7 @@ public class Weapon {
          */
         public void setmY(int mY) {
             this.mY = mY;
-            mDetector.setmPosition(new Point(mX, mY));
+            //mDetector.setmPosition(new Point(mX, mY));
         }
 
         /**
@@ -215,5 +162,28 @@ public class Weapon {
             mBMP.recycle();
             return resizedBMP;
         }
+
+        /**
+         * Updates the position of the survivor's bullet.
+         */
+        public void updateBulletPosition() {
+            if(mY - 1 > 0) {
+                mY-=15;
+            } else {
+                mIsActive = false;
+            }
+        }
+
+        /**
+         * Gets the status of the bullet being drawn currently.
+         * @return mIsActive - true if the bullet is active, false otherwise.
+         */
+        public boolean getmIsActive() {return mIsActive;}
+
+        /**
+         * Sets the status of the current bullet.
+         * @param status true if the bullet is active, false otherwise.
+         */
+        public void setmIsActive(boolean status) { mIsActive = status;}
     }
 }

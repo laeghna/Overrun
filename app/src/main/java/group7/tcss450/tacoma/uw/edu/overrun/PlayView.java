@@ -21,6 +21,9 @@ import android.view.WindowManager;
  */
 public class PlayView extends SurfaceView implements Runnable{
 
+    /** For discerning between tap and scroll. */
+    public static final float TAP_TOLERANCE = 10;
+
     /** A volatile boolean for controlling multithreaded play. */
     volatile boolean mIsPlaying; // True when game is in-play, false otherwise
 
@@ -42,26 +45,32 @@ public class PlayView extends SurfaceView implements Runnable{
     /** The player's weapon. */
     private Weapon mWeapon;
 
-    /** True if the player is shooting a weapon, false otherwise. */
-    private boolean mIsShooting;
+    /** The size of the screen being used to display the game. */
+    private Point mScreen;
+
+    /** Coordinates of the most recent touch on the screen. */
+    private float mTouchX;
+    private float mTouchY;
 
 
-
-    /** Constructor for the PlayView class. */
+    /**
+     * Constructor for the PlayView class.
+     * @param context - the context for the app.
+     */
     public PlayView(Context context) {
         super(context);
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display d = wm.getDefaultDisplay();
-        Point screenSize = new Point();
-        d.getSize(screenSize);
+        mScreen = new Point();
+        d.getSize(mScreen);
+        Log.d("ScreenX/2, ScreenY/3", "(" + mScreen.x/2 + "," +  mScreen.y/3 + ")");
         // create survivor object
-        mSurvivor = new Survivor(context, screenSize);
+        mSurvivor = new Survivor(context, mScreen);
         // create paint object for rendering
         mPaintBrush = new Paint();
         //create holder for view
         mHolder = getHolder();
-        mWeapon = new Weapon(1, 1, screenSize, context);
-        mIsShooting = false;
+        mWeapon = new Weapon(1, 1, mScreen, context);
     }
 
     /**
@@ -73,8 +82,8 @@ public class PlayView extends SurfaceView implements Runnable{
         // game control loop: while the user is playing continue to update the view
         while(mIsPlaying) {
             //update and draw frame
-            updateFrame();
-            drawFrame();
+            update();
+            draw();
             //update the frame controls
             framesPerSecond();
         }
@@ -82,12 +91,14 @@ public class PlayView extends SurfaceView implements Runnable{
     }
 
     /** Updates the frame for the PlayView. */
-    private void updateFrame(){
-        mWeapon.updateBulletPositions();
+    private void update(){
+        if(mWeapon.getmBullet().getmIsActive()) {
+            mWeapon.getmBullet().updateBulletPosition();
+        }
     }
 
     /** Draws the frame for the PlayView. */
-    private void drawFrame() {
+    private void draw() {
         // draw all graphics
         // check holder
         if( mHolder.getSurface().isValid()) {
@@ -95,10 +106,9 @@ public class PlayView extends SurfaceView implements Runnable{
             mBackground.drawColor(Color.BLACK); // color the background black
             mBackground.drawBitmap(mSurvivor.getmBmap(), mSurvivor.getmX(),
                     mSurvivor.getmY(), mPaintBrush);
-            if(!(mWeapon.getmShotsFired()).isEmpty()) {
-                for(Weapon.Bullet b: mWeapon.getmShotsFired()) {
-                    mBackground.drawBitmap(b.getmBMP(), b.getmX(), b.getmY(), mPaintBrush);
-                }
+            if(mWeapon.getmBullet().getmIsActive()) {
+                mBackground.drawBitmap(mWeapon.getmBullet().getmBMP(), mWeapon.getmBullet().getmX(),
+                        mWeapon.getmBullet().getmY(), mPaintBrush);
             }
             mHolder.unlockCanvasAndPost(mBackground); // drawing done -> unlock background
         }
@@ -132,27 +142,25 @@ public class PlayView extends SurfaceView implements Runnable{
 
     @Override
     public boolean onTouchEvent(MotionEvent mEvent) {
-        int actionIndex = mEvent.getActionIndex();
-        int action = mEvent.getActionMasked();
-        int ptrID = mEvent.getPointerId(actionIndex);
-        int theX = (int) mEvent.getX(ptrID);
-        int theY = (int) mEvent.getY(ptrID);
-        Rect touchBox = new Rect(theX, theY, 100, 100);
-        switch(action) {
+        switch(mEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                mIsShooting = true;
+                mTouchX = mEvent.getX();
                 break;
-            case MotionEvent.ACTION_MOVE:
-                mIsShooting = false;
-                mSurvivor.move(theX);
-                break;
-            case MotionEvent.ACTION_UP:
-                if(mIsShooting) {
-                    mWeapon.shootWeapon(mSurvivor.getmX(), mSurvivor.getmY() + mSurvivor.getmCollisionDetect().getmDimensions().height());
-                }
 
+            // Player has removed finger from screen
+            case MotionEvent.ACTION_UP:
+                if(mEvent.getY() < mScreen.y - mScreen.y/3) {
+                    mWeapon.shootWeapon(mSurvivor.getmX(), mSurvivor.getmY() -
+                            mSurvivor.getmBmap().getHeight());
+                }
                 break;
-            case MotionEvent.ACTION_CANCEL:
+
+            case MotionEvent.ACTION_MOVE:
+                if(mEvent.getY() >= mScreen.y - mScreen.y/3) {
+                    if (TAP_TOLERANCE < Math.abs(mTouchX - mEvent.getX())) {
+                        mSurvivor.setmX((int) mEvent.getX());
+                    }
+                }
                 break;
         }
         return true;
