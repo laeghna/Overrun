@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <bool name="logged_in_default">false</bool>
-    <bool name="logged_in">false</bool>
-</resources>
