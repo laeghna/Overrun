@@ -1,0 +1,9 @@
+{
+  "name": "Overrun",
+  "version": "0.1.0",
+  "description": "API docs for the Overrun mobile app",
+  "apidoc": {
+    "title": "Overrun API Doc",
+    "url": "https://cssgate.insttech.washinton.edu:8080/"
+  }
+}
