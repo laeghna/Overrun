@@ -12,6 +12,9 @@ import android.util.Log;
 /**
  * Intended for use with the game Overrun, a fun and fast-paced survival/shooter game.
  * This class creates the player, or the survivor, in the Overrun universe.
+ *
+ * @author Leslie Pedro
+ * @version 2 November 2016
  */
 public class Survivor implements GameCharacter{
 

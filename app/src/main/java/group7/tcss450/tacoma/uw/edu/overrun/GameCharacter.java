@@ -5,7 +5,9 @@ import android.graphics.Bitmap;
 /**
  * Interface for Overrun GameCharacters contains one method signature:
  * getRisizedBmp for resizing bitmaps based on screen size.
- * Created by lesliepedro on 10/23/16.
+ *
+ * @author Leslie Pedro
+ * @version 23 October 2016
  */
 
 public interface GameCharacter {

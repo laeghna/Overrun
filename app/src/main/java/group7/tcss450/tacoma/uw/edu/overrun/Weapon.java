@@ -10,7 +10,9 @@ import java.util.ArrayList;
 
 /**
  * Weapon class for Overrun.
- * Created by lesliepedro on 10/29/16.
+ *
+ * @author Leslie Pedro
+ * @version 2 November 2016
  */
 
 public class Weapon {

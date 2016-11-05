@@ -3,6 +3,7 @@ package group7.tcss450.tacoma.uw.edu.overrun;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 
 import java.util.Random;
 
@@ -33,18 +34,18 @@ public class ZombieCrawler implements Zombie {
     private int yMin;
     private int yMax;
 
-    public ZombieCrawler(Context context, int screenX, int screenY) {
+    public ZombieCrawler(Context context, Point screenSize) {
 
         crawlerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
 
         xMin = 0;
-        xMax = screenX;
+        xMax = screenSize.x;
         yMin = 0;
-        yMax = screenY;
+        yMax = screenSize.y;
 
         Random genRandom = new Random();
 
-        xCoord = screenX;
+        xCoord = xMax;
         yCoord = genRandom.nextInt(yMax - crawlerBitmap.getHeight());
     }
 

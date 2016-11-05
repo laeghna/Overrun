@@ -6,7 +6,8 @@ import android.graphics.Rect;
 /**
  * Detects collisions for game objects.
  *
- * Created by lesliepedro on 10/30/16.
+ * @author Leslie Pedro
+ * @version 30 October 2016
  */
 
 public class CollisionDetector {

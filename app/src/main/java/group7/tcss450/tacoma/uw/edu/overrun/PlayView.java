@@ -7,11 +7,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+
+import static android.R.attr.screenSize;
 
 /** This class is intended for use in the game Overrun. A fun and fast-paced survival
  * game. This class holds the view for the in-app gameplay.
@@ -53,10 +56,15 @@ public class PlayView extends SurfaceView implements Runnable{
     private float mTouchX;
     private float mTouchY;
 
+    /** Array for holding zombie objects. */
+    private Zombie[] zombies;
+
+    /** Adding 3 zombies for testing. */
+    private int zombieCount = 3;
 
     /**
      * Constructor for the PlayView class.
-     * @param context - the context for the app.
+     * @param context the context for the app.
      */
     public PlayView(Context context) {
         super(context);
@@ -65,13 +73,24 @@ public class PlayView extends SurfaceView implements Runnable{
         mScreen = new Point();
         d.getSize(mScreen);
         Log.d("ScreenX/2, ScreenY/3", "(" + mScreen.x/2 + "," +  mScreen.y/3 + ")");
+
         // create survivor object
         mSurvivor = new Survivor(context, mScreen);
+
         // create paint object for rendering
         mPaintBrush = new Paint();
+
         //create holder for view
         mHolder = getHolder();
+
         mWeapon = new Weapon(1, 1, mScreen, context);
+
+        //zombies
+        zombies = new Zombie[zombieCount];
+        for (int i = 0; i < zombieCount; i++) {
+
+            zombies[i] = new ZombieCrawler(context, mScreen);
+        }
     }
 
     /**
