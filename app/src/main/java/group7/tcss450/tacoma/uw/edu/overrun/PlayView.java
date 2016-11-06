@@ -115,6 +115,10 @@ public class PlayView extends SurfaceView implements Runnable{
         if(mWeapon.getmBullet().getmIsActive()) {
             mWeapon.getmBullet().updateBulletPosition();
         }
+
+        for(int i=0; i < zombies.length; i++){
+            zombies[i].updateMovement();
+        }
     }
 
     /** Draws the frame for the PlayView. */
@@ -126,6 +130,17 @@ public class PlayView extends SurfaceView implements Runnable{
             mBackground.drawColor(Color.BLACK); // color the background black
             mBackground.drawBitmap(mSurvivor.getmBmap(), mSurvivor.getmX(),
                     mSurvivor.getmY(), mPaintBrush);
+
+            //Draw zombies
+            for (int i = 0; i < zombies.length; i++) {
+                mBackground.drawBitmap(
+                        zombies[i].getBitmap(),
+                        zombies[i].getXCoord(),
+                        zombies[i].getYCoord(),
+                        mPaintBrush
+                );
+            }
+
             if(mWeapon.getmBullet().getmIsActive()) {
                 mBackground.drawBitmap(mWeapon.getmBullet().getmBMP(), mWeapon.getmBullet().getmX(),
                         mWeapon.getmBullet().getmY(), mPaintBrush);

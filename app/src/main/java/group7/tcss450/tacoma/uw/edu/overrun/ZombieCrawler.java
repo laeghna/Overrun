@@ -3,7 +3,9 @@ package group7.tcss450.tacoma.uw.edu.overrun;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Point;
+import android.util.Log;
 
 import java.util.Random;
 
@@ -19,6 +21,9 @@ public class ZombieCrawler implements Zombie {
 
     //Zombie crawler's speed
     private static final int SPEED = 1;
+
+    //Constant for scaling zombie crawler
+    private static final int SCALE = 15;
 
     //Zombie crawler image
     private Bitmap crawlerBitmap;
@@ -45,21 +50,40 @@ public class ZombieCrawler implements Zombie {
 
         Random genRandom = new Random();
 
-        xCoord = xMax;
-        yCoord = genRandom.nextInt(yMax - crawlerBitmap.getHeight());
+        //resize the bitmap
+        float w_scale = ((float) screenSize.y) / SCALE; // Swap x and y due to forced landscape view
+        float h_scale = ((float) screenSize.x) / SCALE;
+
+        // Get the zombie graphic from drawable:
+        Log.d("OVERRUN: SURVIVOR", "Screen: (" + screenSize.x + "," + screenSize.y + ")");
+        crawlerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie); // a placeholder graphic
+        Log.d("OVERRUN: SURVIVOR", "Before Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
+        crawlerBitmap = getResizedBmp(w_scale, h_scale);
+        Log.d("OVERRUN: SURVIVOR", "After Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
+
+        xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
+        yCoord = yMin;
     }
 
     @Override
     public Bitmap getResizedBmp(float newWidth, float newHeight) {
-        return null;
+        int bmWidth = crawlerBitmap.getWidth();
+        int bmHeight = crawlerBitmap.getHeight();
+        float wScale = newWidth / bmWidth;
+        float hScale = newHeight / bmHeight;
+        Matrix matrix = new Matrix();
+        matrix.postScale(wScale, hScale);
+        Bitmap resizedBMP = Bitmap.createBitmap(crawlerBitmap, 0, 0, bmWidth, bmHeight, matrix, false);
+        crawlerBitmap.recycle();
+        return resizedBMP;
     }
 
     @Override
     public void updateMovement() {
 
-        xCoord -= SPEED;
+        yCoord += SPEED;
 
-        //do something if enemy reaches left edge
+        //do something if enemy reaches bottom edge
     }
 
     @Override
@@ -80,5 +104,9 @@ public class ZombieCrawler implements Zombie {
     @Override
     public int getSpeed() {
         return SPEED;
+    }
+
+    public String toString() {
+        return "crawler";
     }
 }

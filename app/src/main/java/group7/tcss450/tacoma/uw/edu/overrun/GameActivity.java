@@ -10,7 +10,7 @@ import android.os.Bundle;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 1 Nov 2016
+ * @version 4 Nov 2016
  */
 public class GameActivity extends AppCompatActivity {
 
@@ -20,7 +20,6 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game);
 
         //Initialize the play view object
         mPlayView = new PlayView(this);
