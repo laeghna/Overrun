@@ -14,25 +14,25 @@ import java.util.Random;
  * This is the slowest enemy.
  *
  * @author Lisa Taylor
- * @version 1 Nov 2016
+ * @version 6 Nov 2016
  */
 
 public class ZombieCrawler implements Zombie {
 
-    //Zombie crawler's speed
+    /** Zombie crawler's speed */
     private static final int SPEED = 1;
 
-    //Constant for scaling zombie crawler
+    /** Constant for scaling zombie crawler */
     private static final int SCALE = 15;
 
-    //Zombie crawler image
+    /** Zombie crawler image */
     private Bitmap crawlerBitmap;
 
-    //Zombie crawler coordinates
+    /** Zombie crawler coordinates */
     private int xCoord;
     private int yCoord;
 
-    //Screen coordinate sto ensure enemy stays within screen
+    /** Screen coordinate sto ensure enemy stays within screen */
     private int xMin;
     private int xMax;
 

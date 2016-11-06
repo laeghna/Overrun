@@ -14,9 +14,13 @@ import android.util.Log;
  * This class creates the player, or the survivor, in the Overrun universe.
  *
  * @author Leslie Pedro
- * @version 2 November 2016
+ * @author Lisa Taylor
+ * @version 6 November 2016
  */
 public class Survivor implements GameCharacter{
+
+    /** Constant for scaling survivor */
+    private static final int SCALE = 15;
 
     /** The bitmap for the survivor sprite image. */
     private Bitmap mBmap;
@@ -47,8 +51,8 @@ public class Survivor implements GameCharacter{
         mScreen = screenSize;
         mSpeed = 1; // test speed may need to adjust
         //resize the bitmap
-        float w_scale = ((float) screenSize.y) / 20; // Swap x and y due to forced landscape view
-        float h_scale = ((float) screenSize.x) / 20;
+        float w_scale = ((float) screenSize.y) / SCALE; // Swap x and y due to forced landscape view
+        float h_scale = ((float) screenSize.x) / SCALE;
         // Get the player graphic from drawable:
         Log.d("OVERRUN: SURVIVOR", "Screen: (" + screenSize.x + "," + screenSize.y + ")");
         mBmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie); // a placeholder graphic

@@ -21,7 +21,7 @@ import static android.R.attr.screenSize;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 1 Nov 2016
+ * @version 6 Nov 2016
  */
 public class PlayView extends SurfaceView implements Runnable{
 
