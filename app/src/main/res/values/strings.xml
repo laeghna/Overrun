@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Overrun</string>
     <string name="start_description">Start Game</string>
-    <string name="options_description">Options</string>
+    <string name="options_description">Settings</string>
+    <string name="login_description">Sign in</string>
     <string name="sign_in_to_play">Please sign in with your Google account to play</string>
     <string name="shared_prefs">group7.tcss450.tacoma.uw.edu.overrun.SHARED_PREFS</string>
     <string name="logged_in">LOGGED_IN</string>
@@ -9,4 +10,17 @@
     <string name="user_email">USER_EMAIL</string>
     <string name="user_id">USER_ID</string>
     <string name="loading">Loading…</string>
+    <string name="diff_text">Difficulty</string>
+    <string name="title_activity_options">OptionsActivity</string>
+    <string name="saved_difficulty_setting">saved_difficulty</string>
+
+    <string name="diff_one">Slow and Steady</string>
+    <string name="diff_two">Food for Thought</string>
+    <string name="diff_three">Brain Dead</string>
+
+    <string-array name="difficulty_array">
+        <item >Slow and Steady</item>
+        <item>Food for Thought</item>
+        <item>Brain Dead</item>
+    </string-array>
 </resources>
