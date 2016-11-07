@@ -10,19 +10,35 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 public class OptionsActivity extends AppCompatActivity implements View.OnClickListener {
 
+    SharedPreferences mSharedPref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_options);
+
+        mSharedPref = getSharedPreferences(
+                getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
         Button cancel_button = (Button) findViewById(R.id.cancel_button_options);
         Button ok_button = (Button) findViewById(R.id.ok_button_options);
 
         cancel_button.setOnClickListener(this);
         ok_button.setOnClickListener(this);
+
+
+        int current_difficulty = mSharedPref.getInt(
+                getString(R.string.saved_difficulty_setting), 1);
+
+
+
+        Spinner mySpinner = (Spinner) findViewById(R.id.diff_spinner);
+
+        mySpinner.setSelection(current_difficulty - 1);
+
     }
 
     @Override
@@ -53,11 +69,15 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
                         break;
                 }
 
-                SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
+
+                SharedPreferences.Editor editor = mSharedPref.edit();
                 editor.putInt(getString(R.string.saved_difficulty_setting), difficulty);
                 editor.commit();
-                
+
+
+                Toast.makeText(this
+                        , "Difficulty set to: " + text,
+                        Toast.LENGTH_SHORT) .show();
                 intent = new Intent(this, StartMenuActivity.class);
                 startActivity(intent);
                 break;
