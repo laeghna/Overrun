@@ -14,14 +14,12 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
-import static android.R.attr.screenSize;
-
 /** This class is intended for use in the game Overrun. A fun and fast-paced survival
  * game. This class holds the view for the in-app gameplay.
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 6 Nov 2016
+ * @version 8 Nov 2016
  */
 public class PlayView extends SurfaceView implements Runnable{
 
@@ -99,11 +97,14 @@ public class PlayView extends SurfaceView implements Runnable{
      */
     @Override
     public void run() {
+
         // game control loop: while the user is playing continue to update the view
         while(mIsPlaying) {
+
             //update and draw frame
             update();
             draw();
+
             //update the frame controls
             framesPerSecond();
         }
@@ -112,12 +113,22 @@ public class PlayView extends SurfaceView implements Runnable{
 
     /** Updates the frame for the PlayView. */
     private void update(){
-        if(mWeapon.getmBullet().getmIsActive()) {
-            mWeapon.getmBullet().updateBulletPosition();
+
+        if(mWeapon.getBullet().getIsActive()) {
+
+            mWeapon.getBullet().updateBulletPosition();
         }
 
         for(int i=0; i < zombies.length; i++){
             zombies[i].updateMovement();
+
+            //if collision occurs with bullet
+            if (Rect.intersects(mWeapon.getDetectBullet(), zombies[i].getDetectZombie())) {
+
+                //moving enemy outside the bottom edge and setting bullet isActive to false
+                zombies[i].setXCoord(mScreen.y + zombies[i].getBitmap().getHeight());
+                mWeapon.getBullet().setIsActive(false);
+            }
         }
     }
 
@@ -141,9 +152,9 @@ public class PlayView extends SurfaceView implements Runnable{
                 );
             }
 
-            if(mWeapon.getmBullet().getmIsActive()) {
-                mBackground.drawBitmap(mWeapon.getmBullet().getmBMP(), mWeapon.getmBullet().getmX(),
-                        mWeapon.getmBullet().getmY(), mPaintBrush);
+            if(mWeapon.getBullet().getIsActive()) {
+                mBackground.drawBitmap(mWeapon.getBullet().getBMP(), mWeapon.getBullet().getX(),
+                        mWeapon.getBullet().getY(), mPaintBrush);
             }
             mHolder.unlockCanvasAndPost(mBackground); // drawing done -> unlock background
         }

@@ -14,7 +14,7 @@ import android.os.Bundle;
  */
 public class GameActivity extends AppCompatActivity {
 
-    //The game's play view
+    /** The game's play view where all images are drawn. */
     private PlayView mPlayView;
 
     @Override

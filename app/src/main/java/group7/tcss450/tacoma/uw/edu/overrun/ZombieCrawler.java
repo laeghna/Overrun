@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.Log;
 
 import java.util.Random;
@@ -19,26 +20,30 @@ import java.util.Random;
 
 public class ZombieCrawler implements Zombie {
 
-    /** Zombie crawler's speed */
+    /** Zombie crawler's speed. */
     private static final int SPEED = 1;
 
-    /** Constant for scaling zombie crawler */
+    /** Constant for scaling zombie crawler. */
     private static final int SCALE = 15;
 
-    /** Zombie crawler image */
+    /** Zombie crawler image. */
     private Bitmap crawlerBitmap;
 
-    /** Zombie crawler coordinates */
+    /** Zombie crawler coordinates. */
     private int xCoord;
     private int yCoord;
 
-    /** Screen coordinate sto ensure enemy stays within screen */
+    /** Screen coordinates to ensure enemy stays within screen. */
     private int xMin;
     private int xMax;
 
     private int yMin;
     private int yMax;
 
+    /** Rectangle for crawler to determine collisions. */
+    private Rect detectZombie;
+
+    /** Constructor to initialize variables. */
     public ZombieCrawler(Context context, Point screenSize) {
 
         crawlerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
@@ -50,19 +55,24 @@ public class ZombieCrawler implements Zombie {
 
         Random genRandom = new Random();
 
-        //resize the bitmap
-        float w_scale = ((float) screenSize.y) / SCALE; // Swap x and y due to forced landscape view
-        float h_scale = ((float) screenSize.x) / SCALE;
+        //resize the bitmap, swap x and y due to force landscape view
+        float wScale = ((float) screenSize.y) / SCALE;
+        float hScale = ((float) screenSize.x) / SCALE;
 
         // Get the zombie graphic from drawable:
         Log.d("OVERRUN: SURVIVOR", "Screen: (" + screenSize.x + "," + screenSize.y + ")");
-        crawlerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie); // a placeholder graphic
+
+        // a placeholder graphic
+        crawlerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
         Log.d("OVERRUN: SURVIVOR", "Before Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
-        crawlerBitmap = getResizedBmp(w_scale, h_scale);
+
+        crawlerBitmap = getResizedBmp(wScale, hScale);
         Log.d("OVERRUN: SURVIVOR", "After Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
 
         xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
         yCoord = yMin;
+
+        detectZombie =  new Rect(xCoord, yCoord, crawlerBitmap.getWidth(), crawlerBitmap.getHeight());
     }
 
     @Override
@@ -83,7 +93,14 @@ public class ZombieCrawler implements Zombie {
 
         yCoord += SPEED;
 
+        //adding top, left, bottom and right to the rect object
+        detectZombie.left = xCoord;
+        detectZombie.top = yCoord;
+        detectZombie.right = xCoord + crawlerBitmap.getWidth();
+        detectZombie.bottom = yCoord + crawlerBitmap.getHeight();
+
         //do something if enemy reaches bottom edge
+        //such as creating new zombie and reducing survivor health
     }
 
     @Override
@@ -97,6 +114,11 @@ public class ZombieCrawler implements Zombie {
     }
 
     @Override
+    public void setXCoord(int x) {
+        xCoord = x;
+    }
+
+    @Override
     public int getYCoord() {
         return yCoord;
     }
@@ -106,7 +128,8 @@ public class ZombieCrawler implements Zombie {
         return SPEED;
     }
 
-    public String toString() {
-        return "crawler";
+    @Override
+    public Rect getDetectZombie() {
+        return detectZombie;
     }
 }

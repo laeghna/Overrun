@@ -5,14 +5,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
-
-import java.util.ArrayList;
+import android.graphics.Rect;
 
 /**
  * Weapon class for Overrun.
  *
  * @author Leslie Pedro
- * @version 2 November 2016
+ * @author Lisa Taylor
+ * @version 8 November 2016
  */
 
 public class Weapon {
@@ -49,20 +49,26 @@ public class Weapon {
      * @param startY - the y coordinate of the bullet fired.
      */
     public void shootWeapon(int theX, int startY) {
-        if(!mBullet.getmIsActive()) {
-            mBullet.setmX(theX);
-            mBullet.setmY(startY);
-            mBullet.setmIsActive(true);
+        if(!mBullet.getIsActive()) {
+            mBullet.setX(theX);
+            mBullet.setY(startY);
+            mBullet.setIsActive(true);
         }
     }
 
 
-    public Bullet getmBullet() {return mBullet;}
+    /** Get bullet object. */
+    public Bullet getBullet() {return mBullet;}
+
+    /** Get bullet Rect for detecting collisions. */
+    public Rect getDetectBullet() {
+        return mBullet.getDetectBullet();
+    }
 
     /**
      * Inner class for weapon containing the properties of the weapon's ammo.
      */
-    public class Bullet implements GameCharacter{
+    protected class Bullet implements GameCharacter{
 
         /** Bitmap image for the bullets. */
         private Bitmap mBMP;
@@ -73,25 +79,27 @@ public class Weapon {
         /** The y - position of the bullet. */
         private int mY;
 
-        /** CollisionDetector for the bullet. */
-        private CollisionDetector mDetector;
+        /** Rectangle for bullet to determine collisions. */
+        private Rect mDetectBullet;
 
         private boolean mIsActive;
 
 
         /**
-         * Public Bullet constructor.
+         * Constructor to initialize variables.
          */
         public Bullet() {
             mBMP = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.bullets); // a placeholder graphic
             mIsActive = false;
+
+            mDetectBullet =  new Rect(mX, mY, mBMP.getWidth(), mBMP.getHeight());
         }
 
         /**
          * Gets the bitmap for the bullets.
          * @return - the bitmap for the bullets.
          */
-        public Bitmap getmBMP() {
+        public Bitmap getBMP() {
             return mBMP;
         }
 
@@ -99,7 +107,7 @@ public class Weapon {
          * Gets the x position of the bullet.
          * @return - the x-coordinate of the bullet.
          */
-        public int getmX() {
+        public int getX() {
             return mX;
         }
 
@@ -107,16 +115,15 @@ public class Weapon {
          * Sets the x-coordinate position of the bullet to the desired location.
          * @param mX - the new x-coordinate of the bullet.
          */
-        public void setmX(int mX) {
+        public void setX(int mX) {
             this.mX = mX;
-//            mDetector.setmPosition(new Point(mX, mY));
         }
 
         /**
          * Gets the y-coordinate position of the bullet.
          * @return - the y-coord position of the bullet.
          */
-        public int getmY() {
+        public int getY() {
             return mY;
         }
 
@@ -124,27 +131,17 @@ public class Weapon {
          * Sets the y-coordinate of the position of the bullet to the desired location.
          * @param mY - the new y-coord position of the bullet.
          */
-        public void setmY(int mY) {
+        public void setY(int mY) {
             this.mY = mY;
-            //mDetector.setmPosition(new Point(mX, mY));
         }
 
         /**
          * Gets the collision detector for this bullet.
          * @return thw collision detector for this bullet.
          */
-        public CollisionDetector getmDetector() {
-            return mDetector;
+        public Rect getDetectBullet() {
+            return mDetectBullet;
         }
-
-        /**
-         * Sets the collision detector to a new collision detector object.
-         * @param mDetector - the new collision detector.
-         */
-        public void setmDetector(CollisionDetector mDetector) {
-            this.mDetector = mDetector;
-        }
-
 
         /**
          * Resizes the bullet bitmap as needed. **** NOT CURRENTLY REQUIRED *****
@@ -174,18 +171,24 @@ public class Weapon {
             } else {
                 mIsActive = false;
             }
+
+            //Adding the top, left, bottom and right to the rect object
+            mDetectBullet.left = mX;
+            mDetectBullet.top = mY;
+            mDetectBullet.right = mX + mBMP.getWidth();
+            mDetectBullet.bottom = mY + mBMP.getHeight();
         }
 
         /**
          * Gets the status of the bullet being drawn currently.
          * @return mIsActive - true if the bullet is active, false otherwise.
          */
-        public boolean getmIsActive() {return mIsActive;}
+        public boolean getIsActive() {return mIsActive;}
 
         /**
          * Sets the status of the current bullet.
          * @param status true if the bullet is active, false otherwise.
          */
-        public void setmIsActive(boolean status) { mIsActive = status;}
+        public void setIsActive(boolean status) { mIsActive = status;}
     }
 }

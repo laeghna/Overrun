@@ -3,7 +3,7 @@ package group7.tcss450.tacoma.uw.edu.overrun;
 import android.graphics.Bitmap;
 
 /**
- * Interface for Overrun GameCharacters contains one method signature:
+ * Interface contains one method signature:
  * getRisizedBmp for resizing bitmaps based on screen size.
  *
  * @author Leslie Pedro
@@ -12,5 +12,6 @@ import android.graphics.Bitmap;
 
 public interface GameCharacter {
 
+    /** Get resized bitmap image. */
     public Bitmap getResizedBmp(float newWidth, float newHeight);
 }

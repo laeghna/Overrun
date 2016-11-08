@@ -15,7 +15,7 @@ import android.util.Log;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 6 November 2016
+ * @version 8 November 2016
  */
 public class Survivor implements GameCharacter{
 
@@ -32,19 +32,18 @@ public class Survivor implements GameCharacter{
     /** The move speed of the survivor. */
     private double mSpeed;
 
+    /** Boolean for determining if the game is running. */
     private boolean mIsRunning;
 
+    /** Point value for the screen size. */
     private Point mScreen;
 
+    /** Padding for the top and bottom of the game screen. */
     private int mPadBott = 175;
     private int mPadTop = 5;
 
-    /** The collision detector for the survivor.*/
-    private CollisionDetector mCollisionDetect;
-
-
     /**
-     * Contructor for Survivor class.
+     * Contructor to initialize variables.
      * @param context - the context for the application this game is played from
      */
     public Survivor(Context context, Point screenSize) {
@@ -61,15 +60,22 @@ public class Survivor implements GameCharacter{
         Log.d("OVERRUN: SURVIVOR", "After Resize: (" +  mBmap.getWidth() +","+ mBmap.getHeight() + ")");
         mX = mBmap.getWidth();
         mY = screenSize.y - (mBmap.getHeight() + mPadBott);
-        mCollisionDetect = new CollisionDetector(mBmap.getHeight(), mBmap.getWidth(), mX, mY);
         mIsRunning = false;
         //TODO: replace with correct graphics
     }
 
+    /**
+     * Gets mIsRunning.
+     * @return true if game is running, else false
+     */
     public boolean getmIsRunning() {
         return mIsRunning;
     }
 
+    /**
+     * Sets mIsRunning
+     * @param mIsRunning new boolean value
+     */
     public void setmIsRunning(boolean mIsRunning) {
         this.mIsRunning = mIsRunning;
     }
@@ -104,14 +110,6 @@ public class Survivor implements GameCharacter{
      */
     public int getmY() {
         return mY;
-    }
-
-    /**
-     * Gets the collision detector for this Survivor.
-     * @return the collision detector.
-     */
-    public CollisionDetector getmCollisionDetect() {
-        return mCollisionDetect;
     }
 
     /**
