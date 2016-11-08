@@ -20,8 +20,12 @@
 
         <!-- <activity android:name=".PlayView" /> -->
 
-        <activity android:name=".SignInActivity" />
-        <activity android:name=".OptionsActivity"></activity>
+        <activity
+            android:name=".SignInActivity"
+            android:screenOrientation="landscape"/>
+        <activity
+            android:name=".OptionsActivity"
+            android:screenOrientation="landscape"/>
     </application>
 
 </manifest>
