@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -33,22 +34,28 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         int current_difficulty = mSharedPref.getInt(
                 getString(R.string.saved_difficulty_setting), 1);
 
+        double current_volume = mSharedPref.getFloat(
+                getString(R.string.saved_volume_setting), 1);
 
+        System.out.println(current_volume);
 
+        int volume_int = (int) (current_volume * 100);
+
+        System.out.println(volume_int);
         Spinner mySpinner = (Spinner) findViewById(R.id.diff_spinner);
+        SeekBar volumeBar = (SeekBar) findViewById(R.id.volume_bar);
 
+        volumeBar.setProgress(volume_int);
         mySpinner.setSelection(current_difficulty - 1);
 
     }
 
     @Override
     public void onClick(View v) {
-        Intent intent;
 
         switch (v.getId()) {
             case R.id.cancel_button_options:
-                intent = new Intent(this, StartMenuActivity.class);
-                startActivity(intent);
+                this.finish();
                 break;
 
             case R.id.ok_button_options:
@@ -70,18 +77,32 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
                 }
 
 
+                float volume_level = updateVolume();
+
                 SharedPreferences.Editor editor = mSharedPref.edit();
                 editor.putInt(getString(R.string.saved_difficulty_setting), difficulty);
+                editor.putFloat(getString(R.string.saved_volume_setting), volume_level);
                 editor.commit();
 
-
                 Toast.makeText(this
-                        , "Difficulty set to: " + text,
+                        , "Difficulty set to: " + text + "\nVolume set to: " +
+                                (int)(volume_level * 100) + "%",
                         Toast.LENGTH_SHORT) .show();
-                intent = new Intent(this, StartMenuActivity.class);
-                startActivity(intent);
+                finish();
                 break;
 
         }
+    }
+
+    private float updateVolume() {
+        SeekBar volumeBar = (SeekBar) findViewById(R.id.volume_bar);
+
+        int currentInt = volumeBar.getProgress();
+
+        float volume_level = (float) currentInt / 100;
+
+        return volume_level;
+
+
     }
 }

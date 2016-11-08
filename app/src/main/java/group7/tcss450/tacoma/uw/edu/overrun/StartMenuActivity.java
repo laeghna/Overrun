@@ -1,6 +1,8 @@
 package group7.tcss450.tacoma.uw.edu.overrun;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,13 +13,17 @@ import android.widget.Button;
 
 public class StartMenuActivity extends BaseActivity implements View.OnClickListener {
 
-    MediaPlayer mMediaPlayer;
+    private static MediaPlayer mMediaPlayer;
+    private static SharedPreferences mSharedPref;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_menu);
+
+        mSharedPref = getSharedPreferences(
+                getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
         Button op_button = (Button) findViewById(R.id.options_button);
         Button start_button = (Button) findViewById(R.id.start_button);
@@ -27,9 +33,28 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
         start_button.setOnClickListener(this);
         sign_button.setOnClickListener(this);
 
-        mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
-        mMediaPlayer.setLooping(true);
-        mMediaPlayer.start();
+        float current_volume = mSharedPref.getFloat(
+                getString(R.string.saved_volume_setting), 1);
+
+
+        if (mMediaPlayer == null) {
+            mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
+            mMediaPlayer.setLooping(true);
+            mMediaPlayer.setVolume(current_volume, current_volume);
+            mMediaPlayer.start();
+        }
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        float current_volume = mSharedPref.getFloat(
+                getString(R.string.saved_volume_setting), 1);
+        mMediaPlayer.setVolume(current_volume, current_volume);
+
     }
 
 
