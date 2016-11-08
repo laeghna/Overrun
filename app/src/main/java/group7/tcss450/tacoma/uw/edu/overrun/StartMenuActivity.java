@@ -1,6 +1,7 @@
 package group7.tcss450.tacoma.uw.edu.overrun;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,8 @@ import android.view.View;
 import android.widget.Button;
 
 public class StartMenuActivity extends BaseActivity implements View.OnClickListener {
+
+    MediaPlayer mMediaPlayer;
 
 
     @Override
@@ -23,6 +26,10 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
         op_button.setOnClickListener(this);
         start_button.setOnClickListener(this);
         sign_button.setOnClickListener(this);
+
+        mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
+        mMediaPlayer.setLooping(true);
+        mMediaPlayer.start();
     }
 
 
@@ -32,7 +39,7 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
 
         switch (v.getId()) {
             case R.id.start_button:
-                intent = new Intent(this, PlayView.class);
+                intent = new Intent(this, GameActivity.class);
                 startActivity(intent);
                 break;
 
