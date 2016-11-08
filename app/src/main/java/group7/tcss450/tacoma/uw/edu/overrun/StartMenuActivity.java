@@ -5,9 +5,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
 import android.widget.Button;
 
 public class StartMenuActivity extends BaseActivity implements View.OnClickListener {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,13 +25,6 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
         sign_button.setOnClickListener(this);
     }
 
-
-//    public void startGameClicked(View view) {
-//        // Crates an intent which will create a new activity PlayView.class
-//        Intent intent = new Intent(this, PlayView.class);
-//
-//        startActivity(intent);
-//    }
 
     @Override
     public void onClick(View v) {
