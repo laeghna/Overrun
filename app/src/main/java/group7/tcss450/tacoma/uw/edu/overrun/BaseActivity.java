@@ -14,11 +14,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInApi;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,6 +80,12 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        startActivity(intent);
+
 
     }
 
@@ -164,7 +172,39 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
      * Signs a user out by removing their shared preferences.
      */
     public void signOut() {
+
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        editor.remove(getString(R.string.user_id));
+        editor.remove(getString(R.string.user_email));
+        editor.remove(getString(R.string.user_name));
+        editor.remove(getString(R.string.logged_in));
+
+        if (isLoggedIn()) {
+
+            Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient)
+                    .setResultCallback(
+                            new ResultCallback<Status>() {
+                                @Override
+                                public void onResult(@NonNull Status status) {
+                                    Log.d(TAG, "in on result");
+                                    Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                }
+                            });
+
+        }
+
+        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+
+        editor.apply();
+
         new SignOutAsync().execute();
+
     }
 
     /**
@@ -211,6 +251,10 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                 }
             }
         } else {
+            // Signed out, show unauthenticated UI.
+            Toast.makeText(getApplicationContext(), "Signed out.",
+                    Toast.LENGTH_LONG).show();
+
             hideProgressDialog();
             Log.d(TAG, "Failed sign in due to: " + result.getStatus().getStatusCode());
 
