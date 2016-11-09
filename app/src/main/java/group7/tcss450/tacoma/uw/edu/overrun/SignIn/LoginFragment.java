@@ -32,7 +32,8 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
 
 /**
- * A simple {@link Fragment} subclass.
+ * LoginFragment is a fragment that displays and controls the
+ * login process of a User.
  */
 public class LoginFragment extends Fragment {
     private final static String LOGIN_URL = "http://cssgate.insttech.washington.edu/~dionmerz/auth.php?";
@@ -68,6 +69,11 @@ public class LoginFragment extends Fragment {
     }
 
 
+    /**
+     * Setup for buttons attached to this fragment. Also setup
+     * for onClickListeners attached to each button.
+     * @param view the View of this Fragment.
+     */
     private void initButtons(View view) {
 
         emailText = (EditText) view.findViewById(R.id.email_login);
@@ -90,6 +96,7 @@ public class LoginFragment extends Fragment {
                 mUserId = emailText.getText().toString();
                 mPassword = passwordText.getText().toString();
 
+                // Check if the login email is empty
                 if (TextUtils.isEmpty(mUserId)) {
                     Toast.makeText(v.getContext(), "Enter your Email Address"
                             , Toast.LENGTH_SHORT)
@@ -97,6 +104,8 @@ public class LoginFragment extends Fragment {
                     emailText.requestFocus();
                     return;
                 }
+
+                // Check if the email contians a '@' character.
                 if (!mUserId.contains("@")) {
                     Toast.makeText(v.getContext(), "Enter a valid email address"
                             , Toast.LENGTH_SHORT)
@@ -105,6 +114,7 @@ public class LoginFragment extends Fragment {
                     return;
                 }
 
+                // Check if the password field is empty.
                 if (TextUtils.isEmpty(mPassword)) {
                     Toast.makeText(v.getContext(), "Enter password"
                             , Toast.LENGTH_SHORT)
@@ -114,6 +124,7 @@ public class LoginFragment extends Fragment {
                 }
 
 
+                // Check to make sure the password is greater than 5 chars.
                 if (mPassword.length() < 6) {
                     Toast.makeText(v.getContext()
                             , "Enter password of at least 6 characters"
@@ -148,12 +159,22 @@ public class LoginFragment extends Fragment {
 
     }
 
+    /**
+     * Begins the Async task to start the webservices to
+     * validate login credentials.
+     * @param url The complete URL to be sent by LoginAsyncTask
+     */
     public void logIn(String url) {
         LoginAsyncTask task = new LoginAsyncTask();
         task.execute(new String[]{url.toString()});
     }
 
 
+    /**
+     * Builds the URL to send to validate login.
+     * @param v the View
+     * @return String containing the entire URL with parameters
+     */
     private String buildSignInURL(View v) {
 
         StringBuilder sb = new StringBuilder(LOGIN_URL);

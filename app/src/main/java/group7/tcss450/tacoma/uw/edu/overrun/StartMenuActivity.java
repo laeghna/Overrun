@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 
 import android.widget.Button;
+import android.widget.Toast;
 
 import group7.tcss450.tacoma.uw.edu.overrun.SignIn.SignInActivity;
 
@@ -118,6 +119,11 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
                 // Check if the user is logged in then
                 // change the Sign in button.
                 if (loggedIn) {
+
+                    Toast.makeText(v.getContext(), mSharedPref.getString(getString(R.string.user_email), "") +
+                            " logged out.."
+                            , Toast.LENGTH_LONG)
+                            .show();
                     Button sign_button = (Button) findViewById(R.id.login_button);
                     sign_button.setText("Sign in");
 
