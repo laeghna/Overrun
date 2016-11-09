@@ -11,6 +11,8 @@ import android.view.View;
 
 import android.widget.Button;
 
+import group7.tcss450.tacoma.uw.edu.overrun.SignIn.SignInActivity;
+
 
 /**
  * This is the activity for the actual initial start menu.
@@ -109,6 +111,7 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
+    // TODO: logout button needs to be implemented.
     public void testLogout(View view) {
         signOut();
     }

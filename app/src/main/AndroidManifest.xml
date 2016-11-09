@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="group7.tcss450.tacoma.uw.edu.overrun">
 
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -13,6 +18,14 @@
         <activity
             android:name=".StartMenuActivity"
             android:screenOrientation="landscape">
+<<<<<<< HEAD
+=======
+
+        </activity>
+
+        <!--<activity android:name=".PlayView" />-->
+        <activity android:name=".SignIn.SignInActivity">
+>>>>>>> origin/Ethan
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
