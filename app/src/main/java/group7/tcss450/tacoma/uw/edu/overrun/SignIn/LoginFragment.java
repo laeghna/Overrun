@@ -4,6 +4,7 @@ package group7.tcss450.tacoma.uw.edu.overrun.SignIn;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,6 +82,7 @@ public class LoginFragment extends Fragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("LoginFrag", "Signing in...");
                 ((BaseActivity) getActivity()).signIn(emailText.getText().toString(),
                         passwordText.getText().toString());
             }

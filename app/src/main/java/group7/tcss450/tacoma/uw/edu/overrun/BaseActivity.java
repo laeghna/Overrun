@@ -45,12 +45,12 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
      * Used for production.
      * TODO: enable for release.
      */
-    //private static final String API_URL = "https://cssgate.insttech.washington.edu:8080/";
+    private static final String API_URL = "http://cssgate.insttech.washington.edu:8080/";
 
     /**
      * Used for local development.
      */
-    private static final String API_URL = " http://10.0.2.2:8080/";
+    //private static final String API_URL = " http://10.0.2.2:8080/";
 
     /**
      * Log Tag.
