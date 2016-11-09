@@ -77,6 +77,9 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
                 getString(R.string.saved_volume_setting), 1);
         mMediaPlayer.setVolume(current_volume, current_volume);
 
+        if (!mMediaPlayer.isPlaying()) {
+            mMediaPlayer.start();
+        }
     }
 
 
@@ -86,6 +89,7 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
 
         switch (v.getId()) {
             case R.id.start_button:
+                mMediaPlayer.pause();
                 intent = new Intent(this, GameActivity.class);
                 startActivity(intent);
                 break;
