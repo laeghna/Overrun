@@ -90,7 +90,6 @@ public class LoginFragment extends Fragment {
                 mUserId = emailText.getText().toString();
                 mPassword = passwordText.getText().toString();
 
-                //Validates that the Username Field
                 if (TextUtils.isEmpty(mUserId)) {
                     Toast.makeText(v.getContext(), "Enter your Email Address"
                             , Toast.LENGTH_SHORT)
@@ -98,7 +97,6 @@ public class LoginFragment extends Fragment {
                     emailText.requestFocus();
                     return;
                 }
-                //Verifies that an email is used
                 if (!mUserId.contains("@")) {
                     Toast.makeText(v.getContext(), "Enter a valid email address"
                             , Toast.LENGTH_SHORT)
@@ -106,7 +104,7 @@ public class LoginFragment extends Fragment {
                     emailText.requestFocus();
                     return;
                 }
-                //Validates that the password field is not empty
+
                 if (TextUtils.isEmpty(mPassword)) {
                     Toast.makeText(v.getContext(), "Enter password"
                             , Toast.LENGTH_SHORT)
@@ -115,7 +113,7 @@ public class LoginFragment extends Fragment {
                     return;
                 }
 
-                //Validates that the password is not less the 6 Characters.
+
                 if (mPassword.length() < 6) {
                     Toast.makeText(v.getContext()
                             , "Enter password of at least 6 characters"
@@ -173,7 +171,7 @@ public class LoginFragment extends Fragment {
 
         }
         catch(Exception e) {
-            Toast.makeText(v.getContext(), "Something wrong with the url" + e.getMessage(), Toast.LENGTH_LONG)
+            Toast.makeText(v.getContext(), "Something wrong with URL" + e.getMessage(), Toast.LENGTH_LONG)
                     .show();
             Log.e("SB message", e.getMessage());
         }
@@ -225,16 +223,12 @@ public class LoginFragment extends Fragment {
 
 
         /**
-         * It checks to see if there was a problem with the URL(Network) which is when an
-         * exception is caught. It tries to call the parse Method and checks to see if it was successful.
-         * If not, it displays the exception.
          *
          * @param result
          */
         @Override
         protected void onPostExecute(String result) {
-            Log.e("Results: ", result);
-            // Something wrong with the network or the URL.
+
             try {
                 Log.e("Result contains", result);
                 JSONObject jsonObject = new JSONObject(result);
@@ -243,7 +237,7 @@ public class LoginFragment extends Fragment {
                     Toast.makeText(mView.getContext(), "Login Success"
                             , Toast.LENGTH_LONG)
                             .show();
-                    //Adds active login boolean to the Shared Preferences.
+
                     mSharedPref.edit()
                             .putBoolean(getString(R.string.logged_in), true)
                             .commit();

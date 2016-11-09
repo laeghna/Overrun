@@ -75,6 +75,15 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
 
+
+        boolean loggedIn = mSharedPref.getBoolean(getString(R.string.logged_in), false);
+        // Check if the user is logged in then
+        // change the Sign in button.
+        if (loggedIn) {
+            Button sign_button = (Button) findViewById(R.id.login_button);
+            sign_button.setText("Log out");
+        }
+
         float current_volume = mSharedPref.getFloat(
                 getString(R.string.saved_volume_setting), 1);
         mMediaPlayer.setVolume(current_volume, current_volume);
@@ -104,8 +113,25 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
 
             // Starts a new intent to move to the SignIn activity.
             case R.id.login_button:
-                intent = new Intent(this, SignInActivity.class);
-                startActivity(intent);
+
+                boolean loggedIn = mSharedPref.getBoolean(getString(R.string.logged_in), false);
+                // Check if the user is logged in then
+                // change the Sign in button.
+                if (loggedIn) {
+                    Button sign_button = (Button) findViewById(R.id.login_button);
+                    sign_button.setText("Sign in");
+
+                    mSharedPref.edit()
+                            .putBoolean(getString(R.string.logged_in), false)
+                            .commit();
+                    mSharedPref.edit()
+                            .putString(getString(R.string.user_email), "")
+                            .commit();
+                }
+                else {
+                    intent = new Intent(this, SignInActivity.class);
+                    startActivity(intent);
+                }
 
                 break;
         }

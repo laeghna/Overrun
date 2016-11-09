@@ -148,15 +148,11 @@ public class SignInActivity extends BaseActivity implements RegistrationFragment
 
 
         /**
-         * It checks to see if there was a problem with the URL(Network) which is when an
-         * exception is caught. It tries to call the parse Method and checks to see if it was successful.
-         * If not, it displays the exception.
          *
          * @param result
          */
         @Override
         protected void onPostExecute(String result) {
-            // Something wrong with the network or the URL.
             try {
                 JSONObject jsonObject = new JSONObject(result);
                 String status = (String) jsonObject.get("result");
