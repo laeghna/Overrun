@@ -17,7 +17,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Fragment that encapsulates logging in and registering accounts.
  */
 public class LoginFragment extends Fragment {
     /**

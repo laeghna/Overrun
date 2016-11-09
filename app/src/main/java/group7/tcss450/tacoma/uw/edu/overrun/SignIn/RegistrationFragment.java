@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Objects;
 
 import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
@@ -30,7 +29,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.Validation.UsernameValidator;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Fragment that is responsible for registering accounts.
  */
 public class RegistrationFragment extends Fragment implements View.OnClickListener {
     //private static final String API_URL = "https://cssgate.insttech.washington.edu:8080/";
