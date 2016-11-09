@@ -31,10 +31,8 @@ public class PasswordValidator extends TextValidator implements View.OnFocusChan
                 textView.setError(textView.getHint() + " must be " + MIN_PASSWORD_LENGTH + " characters or more.");
                 valid = false;
             } else {
-
+                // further validation
             }
-
-
         }
         return valid;
     }

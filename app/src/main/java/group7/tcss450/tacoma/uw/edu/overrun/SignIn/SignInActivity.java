@@ -11,7 +11,10 @@ import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
 
-public class SignInActivity extends BaseActivity implements View.OnClickListener {
+/**
+ * Activity that encapsulates the login and registration for the user.
+ */
+public class SignInActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,27 +44,24 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
     }
 
     @Override
-    public void onClick(View v) {
-//        switch (v.getId()) {
-//            case R.id.sign_in_button:
-//                signIn();
-//                break;
-//        }
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
         checkLoginStatus();
     }
 
 
+    /**
+     * Shows the login fragment.
+     */
     private void showLoginFragment() {
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment_container, new LoginFragment())
                 .commit();
     }
 
+    /**
+     * Shows the registration fragment.
+     */
     private void showRegistrationFragment() {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, new RegistrationFragment())
@@ -69,6 +69,9 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
                 .commit();
     }
 
+    /**
+     * Transitions to the StartMenuActivity.
+     */
     private void goToStartMenu() {
         String userEmail = getSharedPreferences(getString(R.string.shared_prefs),
                 Context.MODE_PRIVATE)
@@ -81,7 +84,6 @@ public class SignInActivity extends BaseActivity implements View.OnClickListener
         startActivity(intent);
         finish();
     }
-
 
     /**
      * Checks the login status of the user. If logged in already, it will route the user

@@ -1,6 +1,7 @@
 package group7.tcss450.tacoma.uw.edu.overrun.SignIn;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,25 +14,50 @@ import com.google.android.gms.common.SignInButton;
 
 import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
+import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class LoginFragment extends Fragment {
+    /**
+     * Logs the user in with email and password.
+     */
     Button loginButton;
+
+    /**
+     * Logs the user in with their Google account.
+     */
     SignInButton googleSignin;
+
+    /**
+     * Transitions to the registration page.
+     */
     Button registerButton;
+
+    /**
+     * View for the user's email.
+     */
     EditText emailText;
+
+    /**
+     * View for the user's password.
+     */
     EditText passwordText;
 
     public LoginFragment() {
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        if (((BaseActivity) getActivity()).isLoggedIn()) {
+            Intent intent = new Intent(getActivity().getApplicationContext(), StartMenuActivity.class);
+            startActivity(intent);
+            getActivity().finish();
+        }
 
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
@@ -41,7 +67,11 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
-
+    /**
+     * Initializes the buttons.
+     *
+     * @param view The view to find the controls in.
+     */
     private void initButtons(View view) {
 
         emailText = (EditText) view.findViewById(R.id.email_login);
