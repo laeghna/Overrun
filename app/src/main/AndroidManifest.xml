@@ -14,20 +14,31 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+
         <activity
             android:name=".StartMenuActivity"
             android:screenOrientation="landscape">
-
-        </activity>
-
-        <!--<activity android:name=".PlayView" />-->
-        <activity android:name=".SignIn.SignInActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
+        <activity
+            android:name=".SignIn.SignInActivity"
+            android:screenOrientation="landscape">
+        </activity>
+
+        <activity
+            android:name=".OptionsActivity"
+            android:screenOrientation="landscape"/>
+
+       <activity
+           android:name=".GameActivity"
+           android:screenOrientation="landscape"/>
+
     </application>
 
 </manifest>
