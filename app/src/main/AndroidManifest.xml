@@ -18,27 +18,19 @@
         <activity
             android:name=".StartMenuActivity"
             android:screenOrientation="landscape">
-<<<<<<< HEAD
-=======
-
-        </activity>
-
-        <!--<activity android:name=".PlayView" />-->
-        <activity android:name=".SignIn.SignInActivity">
->>>>>>> origin/Ethan
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
-
-        <!--<activity android:name=".PlayView" />-->
-
         <activity
-            android:name=".SignInActivity"
-            android:screenOrientation="landscape"/>
+            android:name=".SignIn.SignInActivity"
+            android:screenOrientation="landscape">
+        </activity>
+
         <activity
             android:name=".OptionsActivity"
             android:screenOrientation="landscape"/>
