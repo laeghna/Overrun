@@ -82,6 +82,7 @@ public class Weapon {
         /** Rectangle for bullet to determine collisions. */
         private Rect mDetectBullet;
 
+        /** Boolean to determine if bullet should be drawn or not. */
         private boolean mIsActive;
 
 

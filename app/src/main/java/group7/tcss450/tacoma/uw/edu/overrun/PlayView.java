@@ -88,6 +88,7 @@ public class PlayView extends SurfaceView implements Runnable{
         for (int i = 0; i < zombieCount; i++) {
 
             zombies[i] = new ZombieCrawler(context, mScreen);
+            zombies[i].setIsActive(true);
         }
     }
 

@@ -43,6 +43,9 @@ public class ZombieCrawler implements Zombie {
     /** Rectangle for crawler to determine collisions. */
     private Rect detectZombie;
 
+    /** Boolean to determine if crawler should be drawn or not. */
+    private boolean isActive;
+
     /** Constructor to initialize variables. */
     public ZombieCrawler(Context context, Point screenSize) {
 
@@ -73,6 +76,8 @@ public class ZombieCrawler implements Zombie {
         yCoord = yMin;
 
         detectZombie =  new Rect(xCoord, yCoord, crawlerBitmap.getWidth(), crawlerBitmap.getHeight());
+
+        isActive = false;
     }
 
     @Override
@@ -91,7 +96,11 @@ public class ZombieCrawler implements Zombie {
     @Override
     public void updateMovement() {
 
-        yCoord += SPEED;
+        if (yCoord + 1 < yMax) {
+            yCoord += SPEED;
+        } else {
+            isActive = false;
+        }
 
         //adding top, left, bottom and right to the rect object
         detectZombie.left = xCoord;
@@ -132,4 +141,16 @@ public class ZombieCrawler implements Zombie {
     public Rect getDetectZombie() {
         return detectZombie;
     }
+
+    /**
+     * Gets the status of the crawler being drawn currently.
+     * @return isActive - true if the crawler is active, false otherwise.
+     */
+    public boolean getIsActive() {return isActive;}
+
+    /**
+     * Sets the status of the current crawler.
+     * @param status true if the crawler is active, false otherwise.
+     */
+    public void setIsActive(boolean status) { isActive = status;}
 }
