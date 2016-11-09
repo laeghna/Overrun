@@ -1,15 +1,27 @@
 package group7.tcss450.tacoma.uw.edu.overrun.SignIn;
 
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.Validation.PasswordValidator;
@@ -19,10 +31,15 @@ import group7.tcss450.tacoma.uw.edu.overrun.Validation.UsernameValidator;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RegistrationFragment extends Fragment implements View.OnClickListener {
+public class RegistrationFragment extends Fragment {
     EditText username;
     EditText pass;
     EditText confirm_pass;
+
+    private UserAddListener mListener;
+
+    private static String USER_URL =
+            "http://cssgate.insttech.washington.edu/~dionmerz/overrun_register.php?";
 
     public RegistrationFragment() {
         // Required empty public constructor
@@ -42,11 +59,12 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
         addTextValidators(view);
 
 
-        Button submitButton = (Button) view.findViewById(R.id.register_button);
-        submitButton.setOnClickListener(new View.OnClickListener() {
+        Button addUserButton = (Button) view.findViewById(R.id.register_button);
+                addUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submitRegistrationForm(v);
+                String url = buildCourseURL(v);
+                mListener.addUser(url);
             }
         });
 
@@ -54,17 +72,28 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
         return view;
     }
 
-    /**
-     * Handles the submission of the registration form.
-     */
-    public void submitRegistrationForm(View v) {
-
-        if (validForm(v)) {
-            Toast.makeText(getContext(), "Registration form submitted.", Toast.LENGTH_LONG).show();
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof UserAddListener) {
+            mListener = (UserAddListener) context;
         } else {
-            Toast.makeText(getContext(), "Registration form is not valid.", Toast.LENGTH_LONG).show();
+            throw new RuntimeException(context.toString()
+                    + " must implement UserAddListener");
         }
     }
+
+//    /**
+//     * Handles the submission of the registration form.
+//     */
+//    public void submitRegistrationForm(View v) {
+//
+//        if (validForm(v)) {
+//            Toast.makeText(getContext(), "Registration form submitted.", Toast.LENGTH_LONG).show();
+//        } else {
+//            Toast.makeText(getContext(), "Registration form is not valid.", Toast.LENGTH_LONG).show();
+//        }
+//    }
 
     private boolean validForm(View v) {
         boolean registrationValid = true;
@@ -96,17 +125,33 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
         confirm_pass.setOnFocusChangeListener(new PasswordValidator(confirm_pass));
     }
 
-    @Override
-    public void onClick(View v) {
 
-    }
+    private String buildCourseURL(View v) {
+
+        StringBuilder sb = new StringBuilder(USER_URL);
+
+        try {
+
+            String userId = username.getText().toString();
+            sb.append("user=");
+            sb.append(userId);
 
 
-    private class RegisterAsync extends AsyncTask<Void, Void, Void> {
+            String userPw = pass.getText().toString();
+            sb.append("&pw=");
+            sb.append(userPw);
 
-        @Override
-        protected Void doInBackground(Void... params) {
-            return null;
+            Log.i("UserRegisterFragment", sb.toString());
+
+        } catch (Exception e) {
+            Toast.makeText(v.getContext(), "Something wrong with the url" + e.getMessage(), Toast.LENGTH_LONG)
+                    .show();
         }
+        return sb.toString();
     }
+
+    public interface UserAddListener {
+        public void addUser(String url);
+    }
+
 }
