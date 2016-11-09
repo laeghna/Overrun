@@ -13,6 +13,7 @@
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "google-auth-library": "^0.9.9",
-    "mariasql": "^0.2.6"
+    "mariasql": "^0.2.6",
+    "node-biginteger": "0.0.10"
   }
 }
