@@ -1,6 +1,8 @@
 var http = require('http');
 var fs = require('fs');
-
+var crypto = require('crypto');
+var BigInteger = require('node-biginteger');
+var config = fs.readFileSync("overrun.json");
 
 var express = require('express');
 var app = express();
@@ -29,14 +31,22 @@ app.use(bp.urlencoded({ extended: true }));
 
 // MySQL config
 var Client = require('mariasql');
-var config = fs.readFileSync("overrun.json");
-var c = new Client(config.mysqlConfig);
+
+//var c = new Client(config.mysqlConfig);
+var c = new Client({
+    "host"    : "cssgate.insttech.washington.edu",
+    "user"    : "earowell",
+    "password": "azLats*",
+    "db"      : "earowell"
+});
 
 // SQL prepared statements
-var createUser = c.prepare('INSERT INTO User (email, firstName, lastName) ' +
-    'VALUES ( :email, :firstName, :lastName );');
+var createUser = c.prepare('INSERT INTO User (email, pass) ' +
+    'VALUES ( :email, :pass );');
+var login = c.prepare('SELECT * FROM User WHERE email = :email' +
+    ' AND pass = :pass;');
 var getUser = c.prepare('SELECT * FROM User WHERE email = :email;');
-var getUsers = c.prepare('SELECT * FROM User;');
+var getUsers = c.prepare('SELECT email FROM User;');
 var createGame = c.prepare('INSERT INTO Game (userId, score, zombiesKilled, level, shotsFirst)' +
     'VALUES ( :userId, :score, :zombiesKilled, :level, :shotsFired );');
 var getUserStats = c.prepare('SELECT COUNT(*) AS TotalGames, ' +
@@ -61,34 +71,64 @@ var getStats = c.prepare('SELECT email, ' +
  * @apiGroup User
  *
  * @apiParam {String} email The user's email.
- * @apiParam {String} firstName The user's first name.
- * @apiParam {String} lastName The user's last name.
+ * @apiParam {String} pass User's password.
  *
  * @apiSuccess {String} email The user's email.
  *
- * @apiError IncorrectParameters
+ * @apiError MissingParameters Some parameters were missing.
+ * @apiErrorExample {json} MissingParameters
+ *          HTTP/1.1 400 Bad Request
+ *          {
+ *              "error": "Some parameters were missing."
+ *          }
+ *
+ * @apiError Invalid-Email Was not a valid email address.
+ * @apiErrorExample {json} Invalid-Email
+ *          HTTP/1.1 400 Bad Request
+ *          {
+ *              "error": "Invalid email format."
+ *          }
+ *
+ * @apiError DisplayNameConflict
+ * @apiErrorExample {json} Email-Conflict
+ *          HTTP/1.1 409 Conflict
+ *          {
+ *              "error": "A user already exists with the email provided."
+ *          }
  *
  * @apiVersion 0.1.0
  */
 app.post('/api/user', (req, res) => {
-    if (!req.query || !req.query.email || !req.query.firstName || !req.query.lastName) {
-        return res.status(400).send('Some parameters were not supplied correctly.');
+
+    console.dir(req.body);
+
+    if (!req.body || !req.body.email || !req.body.pass) {
+        return res.status(400).json({ 'error': 'Some parameters were missing.' });
     }
 
-    // TODO: check for unique email
-
-    console.dir(req.query);
+    // checks for valid email.
+    if (!validateEmail(req.body.email)) {
+        return res.status(400).json({ 'error': 'Invalid email format.' });
+    }
 
     c.query(createUser({
-        email    : req.query.email,
-        firstName: req.query.firstName,
-        lastName : req.query.lastName
-    }))
-        .on('result', (result) => {
-            console.dir(result);
-            //res.status(200).send("User inserted with id: " + result.info.insertId);
-            res.status(200).json({ email: req.query.email });
-        });
+        email: req.body.email,
+        pass : req.body.pass
+    }), (err, rows) => {
+        if (err) {
+            // duplicate
+            if (err.code === 1062) {
+                res.status(409).json({ 'error': 'A user already exists with the email provided.' });
+            }
+
+            console.dir(err);
+
+            res.status(409).json({ 'error': 'User could not be created.' });
+        } else {
+            console.dir(rows);
+            res.status(200).json({ email: req.body.email });
+        }
+    });
 });
 
 /**
@@ -97,20 +137,16 @@ app.post('/api/user', (req, res) => {
  * @apiGroup User
  *
  * @apiSuccess {String} email The user's email.
- * @apiSuccess {String} firstName The user's first name.
- * @apiSuccess {String} lastName The user's last name.
  *
- * @apiSuccessExample {json} Success-Response:
+ * @apiSuccessExample {json} Success-Response
  *          HTTP/1.1 200 OK
  *          {
- *              "email": {string},
- *              "firstName": {string},
- *              "lastName": {string}
+ *              "email": {String},
  *          }
  *
  * @apiVersion 0.1.0
  */
-app.get('/api/users', (req, res) => {
+app.get('/api/users', (req, res, next) => {
 
     // email not supplied,  gets all users
     if (!req.query || !req.query.email) {
@@ -120,13 +156,9 @@ app.get('/api/users', (req, res) => {
     else {
         c.query(getUser({
             email: req.query.email
-        }))
-            .on('result', (result) => {
-                console.dir(result);
-                result.on('data', (row) => {
-                    res.send(JSON.stringify(row));
-                });
-            });
+        }), (err, rows) => {
+            res.send(JSON.stringify(rows));
+        });
     }
 });
 
@@ -135,22 +167,14 @@ app.get('/api/users', (req, res) => {
  * @apiName GetUser
  * @apiGroup User
  *
- * @apiParam {String} email The user's email to return information for.
- *
  * @apiSuccess {Object[]} profile The user's profile object.
- * @apiSuccess {String} profile.userId The user's unique ID.
- * @apiSuccess {String} profile.email The user's email.
- * @apiSuccess {String} profile.firstName The user's first name.
- * @apiSuccess {String} profile.lastName The user's last name.
+ * @apiSuccess {String} email The user's email.
  *
  * @apiSuccessExample {json} Success-Response:
  *          HTTP/1.1 200 OK
  *          [
  *          {
- *              "userId": {number},
- *              "email": {string},
- *              "firstName": {string},
- *              "lastName": {string}
+ *              "email": {String},
  *          },
  *          {
  *              ...
@@ -160,17 +184,14 @@ app.get('/api/users', (req, res) => {
  * @apiVersion 0.1.0
  */
 app.get('/api/users', (req, res) => {
-    c.query(getUsers())
-        .on('result', (result) => {
-            var results = [];
-
-            result.on('data', (row) => {
-                results.push(row);
-            }).on('end', () => {
-                res.send(JSON.stringify(results));
-            });
-
-        });
+    c.query(getUsers(), (err, rows) => {
+        if (err) {
+            res.status(400).json({ 'error': 'Could not get users.' });
+        } else {
+            console.dir(rows);
+            res.send(JSON.stringify(rows));
+        }
+    });
 });
 
 
@@ -197,22 +218,21 @@ app.get('/api/users', (req, res) => {
  */
 app.post('/api/game', (req, res) => {
 
-    if (!req.query.userId || !req.query.score || !req.query.zombiesKilled
+    if (!req.query.email || !req.query.score || !req.query.zombiesKilled
         || !req.query.level || !req.query.shotsFired) {
         return res.status(400).send('Some parameters were not supplied correctly.');
     }
 
     c.query(createGame({
-        userId       : req.query.userId,
+        email        : req.query.email,
         score        : req.query.score,
         zombiesKilled: req.query.zombiesKilled,
         level        : req.query.level,
         shotsFired   : req.query.shotsFired
-    }))
-        .on('result', (result) => {
-            console.dir(result);
-            res.status(200).json({ gameId: result.info.insertId });
-        });
+    }), (err, result) => {
+        console.dir(result);
+        res.status(200).json({ gameId: result.info.insertId });
+    });
 });
 
 
@@ -237,16 +257,24 @@ app.post('/api/game', (req, res) => {
  * @apiVersion 0.1.0
  */
 app.get('/api/leaderboard', (req, res) => {
-    c.query(getStats())
-        .on('result', (result) => {
-            var results = [];
+    c.query(getStats(),
+        (err, rows) => {
 
-            result.on('data', (row) => {
-                results.push(row);
-            }).on('end', () => {
-                res.send(JSON.stringify(results));
-            });
+            if (err) {
+
+            }
+
+            res.status(200).send(JSON.stringify(rows));
         });
+    // .on('result', (result) => {
+    //     var results = [];
+    //
+    //     result.on('data', (row) => {
+    //         results.push(row);
+    //     }).on('end', () => {
+    //         res.send(JSON.stringify(results));
+    //     });
+    // });
 });
 
 
@@ -272,31 +300,31 @@ app.get('/api/leaderboard', (req, res) => {
  */
 app.get('/api/leaderboard/user/:email', (req, res) => {
 
-    try {
-        c.query(getUserStats({
-            email: req.params.email
-        }))
-            .on('result', (result) => {
-                result.on('data', (row) => {
-                    res.send(JSON.stringify(row));
-                });
-            });
-    } catch (e) {
-        console.error("Error: " + e);
-    }
-
+    c.query(getUserStats({
+        email: req.params.email
+    }), (err, result) => {
+        res.send(JSON.stringify(result));
+    });
+    // .on('result', (result) => {
+    //     result.on('data', (row) => {
+    //         res.send(JSON.stringify(row));
+    //     });
+    // });
 });
 
+
 /**
- * @api {POST} /api/signin Sign user in.
- * @apiName SignIn
+ * @api {POST} /api/login Log user in.
+ * @apiName Login
  * @apiGroup User
- * @apiDescription Verifies the token provided by the Google API client. Once valid,
- *                 a check is done to see if the Google account has been registered with
- *                 the app before. If not, an account is created. Account information is
- *                 returned back.
+ * @apiDescription If an id_token parameter is supplied, it will sign the user in with
+ *                 their Google account by verifying the token provided with the Google API
+ *                 client. Once valid, a check is done to see if the Google account has
+ *                 been registered with the app before. If not, an account is created.
+ *                 Account information is returned back.
  *
  * @apiParam id_token The JWT provided by the Google API client that is going to be validated.
+ * @apiParam email The user's email
  *
  * @apiSuccessExample {json} Success-Response:
  *          HTTP/1.1 200 OK
@@ -309,50 +337,94 @@ app.get('/api/leaderboard/user/:email', (req, res) => {
  *
  * @apiVersion 0.1.0
  */
-app.post('/api/signin', (req, res) => {
+app.post('/api/login', (req, res) => {
+
+
+    // sign in with email and pass
     if (!req.query.id_token) {
-        return res.status(400).send('ID Token missing.');
-    }
+        console.log("in email and pass");
 
-    validateToken(req.query.id_token, (err, response) => {
-        console.log("verifying");
-        if (err) {
-            //return res.status(500).send('Token could not be verified.');
-            return res.status(500).json({ error: "Token could not be verified.", email_verified: false });
-        } else {
-            var tokenInfo = response.getPayload();
-
-            c.query(getUser({ email: tokenInfo.email }),
-                (error, result) => {
-                    //console.dir(error);
-                    console.dir(result);
-
-                    if (result.length) {
-                        result[0].email_verified = true;
-                        console.dir(result);
-                        return res.status(200).json(result);
-                    } else {
-                        c.query(createUser({
-                            email    : tokenInfo.email,
-                            firstName: tokenInfo.given_name,
-                            lastName : tokenInfo.family_name
-                        }), (error, result) => {
-                            if (error) {
-                                return res.status(500).json({ error: "Error occurred.", email_verified: false });
-                            } else {
-                                result.email_verified = true;
-                                return res.status(200).json(result);
-                            }
-                        });
-                    }
-                });
+        if (!req.body.email || !req.body.pass) {
+            return res.status(400).json({ 'error': 'Parameter missing.' });
         }
-    });
+        console.dir("pass: " + req.body.pass);
+        c.query(login({
+            email: req.body.email,
+            pass : req.body.pass
+        }), (error, result) => {
+            if (error) {
+                res.status(400).json({ 'error': 'Something went wrong while logging in.' });
+            } else if (!result || !result.info || !result.info.numRows) {
+                res.status(401).json({ 'error': 'Email or password did not match.' })
+            } else {
+                //console.log(result);
+                if (result.info.affectedRows == 0) {
+                    console.log("Failed login");
+                    res.status(401).json({ 'error': 'Email or password did not match.' })
+                } else {
+                    console.log("Success");
+                    res.status(200).json({
+                        email: result[0].email,
+                        firstName: "",
+                        lastName: ""
+                    });
+                }
+            }
+        });
+    }
+    // sign in with google account by verifying id_token
+    else {
+
+        console.log("in validate token");
+
+        validateToken(req.query.id_token, (err, response) => {
+            console.log("verifying");
+            if (err) {
+                //return res.status(500).send('Token could not be verified.');
+                return res.status(500).json({ error: "Token could not be verified.", email_verified: false });
+            } else {
+                var tokenInfo = response.getPayload();
+
+                c.query(getUser({ email: tokenInfo.email }),
+                    (error, result) => {
+                        //console.dir(error);
+                        console.dir(result);
+
+                        if (result.length) {
+                            console.log("user already created");
+                            result[0].email_verified = true;
+                            console.dir(tokenInfo);
+                            //return res.status(200).json(result);
+                        } else {
+                            console.log("creating user");
+
+                            //console.dir(tokenInfo);
+                            c.query(createUser({
+                                email: tokenInfo.email,
+                                pass : 'google',
+                            }), (error, result) => {
+                                if (error) {
+                                    return res.status(500).json({ error: "Error occurred.", email_verified: false });
+                                }
+                            });
+                        }
+                        var responseObj = {
+                            email_verified: true,
+                            email         : tokenInfo.email,
+                            firstName     : tokenInfo.given_name,
+                            lastName      : tokenInfo.family_name
+                        };
+                        return res.status(200).json(responseObj);
+
+                    });
+            }
+        });
+    }
 });
 
 
 function validateToken(token, callback) {
-    oauth2Client.verifyIdToken(token, CLIENT_ID, callback);
+    oauth2Client.verifyIdToken(token, config.CLIENT_ID, callback);
 }
 
 function handleError(err, res, message) {
@@ -360,6 +432,13 @@ function handleError(err, res, message) {
 
     res.send("Error: " + message);
     throw err;
+}
+
+// source: https://goo.gl/0TFRJt
+function validateEmail(email) {
+
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
 }
 
 app.listen(PORT, function () {
