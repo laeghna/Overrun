@@ -19,6 +19,9 @@ import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
 
 /**
  * Fragment that encapsulates logging in and registering accounts.
+ *
+ * @author Ethan Rowell
+ * @version 9 Nov 2016
  */
 public class LoginFragment extends Fragment {
     /**

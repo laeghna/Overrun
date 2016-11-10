@@ -25,11 +25,14 @@ import java.net.URL;
 import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.Validation.PasswordValidator;
-import group7.tcss450.tacoma.uw.edu.overrun.Validation.UsernameValidator;
+import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailValidator;
 
 
 /**
  * Fragment that is responsible for registering accounts.
+ *
+ * @author Ethan Rowell
+ * @version 9 Nov 2016
  */
 public class RegistrationFragment extends Fragment implements View.OnClickListener {
     //private static final String API_URL = "https://cssgate.insttech.washington.edu:8080/";
@@ -115,8 +118,8 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
      * Sets up validators for the text inputs.
      */
     private void addTextValidators(View view) {
-        username.addTextChangedListener(new UsernameValidator(username));
-        username.setOnFocusChangeListener(new UsernameValidator(username));
+        username.addTextChangedListener(new EmailValidator(username));
+        username.setOnFocusChangeListener(new EmailValidator(username));
 
         pass.addTextChangedListener(new PasswordValidator(pass));
         pass.setOnFocusChangeListener(new PasswordValidator(pass));

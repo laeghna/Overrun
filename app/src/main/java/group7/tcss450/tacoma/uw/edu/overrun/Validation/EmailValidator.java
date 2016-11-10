@@ -4,11 +4,17 @@ import android.view.View;
 import android.widget.TextView;
 
 
-public class UsernameValidator extends TextValidator implements View.OnFocusChangeListener {
+/**
+ * Validator for the email.
+ *
+ * @author Ethan Rowell
+ * @version 9 Nov 2016
+ */
+public class EmailValidator extends TextValidator implements View.OnFocusChangeListener {
 
-    private static int MIN_USERNAME_LENGTH = 3;
+    private static int MIN_EMAIL_LENGTH = 3;
 
-    public UsernameValidator(TextView textView) {
+    public EmailValidator(TextView textView) {
         super(textView);
     }
 
@@ -28,8 +34,8 @@ public class UsernameValidator extends TextValidator implements View.OnFocusChan
             textView.setError(textView.getHint() + " is required.");
             valid = false;
         } else {
-            if (text.length() < MIN_USERNAME_LENGTH) {
-                textView.setError(textView.getHint() + " must be " + MIN_USERNAME_LENGTH +  " characters or more.");
+            if (text.length() < MIN_EMAIL_LENGTH) {
+                textView.setError(textView.getHint() + " must be " + MIN_EMAIL_LENGTH +  " characters or more.");
                 valid = false;
             }
         }

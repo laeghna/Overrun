@@ -38,6 +38,9 @@ import group7.tcss450.tacoma.uw.edu.overrun.SignIn.SignInActivity;
 /**
  * Base Activity that classes can extend in order to have access to methods to interact with
  * the current user.
+ *
+ * @author Ethan Rowell
+ * @version 9 Nov 2016
  */
 public class BaseActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -540,7 +543,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 
 
             } else {
-                Log.e("WSL", "Could not be verified");
+                Log.e(TAG, "Could not be verified");
                 Toast.makeText(context, "Account could not be verified.",
                         Toast.LENGTH_LONG).show();
             }

@@ -13,6 +13,9 @@ import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
 
 /**
  * Activity that encapsulates the login and registration for the user.
+ *
+ * @author Ethan Rowell
+ * @version 9 Nov 2016
  */
 public class SignInActivity extends BaseActivity {
 
