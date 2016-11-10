@@ -126,8 +126,8 @@ public class PlayView extends SurfaceView implements Runnable{
             //if collision occurs with bullet
             if (Rect.intersects(mWeapon.getDetectBullet(), zombies[i].getDetectZombie())) {
 
-                //moving enemy outside the bottom edge and setting bullet isActive to false
-                zombies[i].setXCoord(mScreen.y + zombies[i].getBitmap().getHeight());
+                //setting enemy's and bullet's isActive to false so they are no longer drawn
+                zombies[i].setIsActive(false);
                 mWeapon.getBullet().setIsActive(false);
             }
         }
@@ -145,12 +145,13 @@ public class PlayView extends SurfaceView implements Runnable{
 
             //Draw zombies
             for (int i = 0; i < zombies.length; i++) {
-                mBackground.drawBitmap(
-                        zombies[i].getBitmap(),
-                        zombies[i].getXCoord(),
-                        zombies[i].getYCoord(),
-                        mPaintBrush
-                );
+                if (zombies[i].getIsActive()) {
+                    mBackground.drawBitmap(
+                            zombies[i].getBitmap(),
+                            zombies[i].getXCoord(),
+                            zombies[i].getYCoord(),
+                            mPaintBrush);
+                }
             }
 
             if(mWeapon.getBullet().getIsActive()) {
