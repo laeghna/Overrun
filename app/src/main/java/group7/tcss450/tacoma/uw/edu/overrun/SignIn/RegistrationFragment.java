@@ -35,12 +35,6 @@ import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailValidator;
  * @version 9 Nov 2016
  */
 public class RegistrationFragment extends Fragment implements View.OnClickListener {
-    private static final String API_URL = "http://cssgate.insttech.washington.edu:8080/";
-
-    /**
-     * Used for local development.
-     */
-   // private static final String API_URL = " http://10.0.2.2:8080/";
 
     private static final String TAG = "RegistrationActivity";
 
@@ -153,7 +147,7 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
             StringBuilder sb = new StringBuilder();
 
             try {
-                sb.append(API_URL);
+                sb.append(getString(R.string.PROD_API_URL));
                 sb.append("api/user");
                 URL url = new URL(sb.toString());
                 sb.setLength(0);
