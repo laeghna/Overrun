@@ -112,6 +112,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 
     /**
      * Checks shared preferences to determine if a user is logged in or not.
+     *
      * @return Logged in status of current user.
      */
     public boolean isLoggedIn() {
@@ -123,7 +124,8 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 
     /**
      * Signs the user in with a previously registered email and password.
-     * @param email User's email.
+     *
+     * @param email    User's email.
      * @param password User's password.
      */
     public void signIn(String email, String password) {
@@ -180,26 +182,21 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                                 @Override
                                 public void onResult(@NonNull Status status) {
                                     Log.d(TAG, "in on result");
-                                    Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    startActivity(intent);
+                                    finish();
                                 }
                             });
 
         }
 
-        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-
         editor.apply();
 
-        new SignOutAsync().execute();
+        new SignOutAsync(this).execute();
 
     }
 
     /**
      * Shows the progress dialog with the given message.
+     *
      * @param messageText The text to be displayed on the progress dialog.
      */
     public void showProgressDialog(String messageText) {
@@ -284,9 +281,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 
         Toast.makeText(getApplicationContext(), "Signed in as: " + acct.getEmail(),
                 Toast.LENGTH_LONG).show();
-
-        Intent intent = new Intent(getApplicationContext(), StartMenuActivity.class);
-        startActivity(intent);
 
         finish();
     }
@@ -416,8 +410,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                         editor.putBoolean(getString(R.string.logged_in), true);
                         editor.apply();
 
-                        Intent intent = new Intent(context, StartMenuActivity.class);
-                        startActivity(intent);
                         finish();
                         Toast.makeText(context, "Signed in as: " + email,
                                 Toast.LENGTH_LONG).show();
@@ -537,9 +529,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                         Toast.LENGTH_LONG).show();
             }
 
-            Intent intent = new Intent(getApplicationContext(), StartMenuActivity.class);
-            startActivity(intent);
-
             finish();
 
             hideProgressDialog();
@@ -556,9 +545,16 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
      * Signs the user's account out asynchronously.
      */
     private class SignOutAsync extends AsyncTask<Void, Void, Void> {
+        Context context;
+
+        SignOutAsync(Context context) {
+            this.context = context;
+
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
+
             SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
 
@@ -573,10 +569,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                             new ResultCallback<com.google.android.gms.common.api.Status>() {
                                 @Override
                                 public void onResult(@NonNull com.google.android.gms.common.api.Status status) {
-                                    Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK
-                                            | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    startActivity(intent);
+                                    ((BaseActivity) context).finish();
                                 }
                             });
 
