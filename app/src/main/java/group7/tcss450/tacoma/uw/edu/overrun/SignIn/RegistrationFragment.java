@@ -35,12 +35,12 @@ import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailValidator;
  * @version 9 Nov 2016
  */
 public class RegistrationFragment extends Fragment implements View.OnClickListener {
-    //private static final String API_URL = "https://cssgate.insttech.washington.edu:8080/";
+    private static final String API_URL = "http://cssgate.insttech.washington.edu:8080/";
 
     /**
      * Used for local development.
      */
-    private static final String API_URL = " http://10.0.2.2:8080/";
+   // private static final String API_URL = " http://10.0.2.2:8080/";
 
     private static final String TAG = "RegistrationActivity";
 
