@@ -45,17 +45,6 @@ import group7.tcss450.tacoma.uw.edu.overrun.SignIn.SignInActivity;
 public class BaseActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     /**
-     * Used for production.
-     * TODO: enable for release.
-     */
-    private static final String API_URL = "http://cssgate.insttech.washington.edu:8080/";
-
-    /**
-     * Used for local development.
-     */
-    //private static final String API_URL = " http://10.0.2.2:8080/";
-
-    /**
      * Log Tag.
      */
     private static final String TAG = "BaseActivity";
@@ -336,7 +325,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
             StringBuilder sb = new StringBuilder();
 
             try {
-                sb.append(API_URL);
+                sb.append(getString(R.string.PROD_API_URL));
                 sb.append("api/login");
                 URL url = new URL(sb.toString());
                 sb.setLength(0);
@@ -469,7 +458,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
          */
         @Override
         protected String doInBackground(String... params) {
-            String signinUrl = API_URL + "api/login?id_token=" + params[0];
+            String signinUrl = getString(R.string.PROD_API_URL) + "api/login?id_token=" + params[0];
             Log.d(TAG, "API_URL: " + signinUrl);
 
             StringBuilder sb = new StringBuilder();
