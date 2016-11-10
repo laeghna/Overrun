@@ -1,0 +1,40 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="group7.tcss450.tacoma.uw.edu.overrun.SignIn.RegistrationFragment"
+    android:orientation="vertical">
+
+    <!-- TODO: Update blank fragment layout -->
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/reg_email"
+        android:hint="@string/email_hint"
+        android:inputType="textEmailAddress"
+        android:layout_gravity="top"
+        android:imeOptions="actionNext"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:hint="@string/password_hint"
+        android:id="@+id/reg_password"
+        android:layout_gravity="top"
+        android:imeOptions="actionNext"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:hint="@string/confirm_password_hint"
+        android:id="@+id/reg_confirm_password"
+        android:imeOptions="actionDone"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/register"
+        android:id="@+id/register_button"/>
+
+</LinearLayout>

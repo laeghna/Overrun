@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="group7.tcss450.tacoma.uw.edu.overrun">
 
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,11 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+
         <activity
             android:name=".StartMenuActivity"
             android:screenOrientation="landscape">
-
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,7 +26,19 @@
 
         </activity>
 
-        <activity android:name=".PlayView"></activity>
+        <activity
+            android:name=".SignIn.SignInActivity"
+            android:screenOrientation="landscape">
+        </activity>
+
+        <activity
+            android:name=".OptionsActivity"
+            android:screenOrientation="landscape"/>
+
+       <activity
+           android:name=".GameActivity"
+           android:screenOrientation="landscape"/>
+
     </application>
 
 </manifest>
