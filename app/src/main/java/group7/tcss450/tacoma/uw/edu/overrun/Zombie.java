@@ -59,4 +59,8 @@ public interface Zombie {
      * @return the zombie rectangle
      */
     Rect getDetectZombie();
+
+    boolean getIsActive();
+
+    void setIsActive(boolean b);
 }

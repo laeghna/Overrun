@@ -40,6 +40,9 @@ public class ZombieCrawler implements Zombie {
     private int yMin;
     private int yMax;
 
+    /** A random generator for placing new crawlers. */
+    private Random genRandom;
+
     /** Rectangle for crawler to determine collisions. */
     private Rect detectZombie;
 
@@ -56,7 +59,7 @@ public class ZombieCrawler implements Zombie {
         yMin = 0;
         yMax = screenSize.y;
 
-        Random genRandom = new Random();
+        genRandom = new Random();
 
         //resize the bitmap, swap x and y due to force landscape view
         float wScale = ((float) screenSize.y) / SCALE;
@@ -99,7 +102,9 @@ public class ZombieCrawler implements Zombie {
         if (yCoord + 1 < yMax) {
             yCoord += SPEED;
         } else {
-            isActive = false;
+            xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
+            yCoord = yMin;
+            setIsActive(true);
         }
 
         //adding top, left, bottom and right to the rect object
