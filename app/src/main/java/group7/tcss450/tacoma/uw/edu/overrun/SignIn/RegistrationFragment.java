@@ -34,13 +34,24 @@ import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailValidator;
  * @author Ethan Rowell
  * @version 9 Nov 2016
  */
-public class RegistrationFragment extends Fragment implements View.OnClickListener {
+public class RegistrationFragment extends Fragment {
 
     private static final String TAG = "RegistrationActivity";
 
-    EditText username;
-    EditText pass;
-    EditText confirm_pass;
+    /**
+     * The user's emailText.
+     */
+    private EditText emailText;
+
+    /**
+     * The user's password.
+     */
+    private EditText passText;
+
+    /**
+     * The user's confirmation password.
+     */
+    private EditText confirmPassText;
 
     public RegistrationFragment() {
         // Required empty public constructor
@@ -52,19 +63,17 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_registration, container, false);
 
-        username = (EditText) view.findViewById(R.id.reg_email);
-        pass = (EditText) view.findViewById(R.id.reg_password);
-        confirm_pass = (EditText) view.findViewById(R.id.reg_confirm_password);
-
+        emailText = (EditText) view.findViewById(R.id.reg_email);
+        passText = (EditText) view.findViewById(R.id.reg_password);
+        confirmPassText = (EditText) view.findViewById(R.id.reg_confirm_password);
 
         addTextValidators(view);
-
 
         Button submitButton = (Button) view.findViewById(R.id.register_button);
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submitRegistrationForm(v);
+                submitRegistrationForm();
             }
         });
 
@@ -75,10 +84,10 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
     /**
      * Handles the submission of the registration form.
      */
-    public void submitRegistrationForm(View v) {
+    private void submitRegistrationForm() {
 
         if (validForm()) {
-            new RegisterAsync().execute(username.getText().toString(), pass.getText().toString());
+            new RegisterAsync().execute(emailText.getText().toString(), passText.getText().toString());
 
             Toast.makeText(getContext(), "Registration form submitted.", Toast.LENGTH_LONG).show();
         } else {
@@ -94,14 +103,14 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
         boolean registrationValid = true;
 
         // fields shouldn't be empty
-        if (username.getError() != null && !username.getError().toString().isEmpty() ||
-                pass.getError() != null && !pass.getError().toString().isEmpty() ||
-                confirm_pass.getError() != null && !confirm_pass.getError().toString().isEmpty()) {
+        if (emailText.getError() != null && !emailText.getError().toString().isEmpty() ||
+                passText.getError() != null && !passText.getError().toString().isEmpty() ||
+                confirmPassText.getError() != null && !confirmPassText.getError().toString().isEmpty()) {
             registrationValid = false;
         }
 
         // passwords should match
-        if (!pass.getText().toString().equals(confirm_pass.getText().toString())) {
+        if (!passText.getText().toString().equals(confirmPassText.getText().toString())) {
             registrationValid = false;
         }
 
@@ -112,19 +121,14 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
      * Sets up validators for the text inputs.
      */
     private void addTextValidators(View view) {
-        username.addTextChangedListener(new EmailValidator(username));
-        username.setOnFocusChangeListener(new EmailValidator(username));
+        emailText.addTextChangedListener(new EmailValidator(emailText));
+        emailText.setOnFocusChangeListener(new EmailValidator(emailText));
 
-        pass.addTextChangedListener(new PasswordValidator(pass));
-        pass.setOnFocusChangeListener(new PasswordValidator(pass));
+        passText.addTextChangedListener(new PasswordValidator(passText));
+        passText.setOnFocusChangeListener(new PasswordValidator(passText));
 
-        confirm_pass.addTextChangedListener(new PasswordValidator(confirm_pass));
-        confirm_pass.setOnFocusChangeListener(new PasswordValidator(confirm_pass));
-    }
-
-    @Override
-    public void onClick(View v) {
-
+        confirmPassText.addTextChangedListener(new PasswordValidator(confirmPassText));
+        confirmPassText.setOnFocusChangeListener(new PasswordValidator(confirmPassText));
     }
 
     /**
@@ -152,8 +156,8 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
                 URL url = new URL(sb.toString());
                 sb.setLength(0);
 
-                sb.append("email=").append(email).append("&");
-                sb.append("pass=").append(password).append("&");
+                sb.append("emailText=").append(email).append("&");
+                sb.append("passText=").append(password).append("&");
 
                 urlCon = (HttpURLConnection) url.openConnection();
                 urlCon.setRequestMethod("POST");
@@ -214,7 +218,7 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
                         Toast.makeText(getActivity().getApplicationContext(), message,
                                 Toast.LENGTH_LONG).show();
                     } else {
-                        message = (String) jsonObject.get("email");
+                        message = (String) jsonObject.get("emailText");
                         getActivity().getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container, new LoginFragment())
                                 .commit();
