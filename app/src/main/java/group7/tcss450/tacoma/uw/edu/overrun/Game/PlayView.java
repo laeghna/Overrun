@@ -1,4 +1,4 @@
-package group7.tcss450.tacoma.uw.edu.overrun;
+package group7.tcss450.tacoma.uw.edu.overrun.Game;
 
 
 import android.content.Context;
@@ -9,17 +9,9 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.Display;
-import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-
-import group7.tcss450.tacoma.uw.edu.overrun.Listeners.ButtonListener;
 
 /** This class is intended for use in the game Overrun. A fun and fast-paced survival
  * game. This class holds the view for the in-app gameplay.
