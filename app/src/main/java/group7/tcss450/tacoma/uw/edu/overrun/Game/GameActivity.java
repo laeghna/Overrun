@@ -1,5 +1,7 @@
 package group7.tcss450.tacoma.uw.edu.overrun.Game;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +12,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Listeners.ButtonListener;
+import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 /**
  * This is the activity for the actual game play.
@@ -136,6 +139,15 @@ public class GameActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         mPlayView.pauseGame();
+        AlertDialog.Builder dialog_builder = new AlertDialog.Builder(this);
+        dialog_builder.setMessage(R.string.pause_dialog)
+                .setPositiveButton(R.string.resume_button, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface d, int id) {
+                        onResume();
+                    }
+                });
+        AlertDialog dialog = dialog_builder.create();
+        dialog.show();
         //TODO: finish
     }
 

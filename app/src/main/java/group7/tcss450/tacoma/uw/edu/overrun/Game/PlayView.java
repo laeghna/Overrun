@@ -186,6 +186,7 @@ public class PlayView extends SurfaceView implements Runnable{
         if((mSurvivor.getmX() - mSurvivor.getmSpeed()) > 1) {
             mSurvivor.setmX(mSurvivor.getmX() - mSurvivor.getmSpeed());
         }
+        mSurvivor.updateCollisionDetector();
     }
 
     /**
@@ -195,11 +196,17 @@ public class PlayView extends SurfaceView implements Runnable{
         if((mSurvivor.getmX() + mSurvivor.getmSpeed() + mSurvivor.getmBmap().getWidth()) < mScreen.x) {
             mSurvivor.setmX( mSurvivor.getmX() + mSurvivor.getmSpeed());
         }
+        mSurvivor.updateCollisionDetector();
     }
 
     /** Fires the survivor's weapon. */
     public void fire() {
         mWeapon.shootWeapon(mSurvivor.getmX(), mSurvivor.getmY());
+    }
+
+    /** Checks the survivor's collision detector to see if a collision occured. */
+    public void checkSurvivorCollision() {
+        mSurvivor.getmDetectCollisions();
     }
 
 }

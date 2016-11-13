@@ -51,5 +51,8 @@
     <string name="right_button">RIGHT</string>
     <string name="fire_button">FIRE!</string>
 
+    <string name="pause_dialog">GAME PAUSED</string>
+    <string name="resume_button">Resume</string>
+
 
 </resources>
