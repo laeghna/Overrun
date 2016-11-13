@@ -7,7 +7,7 @@ import android.view.View;
 
 /**
  * ButtonListener class interprets button clicks into real game actions.
- * Author Leslie Pedro
+ * @author : Leslie Pedro
  */
 
 public class ButtonListener implements View.OnTouchListener {

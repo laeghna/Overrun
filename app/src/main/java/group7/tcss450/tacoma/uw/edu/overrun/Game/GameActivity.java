@@ -77,7 +77,6 @@ public class GameActivity extends AppCompatActivity {
         mLeftButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
             public void onClick(View view){
-                Log.d("TAG", "Left");
                 mPlayView.moveLeft();
             }
         }));
@@ -87,7 +86,6 @@ public class GameActivity extends AppCompatActivity {
         mRightButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
             public void onClick(View view){
-                Log.d("TAG", "Right");
                 mPlayView.moveRight();
             }
         }));
@@ -96,7 +94,6 @@ public class GameActivity extends AppCompatActivity {
         mFireButton.setOnTouchListener(new ButtonListener(0, 0, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("TAG", "FIRE!");
                 mPlayView.fire();
             }
         }));

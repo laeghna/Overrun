@@ -41,7 +41,7 @@ public class PlayView extends SurfaceView implements Runnable{
     private SurfaceHolder mHolder;
 
     /** The player's weapon. */
-    private Weapon mWeapon;
+    private Bullet[] mBullets;
 
     /** The size of the screen being used to display the game. */
     private Point mScreen;
@@ -63,7 +63,6 @@ public class PlayView extends SurfaceView implements Runnable{
         Display d = wm.getDefaultDisplay();
         mScreen = new Point();
         d.getSize(mScreen);
-        Log.d("ScreenX/2, ScreenY/3", "(" + mScreen.x / 2 + "," + mScreen.y / 3 + ")");
 
         // create survivor object
         mSurvivor = new Survivor(context, mScreen);
@@ -74,7 +73,7 @@ public class PlayView extends SurfaceView implements Runnable{
         //create holder for view
         mHolder = getHolder();
 
-        mWeapon = new Weapon(1, 1, mScreen, context);
+        mBullets = new Bullet[Bullet.AMMO_CAPACITY];
 
         //zombies
         zombies = new Zombie[zombieCount];
@@ -106,21 +105,39 @@ public class PlayView extends SurfaceView implements Runnable{
 
     /** Updates the frame for the PlayView. */
     private void update(){
-
-        if(mWeapon.getBullet().getIsActive()) {
-
-            mWeapon.getBullet().updateBulletPosition();
+        // update active bullet positions.
+        for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
+            if(mBullets[i] != null) {
+                if (mBullets[i].getIsActive()) {
+                    mBullets[i].updateBulletPosition();
+                }
+            }
         }
 
+        // update zombie positions.
         for(int i=0; i < zombies.length; i++){
             zombies[i].updateMovement();
+        }
 
-            //if collision occurs with bullet
-            if (Rect.intersects(mWeapon.getDetectBullet(), zombies[i].getDetectZombie())) {
+        //check for collisions between bullets and zombies.
+        for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
+            if (mBullets[i] != null) {
+                if (mBullets[i].getIsActive()) {
+                    for (int z = 0; z < zombieCount; z++) {
+                        //if collision occurs with bullet
+                        if (Rect.intersects(mBullets[i].getDetectBullet(), zombies[z].getDetectZombie())) {
 
-                //moving enemy outside the bottom edge and setting bullet isActive to false
-                zombies[i].setXCoord(mScreen.y + zombies[i].getBitmap().getHeight());
-                mWeapon.getBullet().setIsActive(false);
+                            //moving enemy outside the bottom edge and setting bullet isActive to false
+                            zombies[z].setXCoord(mScreen.y + zombies[z].getBitmap().getHeight());
+                            mBullets[i].setIsActive(false);
+                        }
+                    }
+                }
+            }
+        }
+        for(int i = 0; i < zombieCount; i++) {
+            if(Rect.intersects(zombies[i].getDetectZombie(), mSurvivor.getmDetectCollisions())) {
+                Log.d("PlayView", "Survivor is hit!");
             }
         }
     }
@@ -145,9 +162,13 @@ public class PlayView extends SurfaceView implements Runnable{
                 );
             }
             // draws bullets
-            if(mWeapon.getBullet().getIsActive()) {
-                mBackground.drawBitmap(mWeapon.getBullet().getBMP(), mWeapon.getBullet().getX(),
-                        mWeapon.getBullet().getY(), mPaintBrush);
+            for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
+                if (mBullets[i] != null) {
+                    if (mBullets[i].getIsActive()) {
+                        mBackground.drawBitmap(mBullets[i].getBMP(), mBullets[i].getX(),
+                                mBullets[i].getY(), mPaintBrush);
+                    }
+                }
             }
             mHolder.unlockCanvasAndPost(mBackground); // drawing done -> unlock background
         }
@@ -199,9 +220,20 @@ public class PlayView extends SurfaceView implements Runnable{
         mSurvivor.updateCollisionDetector();
     }
 
-    /** Fires the survivor's weapon. */
-    public void fire() {
-        mWeapon.shootWeapon(mSurvivor.getmX(), mSurvivor.getmY());
+    /**
+     * Fires the survivor's weapon.
+     * @return true if the bullet was fired (added to the bullet array), false otherwise.
+     */
+    public boolean fire() {
+        Bullet b = new Bullet(1, mScreen, getContext());
+        b.shootWeapon(mSurvivor.getmX(), mSurvivor.getmY());
+        for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
+            if(mBullets[i] == null || !mBullets[i].getIsActive()) {
+                mBullets[i] = b;
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Checks the survivor's collision detector to see if a collision occured. */
