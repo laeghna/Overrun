@@ -9,10 +9,17 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+
+import group7.tcss450.tacoma.uw.edu.overrun.Listeners.ButtonListener;
 
 /** This class is intended for use in the game Overrun. A fun and fast-paced survival
  * game. This class holds the view for the in-app gameplay.
@@ -22,9 +29,6 @@ import android.view.WindowManager;
  * @version 8 Nov 2016
  */
 public class PlayView extends SurfaceView implements Runnable{
-
-    /** For discerning between tap and scroll. */
-    public static final float TAP_TOLERANCE = 10;
 
     /** A volatile boolean for controlling multithreaded play. */
     private volatile boolean mIsPlaying; // True when game is in-play, false otherwise
@@ -50,15 +54,12 @@ public class PlayView extends SurfaceView implements Runnable{
     /** The size of the screen being used to display the game. */
     private Point mScreen;
 
-    /** Coordinates of the most recent touch on the screen. */
-    private float mTouchX;
-    private float mTouchY;
-
     /** Array for holding zombie objects. */
     private Zombie[] zombies;
 
     /** Adding 3 zombies for testing. */
     private int zombieCount = 3;
+
 
     /**
      * Constructor for the PlayView class.
@@ -70,7 +71,7 @@ public class PlayView extends SurfaceView implements Runnable{
         Display d = wm.getDefaultDisplay();
         mScreen = new Point();
         d.getSize(mScreen);
-        Log.d("ScreenX/2, ScreenY/3", "(" + mScreen.x/2 + "," +  mScreen.y/3 + ")");
+        Log.d("ScreenX/2, ScreenY/3", "(" + mScreen.x / 2 + "," + mScreen.y / 3 + ")");
 
         // create survivor object
         mSurvivor = new Survivor(context, mScreen);
@@ -89,6 +90,7 @@ public class PlayView extends SurfaceView implements Runnable{
 
             zombies[i] = new ZombieCrawler(context, mScreen);
         }
+
     }
 
     /**
@@ -104,7 +106,6 @@ public class PlayView extends SurfaceView implements Runnable{
             //update and draw frame
             update();
             draw();
-
             //update the frame controls
             framesPerSecond();
         }
@@ -151,7 +152,7 @@ public class PlayView extends SurfaceView implements Runnable{
                         mPaintBrush
                 );
             }
-
+            // draws bullets
             if(mWeapon.getBullet().getIsActive()) {
                 mBackground.drawBitmap(mWeapon.getBullet().getBMP(), mWeapon.getBullet().getX(),
                         mWeapon.getBullet().getY(), mPaintBrush);
@@ -186,29 +187,27 @@ public class PlayView extends SurfaceView implements Runnable{
         mGameThread.start();
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent mEvent) {
-        switch(mEvent.getAction() & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_DOWN:
-                mTouchX = mEvent.getX();
-                break;
-
-            // Player has removed finger from screen
-            case MotionEvent.ACTION_UP:
-                if(mEvent.getY() < mScreen.y - mScreen.y/3) {
-                    mWeapon.shootWeapon(mSurvivor.getmX(), mSurvivor.getmY() -
-                            mSurvivor.getmBmap().getHeight());
-                }
-                break;
-
-            case MotionEvent.ACTION_MOVE:
-                if(mEvent.getY() >= mScreen.y - mScreen.y/3) {
-                    if (TAP_TOLERANCE < Math.abs(mTouchX - mEvent.getX())) {
-                        mSurvivor.setmX((int) mEvent.getX());
-                    }
-                }
-                break;
+    /**
+     * Moves the survivor toward the left end of the screen.
+     */
+    public void moveLeft() {
+        if((mSurvivor.getmX() - mSurvivor.getmSpeed()) > 1) {
+            mSurvivor.setmX(mSurvivor.getmX() - mSurvivor.getmSpeed());
         }
-        return true;
     }
+
+    /**
+     * Moves the survivor towards the right end of the screen.
+     */
+    public void moveRight() {
+        if((mSurvivor.getmX() + mSurvivor.getmSpeed() + mSurvivor.getmBmap().getWidth()) < mScreen.x) {
+            mSurvivor.setmX( mSurvivor.getmX() + mSurvivor.getmSpeed());
+        }
+    }
+
+    /** Fires the survivor's weapon. */
+    public void fire() {
+        mWeapon.shootWeapon(mSurvivor.getmX(), mSurvivor.getmY());
+    }
+
 }

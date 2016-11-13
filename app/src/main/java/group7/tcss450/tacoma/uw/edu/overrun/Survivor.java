@@ -5,8 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
-import android.graphics.Rect;
-import android.util.Log;
 
 
 /**
@@ -30,7 +28,7 @@ public class Survivor implements GameCharacter{
     private int mY; // y- coordinate
 
     /** The move speed of the survivor. */
-    private double mSpeed;
+    private int mSpeed;
 
     /** Boolean for determining if the game is running. */
     private boolean mIsRunning;
@@ -48,20 +46,17 @@ public class Survivor implements GameCharacter{
      */
     public Survivor(Context context, Point screenSize) {
         mScreen = screenSize;
-        mSpeed = 1; // test speed may need to adjust
+        mSpeed = 2; // test speed may need to adjust
         //resize the bitmap
         float w_scale = ((float) screenSize.y) / SCALE; // Swap x and y due to forced landscape view
         float h_scale = ((float) screenSize.x) / SCALE;
         // Get the player graphic from drawable:
-        Log.d("OVERRUN: SURVIVOR", "Screen: (" + screenSize.x + "," + screenSize.y + ")");
         mBmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie); // a placeholder graphic
-        Log.d("OVERRUN: SURVIVOR", "Before Resize: (" +  mBmap.getWidth() +","+ mBmap.getHeight() + ")");
         mBmap = getResizedBmp(w_scale, h_scale);
-        Log.d("OVERRUN: SURVIVOR", "After Resize: (" +  mBmap.getWidth() +","+ mBmap.getHeight() + ")");
         mX = mBmap.getWidth();
         mY = screenSize.y - (mBmap.getHeight() + mPadBott);
         mIsRunning = false;
-        //TODO: replace with correct graphics
+        //TODO: replace with correct graphics, fix bullets, and implement collision detection
     }
 
     /**
@@ -116,7 +111,7 @@ public class Survivor implements GameCharacter{
      * Gets the survivor's move speed.
      * @return mSpeed - the survivor's move speed.
      */
-    public double getmSpeed() {
+    public int getmSpeed() {
         return mSpeed;
     }
 
