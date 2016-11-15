@@ -295,6 +295,10 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
      * Signs the user in using an email and password.
      */
     private class SignInAsync extends AsyncTask<String, Void, String> {
+
+        /**
+         * The context of the current activity.
+         */
         Context context;
 
         SignInAsync(Context c) {
@@ -429,6 +433,9 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
      */
     private class GoogleSignInAsync extends AsyncTask<String, Void, String> {
 
+        /**
+         * The context of the current activity.
+         */
         Context context;
 
         GoogleSignInAsync(Context c) {
@@ -545,7 +552,11 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
      * Signs the user's account out asynchronously.
      */
     private class SignOutAsync extends AsyncTask<Void, Void, Void> {
-        Context context;
+
+        /**
+         * The context of the current activity.
+         */
+        private Context context;
 
         SignOutAsync(Context context) {
             this.context = context;

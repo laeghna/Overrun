@@ -24,30 +24,16 @@ import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
  * @version 9 Nov 2016
  */
 public class LoginFragment extends Fragment {
-    /**
-     * Logs the user in with email and password.
-     */
-    Button loginButton;
-
-    /**
-     * Logs the user in with their Google account.
-     */
-    SignInButton googleSignin;
-
-    /**
-     * Transitions to the registration page.
-     */
-    Button registerButton;
 
     /**
      * View for the user's email.
      */
-    EditText emailText;
+    private EditText emailText;
 
     /**
      * View for the user's password.
      */
-    EditText passwordText;
+    private EditText passwordText;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -81,7 +67,7 @@ public class LoginFragment extends Fragment {
         emailText = (EditText) view.findViewById(R.id.email_login);
         passwordText = (EditText) view.findViewById(R.id.password_login);
 
-        loginButton = (Button) view.findViewById(R.id.login_button);
+        Button loginButton = (Button) view.findViewById(R.id.login_button);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,7 +77,7 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        googleSignin = (SignInButton) view.findViewById(R.id.google_sign_in_button);
+        SignInButton googleSignin = (SignInButton) view.findViewById(R.id.google_sign_in_button);
         googleSignin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,7 +85,7 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        registerButton = (Button) view.findViewById(R.id.register_button);
+        Button registerButton = (Button) view.findViewById(R.id.register_button);
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
