@@ -5,7 +5,7 @@
     <string name="login_description">Sign in</string>
     <string name="sign_in_to_play">Please sign in with your Google account to play</string>
 
-    <string name="sign_in_or_reg">Don\'t have an account?\n Sign in with your Google account or register below.</string>
+    <string name="sign_in_or_reg">Don\'t have an account?\n Register or sign in with your Google account below.</string>
 
     <string name="shared_prefs">group7.tcss450.tacoma.uw.edu.overrun.SHARED_PREFS</string>
     <string name="logged_in">LOGGED_IN</string>
@@ -27,7 +27,7 @@
     <string name="diff_three">Brain Dead</string>
 
     <string-array name="difficulty_array">
-        <item >Slow and Steady</item>
+        <item>Slow and Steady</item>
         <item>Food for Thought</item>
         <item>Brain Dead</item>
     </string-array>

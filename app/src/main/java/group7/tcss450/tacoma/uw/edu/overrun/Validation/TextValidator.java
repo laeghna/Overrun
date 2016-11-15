@@ -12,6 +12,10 @@ import android.widget.TextView;
  * @version 9 Nov 2016
  */
 abstract class TextValidator implements TextWatcher {
+
+    /**
+     * The textview to validate.
+     */
     private final TextView textView;
 
     TextValidator(TextView textView) {

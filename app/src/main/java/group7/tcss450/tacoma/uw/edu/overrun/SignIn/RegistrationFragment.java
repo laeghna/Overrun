@@ -4,11 +4,9 @@ package group7.tcss450.tacoma.uw.edu.overrun.SignIn;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -22,10 +20,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
 import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
+import group7.tcss450.tacoma.uw.edu.overrun.BuildConfig;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
-import group7.tcss450.tacoma.uw.edu.overrun.Validation.PasswordValidator;
 import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailValidator;
+import group7.tcss450.tacoma.uw.edu.overrun.Validation.PasswordValidator;
+import timber.log.Timber;
 
 
 /**
@@ -41,17 +45,22 @@ public class RegistrationFragment extends Fragment {
     /**
      * The user's emailText.
      */
-    private EditText emailText;
+    @BindView(R.id.reg_email) EditText emailText;
 
     /**
      * The user's password.
      */
-    private EditText passText;
+    @BindView(R.id.reg_password) EditText passText;
 
     /**
      * The user's confirmation password.
      */
-    private EditText confirmPassText;
+    @BindView(R.id.reg_confirm_password) EditText confirmPassText;
+
+    /**
+     * Unbinds the views.
+     */
+    private Unbinder unbinder;
 
     public RegistrationFragment() {
         // Required empty public constructor
@@ -62,23 +71,20 @@ public class RegistrationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_registration, container, false);
+        unbinder = ButterKnife.bind(this, view);
 
-        emailText = (EditText) view.findViewById(R.id.reg_email);
-        passText = (EditText) view.findViewById(R.id.reg_password);
-        confirmPassText = (EditText) view.findViewById(R.id.reg_confirm_password);
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
 
-        addTextValidators(view);
-
-        Button submitButton = (Button) view.findViewById(R.id.register_button);
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submitRegistrationForm();
-            }
-        });
+        addTextValidators();
 
         // Inflate the layout for this fragment
         return view;
+    }
+
+    @OnClick(R.id.register_button) void submit() {
+        submitRegistrationForm();
     }
 
     /**
@@ -120,7 +126,7 @@ public class RegistrationFragment extends Fragment {
     /**
      * Sets up validators for the text inputs.
      */
-    private void addTextValidators(View view) {
+    private void addTextValidators() {
         emailText.addTextChangedListener(new EmailValidator(emailText));
         emailText.setOnFocusChangeListener(new EmailValidator(emailText));
 
@@ -129,6 +135,12 @@ public class RegistrationFragment extends Fragment {
 
         confirmPassText.addTextChangedListener(new PasswordValidator(confirmPassText));
         confirmPassText.setOnFocusChangeListener(new PasswordValidator(confirmPassText));
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     /**
@@ -171,15 +183,15 @@ public class RegistrationFragment extends Fragment {
                 dataOutputStream.close();
 
                 int statusCode = urlCon.getResponseCode();
-                Log.d(TAG, "Status: " + statusCode);
+                Timber.d("Status: %d", statusCode);
                 sb.setLength(0);
 
                 if (statusCode != HttpURLConnection.HTTP_OK) {
                     // TODO: handle error
-                    Log.d(TAG, "Error during registration.");
+                    Timber.d("Error during registration.");
                     sb.append("Error during login. Status code: ").append(statusCode);
                 } else {
-                    Log.d(TAG, "Successful registration.");
+                    Timber.d("Successful registration.");
 
                     BufferedReader reader = new BufferedReader(new InputStreamReader(urlCon.getInputStream()));
                     String s;
@@ -196,7 +208,7 @@ public class RegistrationFragment extends Fragment {
                 }
             }
 
-            Log.d(TAG, "String that was built: " + sb.toString());
+            Timber.d("String that was built: %s", sb.toString());
 
             return sb.toString();
         }

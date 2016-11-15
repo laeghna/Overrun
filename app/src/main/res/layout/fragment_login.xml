@@ -42,20 +42,20 @@
         android:layout_margin="10dp"
         android:textAlignment="center" />
 
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/google_sign_in_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/sign_in_textview"
-        android:layout_centerHorizontal="true" />
-
     <Button
         android:id="@+id/register_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/google_sign_in_button"
+        android:layout_below="@id/sign_in_textview"
         android:layout_centerHorizontal="true"
         android:text="@string/register_text" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/google_sign_in_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/register_button"
+        android:layout_centerHorizontal="true" />
 
 
 </RelativeLayout>

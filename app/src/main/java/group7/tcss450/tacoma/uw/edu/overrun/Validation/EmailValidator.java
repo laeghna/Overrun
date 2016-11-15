@@ -12,6 +12,9 @@ import android.widget.TextView;
  */
 public class EmailValidator extends TextValidator implements View.OnFocusChangeListener {
 
+    /**
+     * Minimum length for an email.
+     */
     private static int MIN_EMAIL_LENGTH = 3;
 
     public EmailValidator(TextView textView) {

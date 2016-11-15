@@ -4,18 +4,20 @@ package group7.tcss450.tacoma.uw.edu.overrun.SignIn;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 
-import com.google.android.gms.common.SignInButton;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
 import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
+import group7.tcss450.tacoma.uw.edu.overrun.BuildConfig;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
+import timber.log.Timber;
 
 /**
  * Fragment that encapsulates logging in and registering accounts.
@@ -28,12 +30,17 @@ public class LoginFragment extends Fragment {
     /**
      * View for the user's email.
      */
-    private EditText emailText;
+    @BindView(R.id.email_login) EditText emailText;
 
     /**
      * View for the user's password.
      */
-    private EditText passwordText;
+    @BindView(R.id.password_login) EditText passwordText;
+
+    /**
+     * Unbinds the view.
+     */
+    private Unbinder unbinder;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -50,51 +57,39 @@ public class LoginFragment extends Fragment {
         }
 
         View view = inflater.inflate(R.layout.fragment_login, container, false);
+        unbinder = ButterKnife.bind(this, view);
 
-        initButtons(view);
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
 
         // Inflate the layout for this fragment
         return view;
     }
 
-    /**
-     * Initializes the buttons.
-     *
-     * @param view The view to find the controls in.
-     */
-    private void initButtons(View view) {
+    @OnClick(R.id.google_sign_in_button)
+    void googleSignIn() {
+        ((BaseActivity) getActivity()).googleSignIn();
+    }
 
-        emailText = (EditText) view.findViewById(R.id.email_login);
-        passwordText = (EditText) view.findViewById(R.id.password_login);
+    @OnClick(R.id.login_button)
+    void signIn() {
+        Timber.d("Signing in...");
+        ((BaseActivity) getActivity()).signIn(emailText.getText().toString(),
+                passwordText.getText().toString());
+    }
 
-        Button loginButton = (Button) view.findViewById(R.id.login_button);
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("LoginFrag", "Signing in...");
-                ((BaseActivity) getActivity()).signIn(emailText.getText().toString(),
-                        passwordText.getText().toString());
-            }
-        });
+    @OnClick(R.id.register_button)
+    void register() {
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new RegistrationFragment())
+                .addToBackStack(null)
+                .commit();
+    }
 
-        SignInButton googleSignin = (SignInButton) view.findViewById(R.id.google_sign_in_button);
-        googleSignin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((BaseActivity) getActivity()).googleSignIn();
-            }
-        });
-
-        Button registerButton = (Button) view.findViewById(R.id.register_button);
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new RegistrationFragment())
-                        .addToBackStack(null)
-                        .commit();
-            }
-        });
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

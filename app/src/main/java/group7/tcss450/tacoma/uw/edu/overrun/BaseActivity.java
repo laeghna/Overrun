@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -34,6 +33,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import group7.tcss450.tacoma.uw.edu.overrun.SignIn.SignInActivity;
+import timber.log.Timber;
 
 /**
  * Base Activity that classes can extend in order to have access to methods to interact with
@@ -70,19 +70,12 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
     private static boolean IS_DEBUG = false;
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-        startActivity(intent);
-
-
-    }
-
-    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
@@ -181,7 +174,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                             new ResultCallback<Status>() {
                                 @Override
                                 public void onResult(@NonNull Status status) {
-                                    Log.d(TAG, "in on result");
+                                    Timber.d("in on result");
                                     finish();
                                 }
                             });
@@ -191,7 +184,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         editor.apply();
 
         new SignOutAsync(this).execute();
-
     }
 
     /**
@@ -224,13 +216,13 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
      * @param result the result of the sign in
      */
     private void handleSignInResult(GoogleSignInResult result) {
-        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        Timber.d("handleSignInResult: %b", result.isSuccess());
 
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             if (acct != null) {
-                Log.d(TAG, "IdToken: " + acct.getIdToken());
+                Timber.d("IdToken: %s", acct.getIdToken());
 
                 if (IS_DEBUG) {
                     debug_signin(acct);
@@ -239,18 +231,12 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                 }
             }
         } else {
-            // Signed out, show unauthenticated UI.
-            Toast.makeText(getApplicationContext(), "Signed out.",
+            Toast.makeText(getApplicationContext(), "Failed to sign in.",
                     Toast.LENGTH_LONG).show();
 
             hideProgressDialog();
-            Log.d(TAG, "Failed sign in due to: " + result.getStatus().getStatusCode());
-
-            // signed out or canceled
-//            Toast.makeText(getApplicationContext(), "Signed out.",
-//                    Toast.LENGTH_LONG).show();
+            Timber.d("Failed sign in due to: %d", result.getStatus().getStatusCode());
         }
-
     }
 
     /**
@@ -286,6 +272,14 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        startActivity(intent);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         hideProgressDialog();
@@ -317,7 +311,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
             String email = params[0];
             String password = params[1];
 
-            Log.d(TAG, "Password: " + password);
+            Timber.d("Password: %s", password);
 
             HttpURLConnection urlCon = null;
             StringBuilder sb = new StringBuilder();
@@ -332,7 +326,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                 sb.append(URLEncoder.encode("pass", "UTF-8")).append("=")
                         .append(URLEncoder.encode(password, "UTF-8"));
 
-                Log.d(TAG, "Encoded string: " + sb.toString());
+                Timber.d("Encoded string: %s", sb.toString());
 
                 urlCon = (HttpURLConnection) url.openConnection();
                 urlCon.setRequestMethod("POST");
@@ -345,17 +339,17 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                 dataOutputStream.close();
 
                 int statusCode = urlCon.getResponseCode();
-                Log.d(TAG, "Status: " + statusCode);
+                Timber.d("Status: %d", statusCode);
                 sb.setLength(0);
 
                 if (statusCode != HttpURLConnection.HTTP_OK) {
                     // TODO: handle error
                     if (statusCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                        Log.d(TAG, "Error during login. Status code: " + statusCode);
+                        Timber.d("Error during login. Status code: %s", statusCode);
                         sb.append("Wrong password or email.");
                     }
                 } else {
-                    Log.d(TAG, "Successful login.");
+                    Timber.d("Successful login.");
 
                     BufferedReader reader = new BufferedReader(new InputStreamReader(urlCon.getInputStream()));
                     String s;
@@ -371,7 +365,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                 }
             }
 
-            Log.d(TAG, "String that was built: " + sb.toString());
+            Timber.d("String that was built: %s", sb.toString());
 
             return sb.toString();
         }
@@ -458,7 +452,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         @Override
         protected String doInBackground(String... params) {
             String signinUrl = getString(R.string.PROD_API_URL) + "api/login?id_token=" + params[0];
-            Log.d(TAG, "API_URL: " + signinUrl);
+            Timber.d("API_URL: %s", signinUrl);
 
             StringBuilder sb = new StringBuilder();
             HttpURLConnection urlConnection = null;
@@ -482,7 +476,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                 if (urlConnection != null)
                     urlConnection.disconnect();
             }
-            Log.i(TAG, "Response: " + sb.toString());
+            Timber.i("Response: %s", sb.toString());
 
             return sb.toString();
         }
@@ -524,14 +518,14 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                                 + jsonObject.get("error"), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
-                    Log.e(TAG, e.getMessage());
+                    Timber.e(e.getMessage());
                     Toast.makeText(context, "Something went wrong with the data: " +
                             e.getMessage(), Toast.LENGTH_LONG).show();
                 }
 
 
             } else {
-                Log.e(TAG, "Could not be verified");
+                Timber.e("Could not be verified");
                 Toast.makeText(context, "Account could not be verified.",
                         Toast.LENGTH_LONG).show();
             }

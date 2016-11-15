@@ -11,8 +11,11 @@ import android.widget.TextView;
  * @version 9 Nov 2016
  */
 public class PasswordValidator extends TextValidator implements View.OnFocusChangeListener {
-    private static int MIN_PASSWORD_LENGTH = 6;
 
+    /**
+     * Minimum password length.
+     */
+    private static int MIN_PASSWORD_LENGTH = 6;
 
     /**
      * @param textView The text view to watch.
