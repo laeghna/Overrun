@@ -317,7 +317,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
             StringBuilder sb = new StringBuilder();
 
             try {
-                sb.append(getString(R.string.PROD_API_URL));
+                sb.append(getString(R.string.DEV_API_URL));
                 sb.append("api/login");
                 URL url = new URL(sb.toString());
                 sb.setLength(0);
@@ -451,7 +451,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
          */
         @Override
         protected String doInBackground(String... params) {
-            String signinUrl = getString(R.string.PROD_API_URL) + "api/login?id_token=" + params[0];
+            String signinUrl = getString(R.string.DEV_API_URL) + "api/login?id_token=" + params[0];
             Timber.d("API_URL: %s", signinUrl);
 
             StringBuilder sb = new StringBuilder();
@@ -494,6 +494,9 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 
                 try {
                     JSONObject jsonObject = new JSONObject(result);
+
+
+
                     Boolean status = (Boolean) jsonObject.get("email_verified");
 
                     if (status) {
@@ -519,8 +522,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                     }
                 } catch (JSONException e) {
                     Timber.e(e.getMessage());
-                    Toast.makeText(context, "Something went wrong with the data: " +
-                            e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Something went wrong during sign in.", Toast.LENGTH_LONG).show();
                 }
 
 
