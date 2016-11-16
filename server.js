@@ -1,8 +1,7 @@
 var http = require('http');
 var fs = require('fs');
 var crypto = require('crypto');
-var BigInteger = require('node-biginteger');
-var config = fs.readFileSync("overrun.json");
+var config = JSON.parse(fs.readFileSync("overrun.json"));
 
 var express = require('express');
 var app = express();
@@ -11,14 +10,16 @@ var app = express();
 var google = require('google-auth-library');
 var OAuth2 = new google().OAuth2;
 
-var CLIENT_ID = '711195024447-ltgs11u6ho1otmfsocoeql0le3e9n4hm.apps.googleusercontent.com';
-var CLIENT_SECRET = 'yQqOP0KLnM6kM_cL2qoa8IqM';
+// var CLIENT_ID = '417571724567-e4us94dgu6eah1p0icr3bvbgtmgulqqp.apps.googleusercontent.com';
+// var CLIENT_SECRET = 'lc5XyqOSS71WUcccPQzDnkZJ';
+var CLIENT_ID = config.oauthConfig.CLIENT_ID;
+var CLIENT_SECRET = config.oauthConfig.CLIENT_SECRET;
 
 var oauth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET);
 
 // express config
-const PORT = 8080;
-const apiurl = 'https://cssgate.insttech.washington.edu:8080/';
+const PORT = 8081;
+const apiurl = 'https://cssgate.insttech.washington.edu:8081/';
 app.set("title", "Overrun");
 // require('./routes')(app, c);
 
@@ -32,13 +33,13 @@ app.use(bp.urlencoded({ extended: true }));
 // MySQL config
 var Client = require('mariasql');
 
-//var c = new Client(config.mysqlConfig);
-var c = new Client({
-    "host"    : "cssgate.insttech.washington.edu",
-    "user"    : "earowell",
-    "password": "azLats*",
-    "db"      : "earowell"
-});
+var c = new Client(config.mysqlConfig);
+// var c = new Client({
+//     "host"    : "cssgate.insttech.washington.edu",
+//     "user"    : "earowell",
+//     "password": "azLats*",
+//     "db"      : "earowell"
+// });
 
 // SQL prepared statements
 var createUser = c.prepare('INSERT INTO User (email, pass) ' +
@@ -364,9 +365,9 @@ app.post('/api/login', (req, res) => {
                 } else {
                     console.log("Success");
                     res.status(200).json({
-                        email: result[0].email,
+                        email    : result[0].email,
                         firstName: "",
-                        lastName: ""
+                        lastName : ""
                     });
                 }
             }
@@ -374,7 +375,6 @@ app.post('/api/login', (req, res) => {
     }
     // sign in with google account by verifying id_token
     else {
-
         console.log("in validate token");
 
         validateToken(req.query.id_token, (err, response) => {
@@ -424,7 +424,7 @@ app.post('/api/login', (req, res) => {
 
 
 function validateToken(token, callback) {
-    oauth2Client.verifyIdToken(token, config.CLIENT_ID, callback);
+    oauth2Client.verifyIdToken(token, CLIENT_ID, callback);
 }
 
 function handleError(err, res, message) {
