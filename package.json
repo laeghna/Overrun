@@ -15,5 +15,8 @@
     "google-auth-library": "^0.9.9",
     "mariasql": "^0.2.6",
     "node-biginteger": "0.0.10"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
   }
 }
