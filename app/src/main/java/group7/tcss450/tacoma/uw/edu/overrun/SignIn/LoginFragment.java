@@ -17,6 +17,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.BuildConfig;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
+import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailValidator;
 import timber.log.Timber;
 
 /**
@@ -62,6 +63,10 @@ public class LoginFragment extends Fragment {
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
+
+        EmailValidator emailValidator = new EmailValidator(emailText);
+        emailText.addTextChangedListener(emailValidator);
+        emailText.setOnFocusChangeListener(emailValidator);
 
         // Inflate the layout for this fragment
         return view;

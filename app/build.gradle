@@ -38,7 +38,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:3.1.4'
     compile 'com.google.guava:guava:19.0'
-    compile 'org.mindrot:jbcrypt:0.3m'
 }
 
 apply plugin: 'com.google.gms.google-services'

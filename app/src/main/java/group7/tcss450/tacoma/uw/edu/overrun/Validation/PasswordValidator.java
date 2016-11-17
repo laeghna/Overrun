@@ -1,9 +1,11 @@
 package group7.tcss450.tacoma.uw.edu.overrun.Validation;
 
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
-import static android.R.attr.password;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -20,17 +22,39 @@ public class PasswordValidator extends TextValidator implements View.OnFocusChan
     private static int MIN_PASSWORD_LENGTH = 6;
 
     /**
+     * List of EditTexts to ensure this field matches.
+     */
+    private List<EditText> otherPasswordFields;
+
+    /**
+     * Ensures validation doesn't occur until after it gains focus and then
+     * focus is lost.
+     */
+    private boolean touched = false;
+
+    /**
      * @param textView The text view to watch.
      */
     public PasswordValidator(TextView textView) {
         super(textView);
+        otherPasswordFields = new ArrayList<>();
     }
 
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-        if (!hasFocus) {
+        if (hasFocus) touched = true;
+
+        if (!hasFocus && touched) {
             validate((TextView) v);
         }
+    }
+
+    /**
+     * Adds another password field to check against to ensure they match.
+     * @param passwordField The password field to check against.
+     */
+    public void addPasswordField(EditText passwordField) {
+        otherPasswordFields.add(passwordField);
     }
 
     @Override
@@ -59,6 +83,14 @@ public class PasswordValidator extends TextValidator implements View.OnFocusChan
                 } else if (!foundSymbol) {
                     textView.setError(textView.getHint() + " must contain a symbol.");
                     return false;
+                }
+
+                // loops through all textviews associated with this validator.
+                for (EditText textField : otherPasswordFields) {
+                    if (!getMyTextView().getText().toString()
+                            .equals(textField.getText().toString())) {
+                        textView.setError(textView.getHint() + " does not match.");
+                    }
                 }
             }
         }

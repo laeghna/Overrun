@@ -24,15 +24,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 
 import group7.tcss450.tacoma.uw.edu.overrun.SignIn.SignInActivity;
+import group7.tcss450.tacoma.uw.edu.overrun.Utils.JSONHelper;
 import timber.log.Timber;
 
 /**
@@ -311,43 +310,33 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
             String email = params[0];
             String password = params[1];
 
-            Timber.d("Password: %s", password);
-
             HttpURLConnection urlCon = null;
             StringBuilder sb = new StringBuilder();
 
             try {
                 sb.append(getString(R.string.DEV_API_URL));
-                sb.append("api/login");
+                sb.append("api/login?");
+
+                sb.append("email=").append(email).append("&");
+                sb.append("pass=").append(password);
                 URL url = new URL(sb.toString());
-                sb.setLength(0);
-                sb.append(URLEncoder.encode("email", "UTF-8")).append("=")
-                        .append(URLEncoder.encode(email, "UTF-8")).append("&");
-                sb.append(URLEncoder.encode("pass", "UTF-8")).append("=")
-                        .append(URLEncoder.encode(password, "UTF-8"));
 
                 Timber.d("Encoded string: %s", sb.toString());
 
                 urlCon = (HttpURLConnection) url.openConnection();
                 urlCon.setRequestMethod("POST");
 
-                DataOutputStream dataOutputStream = new DataOutputStream(urlCon.getOutputStream());
-                dataOutputStream.flush();
-                dataOutputStream.writeBytes(sb.toString());
-
-                dataOutputStream.flush();
-                dataOutputStream.close();
-
                 int statusCode = urlCon.getResponseCode();
                 Timber.d("Status: %d", statusCode);
                 sb.setLength(0);
 
                 if (statusCode != HttpURLConnection.HTTP_OK) {
-                    // TODO: handle error
-                    if (statusCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                        Timber.d("Error during login. Status code: %s", statusCode);
+                    Timber.d("Error during login. Status code: %s", statusCode);
+
+                    if (statusCode == HttpURLConnection.HTTP_UNAUTHORIZED)
                         sb.append("Wrong password or email.");
-                    }
+                    else
+                        sb.append("Sorry our server messed up.");
                 } else {
                     Timber.d("Successful login.");
 
@@ -367,7 +356,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 
             Timber.d("String that was built: %s", sb.toString());
 
-            return sb.toString();
+            return (sb.toString().length() > 0) ? sb.toString() : null;
         }
 
         @Override
@@ -379,25 +368,26 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-
-            if (result.contains("Wrong")) {
-                Toast.makeText(context, result,
+            if (result == null) {
+                Toast.makeText(context, "Something went wrong during sign in.",
                         Toast.LENGTH_LONG).show();
+            } else if (result.contains("Wrong")) {
+                Toast.makeText(context, result, Toast.LENGTH_LONG).show();
             } else {
 
-                JSONObject jsonObject = null;
+                JSONObject jsonObject;
                 String message;
                 try {
                     jsonObject = new JSONObject(result);
                     if (jsonObject.has("error")) {
-                        String error = (String) jsonObject.get("error");
+                        String error = JSONHelper.tryGetString(jsonObject, "error");
                         message = "Error: " + error;
                         Toast.makeText(context, message,
                                 Toast.LENGTH_LONG).show();
                     } else {
-                        String email = (String) jsonObject.get("email");
-                        String firstName = (String) jsonObject.get("firstName");
-                        String lastName = (String) jsonObject.get("lastName");
+                        String email = JSONHelper.tryGetString(jsonObject, "email");
+                        String firstName = JSONHelper.tryGetString(jsonObject, "firstName");
+                        String lastName = JSONHelper.tryGetString(jsonObject, "lastName");
 
                         SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs),
                                 Context.MODE_PRIVATE);
@@ -409,14 +399,12 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                         editor.apply();
 
                         finish();
-                        Toast.makeText(context, "Signed in as: " + email,
-                                Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "Signed in as: " + email, Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-
             hideProgressDialog();
         }
     }
@@ -494,16 +482,12 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 
                 try {
                     JSONObject jsonObject = new JSONObject(result);
+                    Boolean status = JSONHelper.tryGetBoolean(jsonObject, "email_verified");
 
-
-
-                    Boolean status = (Boolean) jsonObject.get("email_verified");
-
-                    if (status) {
-
-                        String email = (String) jsonObject.get("email");
-                        String firstName = (String) jsonObject.get("firstName");
-                        String lastName = (String) jsonObject.get("lastName");
+                    if (status != null && status) {
+                        String email = JSONHelper.tryGetString(jsonObject, "email");
+                        String firstName = JSONHelper.tryGetString(jsonObject, "firstName");
+                        String lastName = JSONHelper.tryGetString(jsonObject, "lastName");
 
                         SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs),
                                 Context.MODE_PRIVATE);
@@ -518,7 +502,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                                 Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(context, "Failed to verify account: "
-                                + jsonObject.get("error"), Toast.LENGTH_LONG).show();
+                                + JSONHelper.tryGetString(jsonObject, "error"), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     Timber.e(e.getMessage());

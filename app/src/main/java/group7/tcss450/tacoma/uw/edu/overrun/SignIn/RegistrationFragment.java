@@ -14,7 +14,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -130,11 +129,17 @@ public class RegistrationFragment extends Fragment {
         emailText.addTextChangedListener(new EmailValidator(emailText));
         emailText.setOnFocusChangeListener(new EmailValidator(emailText));
 
-        passText.addTextChangedListener(new PasswordValidator(passText));
-        passText.setOnFocusChangeListener(new PasswordValidator(passText));
+        PasswordValidator pwValidator = new PasswordValidator(passText);
+        PasswordValidator pwConfValidator = new PasswordValidator(confirmPassText);
 
-        confirmPassText.addTextChangedListener(new PasswordValidator(confirmPassText));
-        confirmPassText.setOnFocusChangeListener(new PasswordValidator(confirmPassText));
+        // have this validator match passText
+        pwConfValidator.addPasswordField(passText);
+
+        passText.addTextChangedListener(pwValidator);
+        passText.setOnFocusChangeListener(pwValidator);
+
+        confirmPassText.addTextChangedListener(pwConfValidator);
+        confirmPassText.setOnFocusChangeListener(pwConfValidator);
     }
 
     @Override
@@ -163,24 +168,17 @@ public class RegistrationFragment extends Fragment {
             StringBuilder sb = new StringBuilder();
 
             try {
-                sb.append(getString(R.string.PROD_API_URL));
-                sb.append("api/user");
-                URL url = new URL(sb.toString());
-                sb.setLength(0);
+                sb.append(getString(R.string.DEV_API_URL));
+                sb.append("api/user?");
 
-                sb.append("emailText=").append(email).append("&");
-                sb.append("passText=").append(password).append("&");
+                sb.append("email=").append(email).append("&");
+                sb.append("pass=").append(password);
+                URL url = new URL(sb.toString());
+
 
                 urlCon = (HttpURLConnection) url.openConnection();
                 urlCon.setRequestMethod("POST");
                 urlCon.setDoOutput(true);
-
-                DataOutputStream dataOutputStream = new DataOutputStream(urlCon.getOutputStream());
-                dataOutputStream.flush();
-                dataOutputStream.writeBytes(sb.toString());
-
-                dataOutputStream.flush();
-                dataOutputStream.close();
 
                 int statusCode = urlCon.getResponseCode();
                 Timber.d("Status: %d", statusCode);
@@ -230,7 +228,7 @@ public class RegistrationFragment extends Fragment {
                         Toast.makeText(getActivity().getApplicationContext(), message,
                                 Toast.LENGTH_LONG).show();
                     } else {
-                        message = (String) jsonObject.get("emailText");
+                        message = (String) jsonObject.get("email");
                         getActivity().getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fragment_container, new LoginFragment())
                                 .commit();

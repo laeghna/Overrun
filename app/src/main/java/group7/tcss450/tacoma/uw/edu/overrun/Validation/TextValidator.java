@@ -29,6 +29,14 @@ abstract class TextValidator implements TextWatcher {
      */
     public abstract boolean validate(TextView textView);
 
+    /**
+     * Returns the instance of the textfield assigned to this validator.
+     * @return a text view
+     */
+    public TextView getMyTextView() {
+        return textView;
+    }
+
     @Override
     final public void afterTextChanged(Editable s) {
         validate(textView);

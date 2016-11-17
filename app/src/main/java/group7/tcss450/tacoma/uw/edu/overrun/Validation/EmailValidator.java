@@ -40,7 +40,7 @@ public class EmailValidator extends TextValidator implements View.OnFocusChangeL
 
     @Override
     public boolean validate(TextView textView) {
-        String text = textView.getText().toString();
+        String text = textView.getText().toString().trim();
         boolean valid = true;
 
         if (text.isEmpty()) {
