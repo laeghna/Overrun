@@ -1,4 +1,4 @@
-package group7.tcss450.tacoma.uw.edu.overrun;
+package group7.tcss450.tacoma.uw.edu.overrun.Game;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,6 +9,8 @@ import android.graphics.Rect;
 import android.util.Log;
 
 import java.util.Random;
+
+import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 /**
  * This class specifies the behavior for a zombie crawler enemy.
@@ -72,7 +74,7 @@ public class ZombieCrawler implements Zombie {
         xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
         yCoord = yMin;
 
-        detectZombie =  new Rect(xCoord, yCoord, crawlerBitmap.getWidth(), crawlerBitmap.getHeight());
+        detectZombie =  new Rect(xCoord, yCoord, xCoord + crawlerBitmap.getWidth(), yCoord + crawlerBitmap.getHeight());
     }
 
     @Override

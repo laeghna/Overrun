@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInApi;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
@@ -22,7 +21,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,37 +31,42 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
-import java.util.Random;
-
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
+import java.net.URLEncoder;
 
 import group7.tcss450.tacoma.uw.edu.overrun.SignIn.SignInActivity;
 
-import static group7.tcss450.tacoma.uw.edu.overrun.BaseActivity.getNextSalt;
-import static group7.tcss450.tacoma.uw.edu.overrun.BaseActivity.hash;
-
+/**
+ * Base Activity that classes can extend in order to have access to methods to interact with
+ * the current user.
+ *
+ * @author Ethan Rowell
+ * @version 9 Nov 2016
+ */
 public class BaseActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
-    //private static final String API_URL = "https://cssgate.insttech.washington.edu:8080/";
 
     /**
-     * Used for local development.
+     * Log Tag.
      */
-    private static final String API_URL = " http://10.0.2.2:8080";
-
     private static final String TAG = "BaseActivity";
-    private static final Random RANDOM = new SecureRandom();
-    private static final int ITERATIONS = 10000;
-    private static final int KEY_LENGTH = 256;
-    private static final int RC_SIGN_IN = 9001;
+
+    /**
+     * Code for retrieving a token for validation from Google API Client.
+     */
     private static final int RC_GET_TOKEN = 9002;
 
+    /**
+     *
+     */
     private GoogleApiClient mGoogleApiClient = null;
+
+    /**
+     * Progress dialog for undergoing processes.
+     */
     private ProgressDialog mProgressDialog;
+
+    /**
+     * Debug flag for testing Google sign in without database access.
+     */
     private static boolean IS_DEBUG = false;
 
     @Override
@@ -107,6 +110,11 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
+    /**
+     * Checks shared preferences to determine if a user is logged in or not.
+     *
+     * @return Logged in status of current user.
+     */
     public boolean isLoggedIn() {
         boolean defaultVal = getResources().getBoolean(R.bool.logged_in_default);
         return getSharedPreferences(getString(R.string.shared_prefs),
@@ -114,15 +122,22 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                 .getBoolean(getString(R.string.logged_in), defaultVal);
     }
 
+    /**
+     * Signs the user in with a previously registered email and password.
+     *
+     * @param email    User's email.
+     * @param password User's password.
+     */
     public void signIn(String email, String password) {
         showProgressDialog("Signing in...");
 
-        new SignInAsync().execute(email, password);
+        new SignInAsync(getApplicationContext()).execute(email, password);
     }
 
-
+    /**
+     * Uses Google API Client to log the user in with their Google Account.
+     */
     public void googleSignIn() {
-
 
         showProgressDialog("Loading...");
 
@@ -146,6 +161,9 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         startActivityForResult(signInIntent, RC_GET_TOKEN);
     }
 
+    /**
+     * Signs a user out by removing their shared preferences.
+     */
     public void signOut() {
 
         SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
@@ -164,24 +182,23 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                                 @Override
                                 public void onResult(@NonNull Status status) {
                                     Log.d(TAG, "in on result");
-                                    Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    startActivity(intent);
+                                    finish();
                                 }
                             });
 
         }
 
-        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-
         editor.apply();
 
-        new SignOutAsync().execute();
+        new SignOutAsync(this).execute();
 
     }
 
+    /**
+     * Shows the progress dialog with the given message.
+     *
+     * @param messageText The text to be displayed on the progress dialog.
+     */
     public void showProgressDialog(String messageText) {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this);
@@ -192,6 +209,9 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         mProgressDialog.show();
     }
 
+    /**
+     * Hides the progress dialog.
+     */
     public void hideProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
@@ -215,10 +235,8 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                 if (IS_DEBUG) {
                     debug_signin(acct);
                 } else {
-                    new GoogleSignInAsync().execute(acct.getIdToken());
+                    new GoogleSignInAsync(getApplicationContext()).execute(acct.getIdToken());
                 }
-
-
             }
         } else {
             // Signed out, show unauthenticated UI.
@@ -233,6 +251,16 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 //                    Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    /**
+     * Displays a toast message stating the error.
+     *
+     * @param message the message to be displayed.
+     */
+    private void handleSigninError(String message) {
+        Toast.makeText(getApplicationContext(), message,
+                Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -254,9 +282,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         Toast.makeText(getApplicationContext(), "Signed in as: " + acct.getEmail(),
                 Toast.LENGTH_LONG).show();
 
-        Intent intent = new Intent(getApplicationContext(), StartMenuActivity.class);
-        startActivity(intent);
-
         finish();
     }
 
@@ -266,65 +291,19 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         hideProgressDialog();
     }
 
-
-    /**
-     * Returns a random salt to be used to hash a password.
-     * Source: https://goo.gl/wYLyBA
-     *
-     * @return a 16 bytes random salt
-     */
-    public static byte[] getNextSalt() {
-        byte[] salt = new byte[16];
-        RANDOM.nextBytes(salt);
-        return salt;
-    }
-
-    /**
-     * Returns a salted and hashed password using the provided hash.<br>
-     * Note - side effect: the password is destroyed (the char[] is filled with zeros)
-     * Source: https://goo.gl/wYLyBA
-     *
-     * @param password the password to be hashed
-     * @param salt     a 16 bytes salt, ideally obtained with the getNextSalt method
-     * @return the hashed password with a pinch of salt
-     */
-    public static byte[] hash(char[] password, byte[] salt) {
-        PBEKeySpec spec = new PBEKeySpec(password, salt, ITERATIONS, KEY_LENGTH);
-        Arrays.fill(password, Character.MIN_VALUE);
-        try {
-            SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-            return skf.generateSecret(spec).getEncoded();
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            Log.e(TAG, "Error when generating secret: " + e.getMessage());
-        } finally {
-            spec.clearPassword();
-        }
-        return new byte[16];
-    }
-
-    /**
-     * Converts a byte array to a hex string.
-     * source: https://goo.gl/xhuvfo
-     *
-     * @param bytes byte array to be converted to hex.
-     * @return hex string
-     */
-    public static String bytesToHex(byte[] bytes) {
-        char[] hexArray = "0123456789ABCDEF".toCharArray();
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
-
-
     /**
      * Signs the user in using an email and password.
      */
     private class SignInAsync extends AsyncTask<String, Void, String> {
+
+        /**
+         * The context of the current activity.
+         */
+        Context context;
+
+        SignInAsync(Context c) {
+            this.context = c;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -332,36 +311,35 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
             showProgressDialog("Logging in...");
         }
 
-
         @Override
         protected String doInBackground(String... params) {
 
             String email = params[0];
             String password = params[1];
 
-            byte[] salt = getNextSalt();
-            byte[] hashedPass = hash(password.toCharArray(), salt);
+            Log.d(TAG, "Password: " + password);
 
             HttpURLConnection urlCon = null;
             StringBuilder sb = new StringBuilder();
 
             try {
-                sb = new StringBuilder();
-                sb.append(API_URL);
-                sb.append("/api/login");
-                sb.append("?email=").append(email).append("&");
-                sb.append("salt=").append(bytesToHex(salt)).append("&");
-                sb.append("hash=").append(bytesToHex((hashedPass)));
-
+                sb.append(getString(R.string.PROD_API_URL));
+                sb.append("api/login");
                 URL url = new URL(sb.toString());
+                sb.setLength(0);
+                sb.append(URLEncoder.encode("email", "UTF-8")).append("=")
+                        .append(URLEncoder.encode(email, "UTF-8")).append("&");
+                sb.append(URLEncoder.encode("pass", "UTF-8")).append("=")
+                        .append(URLEncoder.encode(password, "UTF-8"));
+
+                Log.d(TAG, "Encoded string: " + sb.toString());
+
                 urlCon = (HttpURLConnection) url.openConnection();
                 urlCon.setRequestMethod("POST");
-                urlCon.setDoOutput(true);
-
 
                 DataOutputStream dataOutputStream = new DataOutputStream(urlCon.getOutputStream());
                 dataOutputStream.flush();
-                dataOutputStream.writeUTF(sb.toString());
+                dataOutputStream.writeBytes(sb.toString());
 
                 dataOutputStream.flush();
                 dataOutputStream.close();
@@ -372,8 +350,10 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 
                 if (statusCode != HttpURLConnection.HTTP_OK) {
                     // TODO: handle error
-                    Log.d(TAG, "Error during login.");
-                    sb.append("Error during login. Status code: " + statusCode);
+                    if (statusCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                        Log.d(TAG, "Error during login. Status code: " + statusCode);
+                        sb.append("Wrong password or email.");
+                    }
                 } else {
                     Log.d(TAG, "Successful login.");
 
@@ -383,9 +363,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                         sb.append(s);
                     }
                 }
-
-
-
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -400,30 +377,47 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         }
 
         @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            hideProgressDialog();
+        }
+
+        @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            if (result.contains("Error")) {
-
+            if (result.contains("Wrong")) {
+                Toast.makeText(context, result,
+                        Toast.LENGTH_LONG).show();
             } else {
 
                 JSONObject jsonObject = null;
                 String message;
                 try {
                     jsonObject = new JSONObject(result);
-                    if (jsonObject.has("Error")) {
-                        String error = (String) jsonObject.get("Error");
+                    if (jsonObject.has("error")) {
+                        String error = (String) jsonObject.get("error");
                         message = "Error: " + error;
+                        Toast.makeText(context, message,
+                                Toast.LENGTH_LONG).show();
                     } else {
-                        message = (String) jsonObject.get("Success");
-                        Intent intent = new Intent(getApplicationContext(),
-                                StartMenuActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                    Toast.makeText(getApplicationContext(), message,
-                            Toast.LENGTH_LONG).show();
+                        String email = (String) jsonObject.get("email");
+                        String firstName = (String) jsonObject.get("firstName");
+                        String lastName = (String) jsonObject.get("lastName");
 
+                        SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs),
+                                Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+
+                        editor.putString(getString(R.string.user_email), email);
+                        editor.putString(getString(R.string.user_name), firstName + " " + lastName);
+                        editor.putBoolean(getString(R.string.logged_in), true);
+                        editor.apply();
+
+                        finish();
+                        Toast.makeText(context, "Signed in as: " + email,
+                                Toast.LENGTH_LONG).show();
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -433,10 +427,20 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
+
     /**
      * Signs the user in using their Google account.
      */
     private class GoogleSignInAsync extends AsyncTask<String, Void, String> {
+
+        /**
+         * The context of the current activity.
+         */
+        Context context;
+
+        GoogleSignInAsync(Context c) {
+            this.context = c;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -453,7 +457,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
          */
         @Override
         protected String doInBackground(String... params) {
-            String signinUrl = API_URL + "/api/login?id_token=" + params[0];
+            String signinUrl = getString(R.string.PROD_API_URL) + "api/login?id_token=" + params[0];
             Log.d(TAG, "API_URL: " + signinUrl);
 
             StringBuilder sb = new StringBuilder();
@@ -495,8 +499,7 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
             if (result != null) {
 
                 try {
-                    JSONArray jsonArray = new JSONArray(result);
-                    JSONObject jsonObject = jsonArray.getJSONObject(0);
+                    JSONObject jsonObject = new JSONObject(result);
                     Boolean status = (Boolean) jsonObject.get("email_verified");
 
                     if (status) {
@@ -514,30 +517,33 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                         editor.putBoolean(getString(R.string.logged_in), true);
                         editor.apply();
 
-                        Toast.makeText(getApplicationContext(), "Signed in as: " + email,
+                        Toast.makeText(context, "Signed in as: " + email,
                                 Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(getApplicationContext(), "Failed to verify account: "
+                        Toast.makeText(context, "Failed to verify account: "
                                 + jsonObject.get("error"), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
-                    Log.e("WSL", e.getMessage());
-                    Toast.makeText(getApplicationContext(), "Something went wrong with the data: " +
+                    Log.e(TAG, e.getMessage());
+                    Toast.makeText(context, "Something went wrong with the data: " +
                             e.getMessage(), Toast.LENGTH_LONG).show();
                 }
 
 
             } else {
-                Log.e("WSL", "Could not be verified");
-                Toast.makeText(getApplicationContext(), "Account could not be verified.",
+                Log.e(TAG, "Could not be verified");
+                Toast.makeText(context, "Account could not be verified.",
                         Toast.LENGTH_LONG).show();
             }
 
-            Intent intent = new Intent(getApplicationContext(), StartMenuActivity.class);
-            startActivity(intent);
-
             finish();
 
+            hideProgressDialog();
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
             hideProgressDialog();
         }
     }
@@ -547,8 +553,19 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
      */
     private class SignOutAsync extends AsyncTask<Void, Void, Void> {
 
+        /**
+         * The context of the current activity.
+         */
+        private Context context;
+
+        SignOutAsync(Context context) {
+            this.context = context;
+
+        }
+
         @Override
         protected Void doInBackground(Void... params) {
+
             SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
 
@@ -563,14 +580,17 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                             new ResultCallback<com.google.android.gms.common.api.Status>() {
                                 @Override
                                 public void onResult(@NonNull com.google.android.gms.common.api.Status status) {
-                                    Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK
-                                            | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    startActivity(intent);
+                                    ((BaseActivity) context).finish();
                                 }
                             });
 
             return null;
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            hideProgressDialog();
         }
     }
 }

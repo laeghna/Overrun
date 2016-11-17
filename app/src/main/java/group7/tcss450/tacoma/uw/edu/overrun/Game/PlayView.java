@@ -1,4 +1,4 @@
-package group7.tcss450.tacoma.uw.edu.overrun;
+package group7.tcss450.tacoma.uw.edu.overrun.Game;
 
 
 import android.content.Context;
@@ -9,7 +9,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.Display;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
@@ -22,9 +21,6 @@ import android.view.WindowManager;
  * @version 8 Nov 2016
  */
 public class PlayView extends SurfaceView implements Runnable{
-
-    /** For discerning between tap and scroll. */
-    public static final float TAP_TOLERANCE = 10;
 
     /** A volatile boolean for controlling multithreaded play. */
     private volatile boolean mIsPlaying; // True when game is in-play, false otherwise
@@ -45,20 +41,17 @@ public class PlayView extends SurfaceView implements Runnable{
     private SurfaceHolder mHolder;
 
     /** The player's weapon. */
-    private Weapon mWeapon;
+    private Bullet[] mBullets;
 
     /** The size of the screen being used to display the game. */
     private Point mScreen;
-
-    /** Coordinates of the most recent touch on the screen. */
-    private float mTouchX;
-    private float mTouchY;
 
     /** Array for holding zombie objects. */
     private Zombie[] zombies;
 
     /** Adding 3 zombies for testing. */
     private int zombieCount = 3;
+
 
     /**
      * Constructor for the PlayView class.
@@ -70,7 +63,6 @@ public class PlayView extends SurfaceView implements Runnable{
         Display d = wm.getDefaultDisplay();
         mScreen = new Point();
         d.getSize(mScreen);
-        Log.d("ScreenX/2, ScreenY/3", "(" + mScreen.x/2 + "," +  mScreen.y/3 + ")");
 
         // create survivor object
         mSurvivor = new Survivor(context, mScreen);
@@ -81,7 +73,7 @@ public class PlayView extends SurfaceView implements Runnable{
         //create holder for view
         mHolder = getHolder();
 
-        mWeapon = new Weapon(1, 1, mScreen, context);
+        mBullets = new Bullet[Bullet.AMMO_CAPACITY];
 
         //zombies
         zombies = new Zombie[zombieCount];
@@ -89,6 +81,7 @@ public class PlayView extends SurfaceView implements Runnable{
 
             zombies[i] = new ZombieCrawler(context, mScreen);
         }
+
     }
 
     /**
@@ -104,7 +97,6 @@ public class PlayView extends SurfaceView implements Runnable{
             //update and draw frame
             update();
             draw();
-
             //update the frame controls
             framesPerSecond();
         }
@@ -113,21 +105,39 @@ public class PlayView extends SurfaceView implements Runnable{
 
     /** Updates the frame for the PlayView. */
     private void update(){
-
-        if(mWeapon.getBullet().getIsActive()) {
-
-            mWeapon.getBullet().updateBulletPosition();
+        // update active bullet positions.
+        for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
+            if(mBullets[i] != null) {
+                if (mBullets[i].getIsActive()) {
+                    mBullets[i].updateBulletPosition();
+                }
+            }
         }
 
+        // update zombie positions.
         for(int i=0; i < zombies.length; i++){
             zombies[i].updateMovement();
+        }
 
-            //if collision occurs with bullet
-            if (Rect.intersects(mWeapon.getDetectBullet(), zombies[i].getDetectZombie())) {
+        //check for collisions between bullets and zombies.
+        for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
+            if (mBullets[i] != null) {
+                if (mBullets[i].getIsActive()) {
+                    for (int z = 0; z < zombieCount; z++) {
+                        //if collision occurs with bullet
+                        if (Rect.intersects(mBullets[i].getDetectBullet(), zombies[z].getDetectZombie())) {
 
-                //moving enemy outside the bottom edge and setting bullet isActive to false
-                zombies[i].setXCoord(mScreen.y + zombies[i].getBitmap().getHeight());
-                mWeapon.getBullet().setIsActive(false);
+                            //moving enemy outside the bottom edge and setting bullet isActive to false
+                            zombies[z].setXCoord(mScreen.y + zombies[z].getBitmap().getHeight());
+                            mBullets[i].setIsActive(false);
+                        }
+                    }
+                }
+            }
+        }
+        for(int i = 0; i < zombieCount; i++) {
+            if(Rect.intersects(zombies[i].getDetectZombie(), mSurvivor.getmDetectCollisions())) {
+                Log.d("PlayView", "Survivor is hit!");
             }
         }
     }
@@ -151,10 +161,14 @@ public class PlayView extends SurfaceView implements Runnable{
                         mPaintBrush
                 );
             }
-
-            if(mWeapon.getBullet().getIsActive()) {
-                mBackground.drawBitmap(mWeapon.getBullet().getBMP(), mWeapon.getBullet().getX(),
-                        mWeapon.getBullet().getY(), mPaintBrush);
+            // draws bullets
+            for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
+                if (mBullets[i] != null) {
+                    if (mBullets[i].getIsActive()) {
+                        mBackground.drawBitmap(mBullets[i].getBMP(), mBullets[i].getX(),
+                                mBullets[i].getY(), mPaintBrush);
+                    }
+                }
             }
             mHolder.unlockCanvasAndPost(mBackground); // drawing done -> unlock background
         }
@@ -186,29 +200,45 @@ public class PlayView extends SurfaceView implements Runnable{
         mGameThread.start();
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent mEvent) {
-        switch(mEvent.getAction() & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_DOWN:
-                mTouchX = mEvent.getX();
-                break;
-
-            // Player has removed finger from screen
-            case MotionEvent.ACTION_UP:
-                if(mEvent.getY() < mScreen.y - mScreen.y/3) {
-                    mWeapon.shootWeapon(mSurvivor.getmX(), mSurvivor.getmY() -
-                            mSurvivor.getmBmap().getHeight());
-                }
-                break;
-
-            case MotionEvent.ACTION_MOVE:
-                if(mEvent.getY() >= mScreen.y - mScreen.y/3) {
-                    if (TAP_TOLERANCE < Math.abs(mTouchX - mEvent.getX())) {
-                        mSurvivor.setmX((int) mEvent.getX());
-                    }
-                }
-                break;
+    /**
+     * Moves the survivor toward the left end of the screen.
+     */
+    public void moveLeft() {
+        if((mSurvivor.getmX() - mSurvivor.getmSpeed()) > 1) {
+            mSurvivor.setmX(mSurvivor.getmX() - mSurvivor.getmSpeed());
         }
-        return true;
+        mSurvivor.updateCollisionDetector();
     }
+
+    /**
+     * Moves the survivor towards the right end of the screen.
+     */
+    public void moveRight() {
+        if((mSurvivor.getmX() + mSurvivor.getmSpeed() + mSurvivor.getmBmap().getWidth()) < mScreen.x) {
+            mSurvivor.setmX( mSurvivor.getmX() + mSurvivor.getmSpeed());
+        }
+        mSurvivor.updateCollisionDetector();
+    }
+
+    /**
+     * Fires the survivor's weapon.
+     * @return true if the bullet was fired (added to the bullet array), false otherwise.
+     */
+    public boolean fire() {
+        Bullet b = new Bullet(1, mScreen, getContext());
+        b.shootWeapon(mSurvivor.getmX(), mSurvivor.getmY());
+        for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
+            if(mBullets[i] == null || !mBullets[i].getIsActive()) {
+                mBullets[i] = b;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Checks the survivor's collision detector to see if a collision occured. */
+    public void checkSurvivorCollision() {
+        mSurvivor.getmDetectCollisions();
+    }
+
 }

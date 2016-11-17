@@ -1,7 +1,6 @@
 package group7.tcss450.tacoma.uw.edu.overrun.SignIn;
 
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,29 +16,42 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 
+import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.Validation.PasswordValidator;
-import group7.tcss450.tacoma.uw.edu.overrun.Validation.UsernameValidator;
+import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailValidator;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Fragment that is responsible for registering accounts.
+ *
+ * @author Ethan Rowell
+ * @version 9 Nov 2016
  */
 public class RegistrationFragment extends Fragment {
-    EditText username;
-    EditText pass;
-    EditText confirm_pass;
 
-    private UserAddListener mListener;
+    private static final String TAG = "RegistrationActivity";
 
-    private static String USER_URL =
-            "http://cssgate.insttech.washington.edu/~dionmerz/overrun_register.php?";
+    /**
+     * The user's emailText.
+     */
+    private EditText emailText;
+
+    /**
+     * The user's password.
+     */
+    private EditText passText;
+
+    /**
+     * The user's confirmation password.
+     */
+    private EditText confirmPassText;
 
     public RegistrationFragment() {
         // Required empty public constructor
@@ -51,20 +63,17 @@ public class RegistrationFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_registration, container, false);
 
-        username = (EditText) view.findViewById(R.id.reg_email);
-        pass = (EditText) view.findViewById(R.id.reg_password);
-        confirm_pass = (EditText) view.findViewById(R.id.reg_confirm_password);
-
+        emailText = (EditText) view.findViewById(R.id.reg_email);
+        passText = (EditText) view.findViewById(R.id.reg_password);
+        confirmPassText = (EditText) view.findViewById(R.id.reg_confirm_password);
 
         addTextValidators(view);
 
-
-        Button addUserButton = (Button) view.findViewById(R.id.register_button);
-                addUserButton.setOnClickListener(new View.OnClickListener() {
+        Button submitButton = (Button) view.findViewById(R.id.register_button);
+        submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = buildCourseURL(v);
-                mListener.addUser(url);
+                submitRegistrationForm();
             }
         });
 
@@ -72,36 +81,36 @@ public class RegistrationFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof UserAddListener) {
-            mListener = (UserAddListener) context;
+    /**
+     * Handles the submission of the registration form.
+     */
+    private void submitRegistrationForm() {
+
+        if (validForm()) {
+            new RegisterAsync().execute(emailText.getText().toString(), passText.getText().toString());
+
+            Toast.makeText(getContext(), "Registration form submitted.", Toast.LENGTH_LONG).show();
         } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement UserAddListener");
+            Toast.makeText(getContext(), "Registration form is not valid.", Toast.LENGTH_LONG).show();
         }
     }
 
-//    /**
-//     * Handles the submission of the registration form.
-//     */
-//    public void submitRegistrationForm(View v) {
-//
-//        if (validForm(v)) {
-//            Toast.makeText(getContext(), "Registration form submitted.", Toast.LENGTH_LONG).show();
-//        } else {
-//            Toast.makeText(getContext(), "Registration form is not valid.", Toast.LENGTH_LONG).show();
-//        }
-//    }
-
-    private boolean validForm(View v) {
+    /**
+     * Validates form ensuring no empty fields and passwords match.
+     * @return whether the form is valid or not.
+     */
+    private boolean validForm() {
         boolean registrationValid = true;
 
-        if (username.getError() != null && !username.getError().toString().isEmpty() ||
-                pass.getError() != null && !pass.getError().toString().isEmpty() ||
-                confirm_pass.getError() != null && !confirm_pass.getError().toString().isEmpty()) {
+        // fields shouldn't be empty
+        if (emailText.getError() != null && !emailText.getError().toString().isEmpty() ||
+                passText.getError() != null && !passText.getError().toString().isEmpty() ||
+                confirmPassText.getError() != null && !confirmPassText.getError().toString().isEmpty()) {
+            registrationValid = false;
+        }
 
+        // passwords should match
+        if (!passText.getText().toString().equals(confirmPassText.getText().toString())) {
             registrationValid = false;
         }
 
@@ -112,46 +121,119 @@ public class RegistrationFragment extends Fragment {
      * Sets up validators for the text inputs.
      */
     private void addTextValidators(View view) {
-        //username = (EditText) view.findViewById(R.id.reg_email);
-        username.addTextChangedListener(new UsernameValidator(username));
-        username.setOnFocusChangeListener(new UsernameValidator(username));
+        emailText.addTextChangedListener(new EmailValidator(emailText));
+        emailText.setOnFocusChangeListener(new EmailValidator(emailText));
 
-        //pass = (EditText) view.findViewById(R.id.reg_password);
-        pass.addTextChangedListener(new PasswordValidator(pass));
-        pass.setOnFocusChangeListener(new PasswordValidator(pass));
+        passText.addTextChangedListener(new PasswordValidator(passText));
+        passText.setOnFocusChangeListener(new PasswordValidator(passText));
 
-        //confirm_pass = (EditText) view.findViewById(R.id.reg_confirm_password);
-        confirm_pass.addTextChangedListener(new PasswordValidator(confirm_pass));
-        confirm_pass.setOnFocusChangeListener(new PasswordValidator(confirm_pass));
+        confirmPassText.addTextChangedListener(new PasswordValidator(confirmPassText));
+        confirmPassText.setOnFocusChangeListener(new PasswordValidator(confirmPassText));
     }
 
+    /**
+     * Registers the user asynchronously and reroutes to LoginFragment upon successful registration.
+     */
+    private class RegisterAsync extends AsyncTask<String, Void, String> {
 
-    private String buildCourseURL(View v) {
-
-        StringBuilder sb = new StringBuilder(USER_URL);
-
-        try {
-
-            String userId = username.getText().toString();
-            sb.append("user=");
-            sb.append(userId);
-
-
-            String userPw = pass.getText().toString();
-            sb.append("&pw=");
-            sb.append(userPw);
-
-            Log.i("UserRegisterFragment", sb.toString());
-
-        } catch (Exception e) {
-            Toast.makeText(v.getContext(), "Something wrong with URL" + e.getMessage(), Toast.LENGTH_LONG)
-                    .show();
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            ((BaseActivity) getActivity()).showProgressDialog("Loading...");
         }
-        return sb.toString();
-    }
 
-    public interface UserAddListener {
-        public void addUser(String url);
-    }
+        @Override
+        protected String doInBackground(String... params) {
+            String email = params[0];
+            String password = params[1];
 
+            HttpURLConnection urlCon = null;
+            StringBuilder sb = new StringBuilder();
+
+            try {
+                sb.append(getString(R.string.PROD_API_URL));
+                sb.append("api/user");
+                URL url = new URL(sb.toString());
+                sb.setLength(0);
+
+                sb.append("emailText=").append(email).append("&");
+                sb.append("passText=").append(password).append("&");
+
+                urlCon = (HttpURLConnection) url.openConnection();
+                urlCon.setRequestMethod("POST");
+                urlCon.setDoOutput(true);
+
+                DataOutputStream dataOutputStream = new DataOutputStream(urlCon.getOutputStream());
+                dataOutputStream.flush();
+                dataOutputStream.writeBytes(sb.toString());
+
+                dataOutputStream.flush();
+                dataOutputStream.close();
+
+                int statusCode = urlCon.getResponseCode();
+                Log.d(TAG, "Status: " + statusCode);
+                sb.setLength(0);
+
+                if (statusCode != HttpURLConnection.HTTP_OK) {
+                    // TODO: handle error
+                    Log.d(TAG, "Error during registration.");
+                    sb.append("Error during login. Status code: ").append(statusCode);
+                } else {
+                    Log.d(TAG, "Successful registration.");
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(urlCon.getInputStream()));
+                    String s;
+                    while ((s = reader.readLine()) != null) {
+                        sb.append(s);
+                    }
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (urlCon != null) {
+                    urlCon.disconnect();
+                }
+            }
+
+            Log.d(TAG, "String that was built: " + sb.toString());
+
+            return sb.toString();
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (result.contains("Error")) {
+
+            } else {
+
+                JSONObject jsonObject = null;
+                String message;
+                try {
+                    jsonObject = new JSONObject(result);
+                    if (jsonObject.has("error")) {
+                        String error = (String) jsonObject.get("error");
+                        message = "Error: " + error;
+                        Toast.makeText(getActivity().getApplicationContext(), message,
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        message = (String) jsonObject.get("emailText");
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container, new LoginFragment())
+                                .commit();
+                        Toast.makeText(getActivity().getApplicationContext(), "Successful account " +
+                                "creation for: " + message,
+                                Toast.LENGTH_LONG).show();
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            ((BaseActivity) getActivity()).hideProgressDialog();
+        }
+    }
 }

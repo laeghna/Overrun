@@ -3,10 +3,20 @@ package group7.tcss450.tacoma.uw.edu.overrun.Validation;
 import android.view.View;
 import android.widget.TextView;
 
+
+/**
+ * Validated passwords for text views.
+ *
+ * @author Ethan Rowell
+ * @version 9 Nov 2016
+ */
 public class PasswordValidator extends TextValidator implements View.OnFocusChangeListener {
     private static int MIN_PASSWORD_LENGTH = 6;
 
 
+    /**
+     * @param textView The text view to watch.
+     */
     public PasswordValidator(TextView textView) {
         super(textView);
     }
@@ -31,10 +41,8 @@ public class PasswordValidator extends TextValidator implements View.OnFocusChan
                 textView.setError(textView.getHint() + " must be " + MIN_PASSWORD_LENGTH + " characters or more.");
                 valid = false;
             } else {
-
+                // further validation
             }
-
-
         }
         return valid;
     }

@@ -6,16 +6,23 @@ import android.widget.TextView;
 
 /**
  * Validates input fields after the text is changed.
- *
  * Source: https://goo.gl/ilB6rA
+ *
+ * @author Ethan Rowell
+ * @version 9 Nov 2016
  */
-public abstract class TextValidator implements TextWatcher {
+abstract class TextValidator implements TextWatcher {
     private final TextView textView;
 
-    public TextValidator(TextView textView) {
+    TextValidator(TextView textView) {
         this.textView = textView;
     }
 
+    /**
+     * Validation logic is implemented through this method.
+     * @param textView The text view to validate.
+     * @return Whether the text is valid or not.
+     */
     public abstract boolean validate(TextView textView);
 
     @Override
