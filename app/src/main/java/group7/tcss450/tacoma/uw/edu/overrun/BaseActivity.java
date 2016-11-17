@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +12,12 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -20,18 +27,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
 
 import group7.tcss450.tacoma.uw.edu.overrun.SignIn.SignInActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.Utils.JSONHelper;
+import group7.tcss450.tacoma.uw.edu.overrun.Utils.VolleySingleton;
 import timber.log.Timber;
 
 /**
@@ -102,6 +104,22 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        hideProgressDialog();
+    }
+
+
+
     /**
      * Checks shared preferences to determine if a user is logged in or not.
      *
@@ -115,6 +133,19 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     /**
+     * Checks if network is available
+     *
+     * @param context Context to check network with.
+     * @return Whether the network is available or not
+     */
+    public boolean isNetworkAvailable(final Context context) {
+        final ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
+    }
+
+
+
+    /**
      * Signs the user in with a previously registered email and password.
      *
      * @param email    User's email.
@@ -123,7 +154,11 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
     public void signIn(String email, String password) {
         showProgressDialog("Signing in...");
 
-        new SignInAsync(getApplicationContext()).execute(email, password);
+        if (isNetworkAvailable(this)) {
+            signInAsyncVolley(email, password);
+        } else {
+            // signIn offline
+        }
     }
 
     /**
@@ -209,6 +244,10 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
+
+
+
+
     /**
      * Handles the sign in result by saving the user's account information.
      *
@@ -226,7 +265,8 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                 if (IS_DEBUG) {
                     debug_signin(acct);
                 } else {
-                    new GoogleSignInAsync(getApplicationContext()).execute(acct.getIdToken());
+                    GoogleSignInAsyncVolley(acct.getIdToken());
+                    //new GoogleSignInAsync(getApplicationContext()).execute(acct.getIdToken());
                 }
             }
         } else {
@@ -236,16 +276,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
             hideProgressDialog();
             Timber.d("Failed sign in due to: %d", result.getStatus().getStatusCode());
         }
-    }
-
-    /**
-     * Displays a toast message stating the error.
-     *
-     * @param message the message to be displayed.
-     */
-    private void handleSigninError(String message) {
-        Toast.makeText(getApplicationContext(), message,
-                Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -270,262 +300,111 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         finish();
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Intent intent = new Intent(getApplicationContext(), SignInActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-        startActivity(intent);
+    /**
+     * Sign in with a registered account.
+     * @param email User's email
+     * @param password User's password
+     */
+    private void signInAsyncVolley(String email, String password) {
+        RequestQueue requestQueue = VolleySingleton.getInstance(this).getRequestQueue();
+
+        showProgressDialog("Signing in...");
+        String url = getString(R.string.DEV_API_URL) +
+                "api/login?email=" + email + "&pass=" + password;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        handleSignInSuccess(response);
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        handleSignInError(error);
+                    }
+                });
+        requestQueue.add(jsonObjectRequest);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    /**
+     * Google sign in asynchronously.
+     *
+     * @param token Token provided by Google API.
+     */
+    private void GoogleSignInAsyncVolley(String token) {
+        RequestQueue requestQueue = VolleySingleton.getInstance(this).getRequestQueue();
+
+        showProgressDialog("Signing in...");
+        String url = getString(R.string.DEV_API_URL) + "api/login?id_token=" + token;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        handleSignInSuccess(response);
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        handleSignInError(error);
+                    }
+                });
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    /**
+     * Handles the sign in from Volley.
+     *
+     * @param response JSON object response from the Volley request.
+     */
+    private void handleSignInSuccess(JSONObject response) {
+        String message;
+        if (response.has("error")) {
+            String error = JSONHelper.tryGetString(response, "error");
+            message = "Error: " + error;
+            Toast.makeText(getApplicationContext(), message,
+                    Toast.LENGTH_LONG).show();
+        } else {
+            String email = JSONHelper.tryGetString(response, "email");
+            String firstName = JSONHelper.tryGetString(response, "firstName");
+            String lastName = JSONHelper.tryGetString(response, "lastName");
+
+            SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs),
+                    Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+
+            editor.putString(getString(R.string.user_email), email);
+            editor.putString(getString(R.string.user_name), firstName + " " + lastName);
+            editor.putBoolean(getString(R.string.logged_in), true);
+            editor.apply();
+
+            finish();
+            Toast.makeText(getApplicationContext(), "Signed in as: " + email, Toast.LENGTH_LONG).show();
+        }
         hideProgressDialog();
     }
 
     /**
-     * Signs the user in using an email and password.
+     * Handles sign in errors from Volley requests.
+     *
+     * @param error VollyError from sign in.
      */
-    private class SignInAsync extends AsyncTask<String, Void, String> {
+    private void handleSignInError(VolleyError error) {
+        NetworkResponse status = error.networkResponse;
+        String message;
+        if (status.statusCode == HttpURLConnection.HTTP_UNAUTHORIZED)
+            message = "Wrong password or email.";
+        else
+            message = "Sorry our server messed up.";
 
-        /**
-         * The context of the current activity.
-         */
-        Context context;
-
-        SignInAsync(Context c) {
-            this.context = c;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showProgressDialog("Logging in...");
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            String email = params[0];
-            String password = params[1];
-
-            HttpURLConnection urlCon = null;
-            StringBuilder sb = new StringBuilder();
-
-            try {
-                sb.append(getString(R.string.DEV_API_URL));
-                sb.append("api/login?");
-
-                sb.append("email=").append(email).append("&");
-                sb.append("pass=").append(password);
-                URL url = new URL(sb.toString());
-
-                Timber.d("Encoded string: %s", sb.toString());
-
-                urlCon = (HttpURLConnection) url.openConnection();
-                urlCon.setRequestMethod("POST");
-
-                int statusCode = urlCon.getResponseCode();
-                Timber.d("Status: %d", statusCode);
-                sb.setLength(0);
-
-                if (statusCode != HttpURLConnection.HTTP_OK) {
-                    Timber.d("Error during login. Status code: %s", statusCode);
-
-                    if (statusCode == HttpURLConnection.HTTP_UNAUTHORIZED)
-                        sb.append("Wrong password or email.");
-                    else
-                        sb.append("Sorry our server messed up.");
-                } else {
-                    Timber.d("Successful login.");
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(urlCon.getInputStream()));
-                    String s;
-                    while ((s = reader.readLine()) != null) {
-                        sb.append(s);
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (urlCon != null) {
-                    urlCon.disconnect();
-                }
-            }
-
-            Timber.d("String that was built: %s", sb.toString());
-
-            return (sb.toString().length() > 0) ? sb.toString() : null;
-        }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-            hideProgressDialog();
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            if (result == null) {
-                Toast.makeText(context, "Something went wrong during sign in.",
-                        Toast.LENGTH_LONG).show();
-            } else if (result.contains("Wrong")) {
-                Toast.makeText(context, result, Toast.LENGTH_LONG).show();
-            } else {
-
-                JSONObject jsonObject;
-                String message;
-                try {
-                    jsonObject = new JSONObject(result);
-                    if (jsonObject.has("error")) {
-                        String error = JSONHelper.tryGetString(jsonObject, "error");
-                        message = "Error: " + error;
-                        Toast.makeText(context, message,
-                                Toast.LENGTH_LONG).show();
-                    } else {
-                        String email = JSONHelper.tryGetString(jsonObject, "email");
-                        String firstName = JSONHelper.tryGetString(jsonObject, "firstName");
-                        String lastName = JSONHelper.tryGetString(jsonObject, "lastName");
-
-                        SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs),
-                                Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-
-                        editor.putString(getString(R.string.user_email), email);
-                        editor.putString(getString(R.string.user_name), firstName + " " + lastName);
-                        editor.putBoolean(getString(R.string.logged_in), true);
-                        editor.apply();
-
-                        finish();
-                        Toast.makeText(context, "Signed in as: " + email, Toast.LENGTH_LONG).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            hideProgressDialog();
-        }
-    }
-
-
-    /**
-     * Signs the user in using their Google account.
-     */
-    private class GoogleSignInAsync extends AsyncTask<String, Void, String> {
-
-        /**
-         * The context of the current activity.
-         */
-        Context context;
-
-        GoogleSignInAsync(Context c) {
-            this.context = c;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            //showProgressDialog("Loading...");
-        }
-
-        /**
-         * Posts the user's Google ID token to the server for verification. Returns the user's
-         * profile information.
-         *
-         * @param params The Google ID token (JSON Web Token).
-         * @return The response from the server with the status of the account verification.
-         */
-        @Override
-        protected String doInBackground(String... params) {
-            String signinUrl = getString(R.string.DEV_API_URL) + "api/login?id_token=" + params[0];
-            Timber.d("API_URL: %s", signinUrl);
-
-            StringBuilder sb = new StringBuilder();
-            HttpURLConnection urlConnection = null;
-            try {
-                URL urlObject = new URL(signinUrl);
-                urlConnection = (HttpURLConnection) urlObject.openConnection();
-                urlConnection.setRequestMethod("POST");
-
-                InputStream content = urlConnection.getInputStream();
-
-                BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-                String s;
-                while ((s = buffer.readLine()) != null) {
-                    sb.append(s);
-                }
-
-            } catch (Exception e) {
-                sb.append("Unable to verify account, Reason: ");
-                sb.append(e.getMessage());
-            } finally {
-                if (urlConnection != null)
-                    urlConnection.disconnect();
-            }
-            Timber.i("Response: %s", sb.toString());
-
-            return sb.toString();
-        }
-
-
-        /**
-         * If the account is verified, the profile information is cached in shared preferences and
-         * the StartMenuActivity is started.
-         *
-         * @param result result from the SignIn request.
-         */
-        @Override
-        protected void onPostExecute(String result) {
-            if (result != null) {
-
-                try {
-                    JSONObject jsonObject = new JSONObject(result);
-                    Boolean status = JSONHelper.tryGetBoolean(jsonObject, "email_verified");
-
-                    if (status != null && status) {
-                        String email = JSONHelper.tryGetString(jsonObject, "email");
-                        String firstName = JSONHelper.tryGetString(jsonObject, "firstName");
-                        String lastName = JSONHelper.tryGetString(jsonObject, "lastName");
-
-                        SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs),
-                                Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-
-                        editor.putString(getString(R.string.user_email), email);
-                        editor.putString(getString(R.string.user_name), firstName + " " + lastName);
-                        editor.putBoolean(getString(R.string.logged_in), true);
-                        editor.apply();
-
-                        Toast.makeText(context, "Signed in as: " + email,
-                                Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(context, "Failed to verify account: "
-                                + JSONHelper.tryGetString(jsonObject, "error"), Toast.LENGTH_LONG).show();
-                    }
-                } catch (JSONException e) {
-                    Timber.e(e.getMessage());
-                    Toast.makeText(context, "Something went wrong during sign in.", Toast.LENGTH_LONG).show();
-                }
-
-
-            } else {
-                Timber.e("Could not be verified");
-                Toast.makeText(context, "Account could not be verified.",
-                        Toast.LENGTH_LONG).show();
-            }
-
-            finish();
-
-            hideProgressDialog();
-        }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-            hideProgressDialog();
-        }
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+        hideProgressDialog();
     }
 
     /**
@@ -540,12 +419,10 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 
         SignOutAsync(Context context) {
             this.context = context;
-
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-
             SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = prefs.edit();
 
@@ -563,7 +440,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                                     ((BaseActivity) context).finish();
                                 }
                             });
-
             return null;
         }
 

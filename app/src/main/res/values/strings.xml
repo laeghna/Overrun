@@ -45,7 +45,7 @@
     <string name="login_text">Login</string>
     <string name="register_text">Register</string>
     <string name="registration_alt_text">Or you can create an account here:</string>
-    <string name="PROD_API_URL">http://cssgate.insttech.washington.edu:8080/</string>
+    <string name="PROD_API_URL">http://cssgate.insttech.washington.edu:8081/</string>
     <string name="DEV_API_URL">http://10.0.2.2:8081/</string>
 
 </resources>
