@@ -47,4 +47,12 @@
     <string name="registration_alt_text">Or you can create an account here:</string>
     <string name="PROD_API_URL">http://cssgate.insttech.washington.edu:8080/</string>
 
+    <string name="left_button">LEFT</string>
+    <string name="right_button">RIGHT</string>
+    <string name="fire_button">FIRE!</string>
+
+    <string name="pause_dialog">GAME PAUSED</string>
+    <string name="resume_button">Resume</string>
+
+
 </resources>
