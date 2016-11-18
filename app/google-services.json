@@ -1,64 +1,33 @@
 {
   "project_info": {
-    "project_number": "711195024447",
-    "project_id": "overrun-147301"
+    "project_number": "417571724567",
+    "project_id": "firebase-overrun"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:711195024447:android:587e1fb3195183cb",
+        "mobilesdk_app_id": "1:417571724567:android:e11b0cf06ee13b5c",
         "android_client_info": {
           "package_name": "group7.tcss450.tacoma.uw.edu.overrun"
         }
       },
       "oauth_client": [
         {
-          "client_id": "711195024447-ltgs11u6ho1otmfsocoeql0le3e9n4hm.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDB5hHRIaeI6QisyU-gPLJ3KGH4puab8jU"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 1
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:711195024447:android:e11b0cf06ee13b5c",
-        "android_client_info": {
-          "package_name": "group7.tcss450.tacoma.uw.edu.overrun"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "711195024447-59l4jl8gnq3p20a9g64hlc9910d1llnm.apps.googleusercontent.com",
+          "client_id": "417571724567-hu12r0dus39t675cqdhs10j7o3dcekng.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "group7.tcss450.tacoma.uw.edu.overrun",
-            "certificate_hash": "4DA96F967C15258EAD419B3632CB8B938CA268D3"
+            "certificate_hash": "19E7B3C477ED1C4AC035274AA3313B86CE10F714"
           }
         },
         {
-          "client_id": "711195024447-ltgs11u6ho1otmfsocoeql0le3e9n4hm.apps.googleusercontent.com",
+          "client_id": "417571724567-2htmdvf5u69llibomkbvp2fenrlca7ee.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDB5hHRIaeI6QisyU-gPLJ3KGH4puab8jU"
+          "current_key": "AIzaSyBBYD2qsWUj0vN6ss7Vklpi8zsgmMTJch8"
         }
       ],
       "services": {

@@ -9,7 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import group7.tcss450.tacoma.uw.edu.overrun.Game.GameActivity;
+import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.LeaderboardActivity;
+import group7.tcss450.tacoma.uw.edu.overrun.SignIn.LoginFragment;
 import group7.tcss450.tacoma.uw.edu.overrun.SignIn.SignInActivity;
 
 
@@ -42,10 +43,12 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
         Button op_button = (Button) findViewById(R.id.options_button);
         Button start_button = (Button) findViewById(R.id.start_button);
         Button sign_button = (Button) findViewById(R.id.login_button);
+        Button leaderboard_button = (Button) findViewById(R.id.leaderboard_button);
 
         op_button.setOnClickListener(this);
         start_button.setOnClickListener(this);
         sign_button.setOnClickListener(this);
+        leaderboard_button.setOnClickListener(this);
 
         // Getting the current volume setting in system preferences.
         float current_volume = mSharedPref.getFloat(
@@ -135,8 +138,14 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
                 }
 
                 break;
+            case R.id.leaderboard_button:
+                intent = new Intent(this, LeaderboardActivity.class);
+                startActivity(intent);
+                break;
         }
     }
+
+
 
     // TODO: logout button needs to be implemented.
     public void testLogout(View view) {
