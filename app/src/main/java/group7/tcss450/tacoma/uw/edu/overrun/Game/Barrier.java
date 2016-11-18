@@ -8,7 +8,8 @@ import android.graphics.RectF;
 import android.util.Log;
 
 /**
- * Created by lesliepedro on 11/17/16.
+ * This class represents the barrier between the Survivor and the zombies.
+ * @author Leslie Pedro
  */
 
 public class Barrier {
@@ -17,7 +18,7 @@ public class Barrier {
     public static final int BARRIER_ROWS = 5;
 
     /** The number of columns of blocks in the barrier. */
-    public static final int BARRIER_COLS = 25;
+    public static final int BARRIER_COLS = 50;
 
     /** The size of the device's screen. */
     private Point mScreen;
@@ -37,8 +38,6 @@ public class Barrier {
         mScreen = screenSize;
         mSurvivor = s;
         mBarrier = assembleBarrier();
-
-        testBarrier();
     }
 
     /**
@@ -78,21 +77,21 @@ public class Barrier {
      * @return a 2-d array of RectF objects making up the barrier.
      */
     public BarrierBlock[][] assembleBarrier() {
-        float portionOfScreen = 2f/10;
+        float portionOfScreen = 1f/10;
         float barrier_height = portionOfScreen * mScreen.y;
-        float rect_height = barrier_height/BARRIER_ROWS;
-        float startPosY = mSurvivor.getmY() - 1 - barrier_height + barrier_height;
+        float rect_height = barrier_height / BARRIER_ROWS;
+        float startPosY = mSurvivor.getmY() - 1 - barrier_height;
         float endPosY = mSurvivor.getmY() - 1;
         float startPosX = 1f;
         float endPosX = mScreen.x - 1;
         float rect_width = ((endPosX - startPosX)/BARRIER_COLS);
-
         BarrierBlock[][] barrier = new BarrierBlock[BARRIER_ROWS][BARRIER_COLS];
 
         float currentX = startPosX, currentY = startPosY;
         for(int i = 0; i < BARRIER_ROWS; i++) {
+            currentX = startPosX;
             for(int j = 0; j < BARRIER_COLS; j++) {
-                barrier[i][j] = new BarrierBlock(currentX, currentY, rect_width + currentX, currentY - rect_height);
+                barrier[i][j] = new BarrierBlock(currentX, currentY, rect_width + currentX, currentY + rect_height);
                 currentX = currentX + rect_width;
             }
             currentY = currentY + rect_height;
@@ -135,7 +134,7 @@ public class Barrier {
         private RectF mBlock;
 
         /** Max health for all blocks. */
-        public static final int MAX_HEALTH = 200;
+        public static final int MAX_HEALTH = 500;
 
         /** The current health of the block. */
         private int mHealth;
