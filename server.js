@@ -1,21 +1,21 @@
-var http = require('http');
-var fs = require('fs');
-var crypto = require('crypto');
-var config = JSON.parse(fs.readFileSync("overrun.json"));
+const http = require('http');
+const fs = require('fs');
+const bcrypt = require('bcrypt');
+const config = JSON.parse(fs.readFileSync("overrun.json"));
 
-var express = require('express');
-var app = express();
+const express = require('express');
+const app = express();
 
 
-var google = require('google-auth-library');
-var OAuth2 = new google().OAuth2;
+const google = require('google-auth-library');
+const OAuth2 = new google().OAuth2;
 
-// var CLIENT_ID = '417571724567-e4us94dgu6eah1p0icr3bvbgtmgulqqp.apps.googleusercontent.com';
-// var CLIENT_SECRET = 'lc5XyqOSS71WUcccPQzDnkZJ';
-var CLIENT_ID = config.oauthConfig.CLIENT_ID;
-var CLIENT_SECRET = config.oauthConfig.CLIENT_SECRET;
+// const CLIENT_ID = '417571724567-e4us94dgu6eah1p0icr3bvbgtmgulqqp.apps.googleusercontent.com';
+// const CLIENT_SECRET = 'lc5XyqOSS71WUcccPQzDnkZJ';
+const CLIENT_ID = config.oauthConfig.CLIENT_ID;
+const CLIENT_SECRET = config.oauthConfig.CLIENT_SECRET;
 
-var oauth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET);
+const oauth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET);
 
 // express config
 const PORT = 8081;
@@ -25,45 +25,45 @@ app.set("title", "Overrun");
 
 
 // body-parser config
-var bp = require('body-parser');
+const bp = require('body-parser');
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 
 
 // MySQL config
-var Client = require('mariasql');
+const mysql = require('mysql');
 
-var c = new Client(config.mysqlConfig);
-// var c = new Client({
+const c = new mysql.createConnection(config.mysqlConfig);
+// const c = new mysql.createConnection({
 //     "host"    : "cssgate.insttech.washington.edu",
 //     "user"    : "earowell",
-//     "password": "***REMOVED***",
+//     "password": "*******",
 //     "db"      : "earowell"
 // });
 
 // SQL prepared statements
-var createUser = c.prepare('INSERT INTO User (email, pass) ' +
-    'VALUES ( :email, :pass );');
-var login = c.prepare('SELECT * FROM User WHERE email = :email' +
-    ' AND pass = :pass;');
-var getUser = c.prepare('SELECT * FROM User WHERE email = :email;');
-var getUsers = c.prepare('SELECT email FROM User;');
-var createGame = c.prepare('INSERT INTO Game (userId, score, zombiesKilled, level, shotsFirst)' +
-    'VALUES ( :userId, :score, :zombiesKilled, :level, :shotsFired );');
-var getUserStats = c.prepare('SELECT COUNT(*) AS TotalGames, ' +
+const createUser = 'INSERT INTO User (email, salt, hash) ' +
+    'VALUES ( ?, ?, ? );';
+const login = 'SELECT * FROM User WHERE email = ? AND hash = ?;';
+const getUser = 'SELECT * FROM User WHERE email = ?;';
+const getUserSalt = 'SELECT salt FROM User WHERE email = ?;';
+const getUsers = 'SELECT email FROM User;';
+const createGame = 'INSERT INTO Game (userId, score, zombiesKilled, level, shotsFirst)' +
+    'VALUES ( ?, ?, ?, ?, ? );';
+const getUserStats = 'SELECT COUNT(*) AS TotalGames, ' +
     'SUM(score) AS Totalscore, MAX(score) AS Highscore, ' +
     'MAX(zombiesKilled) AS MostZombiesKilled, ' +
     'MAX(level) AS HighestLevel, ' +
     'MAX(shotsFired) AS MostShotsFired ' +
-    'FROM Game WHERE email = :email; ');
-var getStats = c.prepare('SELECT email, ' +
+    'FROM Game WHERE email = ?; ';
+const getStats = 'SELECT email, ' +
     'COUNT(*) AS TotalGames, ' +
     'SUM(score) AS Totalscore, ' +
     'MAX(score) AS Highscore, ' +
     'MAX(zombiesKilled) AS MostZombiesKilled, ' +
     'MAX(level) AS HighestLevel, ' +
     'MAX(shotsFired) AS MostShotsFired ' +
-    'FROM Game');
+    'FROM Game';
 
 
 /**
@@ -101,34 +101,38 @@ var getStats = c.prepare('SELECT email, ' +
  */
 app.post('/api/user', (req, res) => {
 
-    console.dir(req.body);
-
-    if (!req.body || !req.body.email || !req.body.pass) {
+    if (!req.query || !req.query.email || !req.query.pass) {
         return res.status(400).json({ 'error': 'Some parameters were missing.' });
     }
 
     // checks for valid email.
-    if (!validateEmail(req.body.email)) {
+    if (!validateEmail(req.query.email)) {
         return res.status(400).json({ 'error': 'Invalid email format.' });
     }
 
-    c.query(createUser({
-        email: req.body.email,
-        pass : req.body.pass
-    }), (err, rows) => {
-        if (err) {
-            // duplicate
-            if (err.code === 1062) {
-                res.status(409).json({ 'error': 'A user already exists with the email provided.' });
-            }
+    const salt = bcrypt.genSalt(10, (err, salt) => {
 
-            console.dir(err);
+        if (err) return res.status(500).json({ error: 'Internal server error.'});
 
-            res.status(409).json({ 'error': 'User could not be created.' });
-        } else {
-            console.dir(rows);
-            res.status(200).json({ email: req.body.email });
-        }
+        bcrypt.hash(req.query.pass, salt, (err, hash) => {
+            if (err) return res.status(500).json({ error: 'Internal server error.'});
+
+            c.query(createUser, [req.query.email, salt, hash], (err, rows) => {
+                if (err) {
+                    // duplicate
+                    if (err.code === 1062) {
+                        return res.status(409).json({ 'error': 'A user already exists with the email provided.' });
+                    }
+
+                    console.log(err);
+
+                    return res.status(409).json({ 'error': 'User could not be created.' });
+                } else {
+                    console.log(rows);
+                    return res.status(200).json({ email: req.query.email });
+                }
+            });
+        });
     });
 });
 
@@ -155,9 +159,7 @@ app.get('/api/users', (req, res, next) => {
     }
     // email supplied, gets individual user
     else {
-        c.query(getUser({
-            email: req.query.email
-        }), (err, rows) => {
+        c.query(getUser, [req.query.email], (err, rows) => {
             res.send(JSON.stringify(rows));
         });
     }
@@ -185,12 +187,12 @@ app.get('/api/users', (req, res, next) => {
  * @apiVersion 0.1.0
  */
 app.get('/api/users', (req, res) => {
-    c.query(getUsers(), (err, rows) => {
+    c.query(getUsers, (err, rows) => {
         if (err) {
-            res.status(400).json({ 'error': 'Could not get users.' });
+            return res.status(400).json({ 'error': 'Could not get users.' });
         } else {
             console.dir(rows);
-            res.send(JSON.stringify(rows));
+            return res.send(rows);
         }
     });
 });
@@ -224,15 +226,15 @@ app.post('/api/game', (req, res) => {
         return res.status(400).send('Some parameters were not supplied correctly.');
     }
 
-    c.query(createGame({
-        email        : req.query.email,
-        score        : req.query.score,
-        zombiesKilled: req.query.zombiesKilled,
-        level        : req.query.level,
-        shotsFired   : req.query.shotsFired
-    }), (err, result) => {
+    c.query(createGame, [
+        req.query.email,
+        req.query.score,
+        req.query.zombiesKilled,
+        req.query.level,
+        req.query.shotsFired
+    ], (err, result) => {
         console.dir(result);
-        res.status(200).json({ gameId: result.info.insertId });
+        return res.status(200).json({ success: "Games record created.", gameId: result.insertId });
     });
 });
 
@@ -258,24 +260,12 @@ app.post('/api/game', (req, res) => {
  * @apiVersion 0.1.0
  */
 app.get('/api/leaderboard', (req, res) => {
-    c.query(getStats(),
-        (err, rows) => {
+    c.query(getStats, (err, rows) => {
 
-            if (err) {
+            if (err) return res.status(500).json({'error': 'Internal server error.'});
 
-            }
-
-            res.status(200).send(JSON.stringify(rows));
+            return res.status(200).send(JSON.stringify(rows));
         });
-    // .on('result', (result) => {
-    //     var results = [];
-    //
-    //     result.on('data', (row) => {
-    //         results.push(row);
-    //     }).on('end', () => {
-    //         res.send(JSON.stringify(results));
-    //     });
-    // });
 });
 
 
@@ -301,16 +291,9 @@ app.get('/api/leaderboard', (req, res) => {
  */
 app.get('/api/leaderboard/user/:email', (req, res) => {
 
-    c.query(getUserStats({
-        email: req.params.email
-    }), (err, result) => {
+    c.query(getUserStats, [req.params.email], (err, result) => {
         res.send(JSON.stringify(result));
     });
-    // .on('result', (result) => {
-    //     result.on('data', (row) => {
-    //         res.send(JSON.stringify(row));
-    //     });
-    // });
 });
 
 
@@ -340,37 +323,41 @@ app.get('/api/leaderboard/user/:email', (req, res) => {
  */
 app.post('/api/login', (req, res) => {
 
-
     // sign in with email and pass
     if (!req.query.id_token) {
-        console.log("in email and pass");
 
-        if (!req.body.email || !req.body.pass) {
+        if (!req.query.email || !req.query.pass) {
             return res.status(400).json({ 'error': 'Parameter missing.' });
         }
-        console.dir("pass: " + req.body.pass);
-        c.query(login({
-            email: req.body.email,
-            pass : req.body.pass
-        }), (error, result) => {
-            if (error) {
-                res.status(400).json({ 'error': 'Something went wrong while logging in.' });
-            } else if (!result || !result.info || !result.info.numRows) {
-                res.status(401).json({ 'error': 'Email or password did not match.' })
-            } else {
-                //console.log(result);
-                if (result.info.affectedRows == 0) {
-                    console.log("Failed login");
-                    res.status(401).json({ 'error': 'Email or password did not match.' })
-                } else {
-                    console.log("Success");
-                    res.status(200).json({
-                        email    : result[0].email,
-                        firstName: "",
-                        lastName : ""
-                    });
-                }
-            }
+        console.log("email: " + req.query.email + " pass: " + req.query.pass);
+        c.query(getUser, [req.query.email], (err, rows) => {
+
+            if (!rows.length) return res.status(400).json({ 'error': 'No user matching that email.'});
+
+            const salt = rows[0].salt;
+
+            bcrypt.hash(req.query.pass, salt, (err, hash) => {
+               if (err) res.status(500).json({ 'error': 'Internal server error.'})
+
+                c.query(login, [
+                    req.query.email,
+                    hash
+                ], (error, result) => {
+                    if (error) {
+                        res.status(400).json({ 'error': 'Something went wrong while logging in.' });
+                    } else if (!result.length) {
+                        res.status(401).json({ 'error': 'Email or password did not match.' })
+                    } else {
+                        console.log("Success");
+                        res.status(200).json({
+                            email    : result[0].email,
+                            firstName: "",
+                            lastName : "",
+                            email_verified: true
+                        });
+                    }
+                });
+            });
         });
     }
     // sign in with google account by verifying id_token
@@ -383,13 +370,10 @@ app.post('/api/login', (req, res) => {
                 //return res.status(500).send('Token could not be verified.');
                 return res.status(500).json({ error: "Token could not be verified.", email_verified: false });
             } else {
-                var tokenInfo = response.getPayload();
+                const tokenInfo = response.getPayload();
 
-                c.query(getUser({ email: tokenInfo.email }),
+                c.query(getUser, [tokenInfo.email],
                     (error, result) => {
-                        //console.dir(error);
-                        console.dir(result);
-
                         if (result.length) {
                             console.log("user already created");
                             result[0].email_verified = true;
@@ -399,16 +383,16 @@ app.post('/api/login', (req, res) => {
                             console.log("creating user");
 
                             //console.dir(tokenInfo);
-                            c.query(createUser({
-                                email: tokenInfo.email,
-                                pass : 'google',
-                            }), (error, result) => {
+                            c.query(createUser, [
+                                tokenInfo.email,
+                                'google',
+                            ], (error, result) => {
                                 if (error) {
                                     return res.status(500).json({ error: "Error occurred.", email_verified: false });
                                 }
                             });
                         }
-                        var responseObj = {
+                        const responseObj = {
                             email_verified: true,
                             email         : tokenInfo.email,
                             firstName     : tokenInfo.given_name,
@@ -427,20 +411,13 @@ function validateToken(token, callback) {
     oauth2Client.verifyIdToken(token, CLIENT_ID, callback);
 }
 
-function handleError(err, res, message) {
-    console.dir(err.message);
-
-    res.send("Error: " + message);
-    throw err;
-}
-
 // source: https://goo.gl/0TFRJt
 function validateEmail(email) {
 
-    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
 }
 
-app.listen(PORT, function () {
+app.listen(PORT, () => {
     console.log("Server listening on : http://localhost:%s", PORT);
 });
