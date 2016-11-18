@@ -59,7 +59,7 @@ public class Survivor extends GameCharacter{
         mY = screenSize.y - (mBmap.getHeight() + mPadBott);
         mIsRunning = false;
         mDetectCollisions = new Rect(mX, mY, mX + mBmap.getWidth(), mY + mBmap.getHeight());
-        //TODO: replace with correct graphics, fix bullets, and implement collision detection
+        //TODO: replace with correct graphics
     }
 
     /**

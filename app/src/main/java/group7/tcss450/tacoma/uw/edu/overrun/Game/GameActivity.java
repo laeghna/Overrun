@@ -36,8 +36,9 @@ public class GameActivity extends AppCompatActivity {
     /** The button for moving right. */
     private Button mRightButton;
 
-    /** The button for firing the weapon. */
-    private Button mFireButton;
+    /** The buttons (left and right) for firing the weapon. */
+    private Button mFireButton_L;
+    private Button mFireButton_R;
 
     /**
      * To perform on creation of this Activity.
@@ -49,6 +50,9 @@ public class GameActivity extends AppCompatActivity {
 
         //The main layout for the game
         FrameLayout layout = new FrameLayout(this);
+        LinearLayout actionBarCenter = new LinearLayout(this);
+        actionBarCenter.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
+        actionBarCenter.setVerticalGravity(Gravity.BOTTOM);
 
         // The left action bar
         LinearLayout actionBarLeft = new LinearLayout(this);
@@ -89,9 +93,17 @@ public class GameActivity extends AppCompatActivity {
                 mPlayView.moveRight();
             }
         }));
-        mFireButton = new Button(this);
-        mFireButton.setText("FIRE!");
-        mFireButton.setOnTouchListener(new ButtonListener(0, 0, new View.OnClickListener() {
+        mFireButton_L = new Button(this);
+        mFireButton_R = new Button(this);
+        mFireButton_L.setText("FIRE!");
+        mFireButton_R.setText("FIRE");
+        mFireButton_L.setOnTouchListener(new ButtonListener(0, 0, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayView.fire();
+            }
+        }));
+        mFireButton_R.setOnTouchListener(new ButtonListener(0, 0, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mPlayView.fire();
@@ -108,20 +120,22 @@ public class GameActivity extends AppCompatActivity {
         });
 
         //add the buttons to the proper layout
-        buttonsLeft.addView(mPauseButton);
+        buttonsLeft.addView(mFireButton_L);
         buttonsLeft.addView(mLeftButton);
 
-        buttonsRight.addView(mFireButton);
+        buttonsRight.addView(mFireButton_R);
         buttonsRight.addView(mRightButton);
 
         //add the button layouts to the action bars
         actionBarLeft.addView(buttonsLeft);
         actionBarRight.addView(buttonsRight);
+        actionBarCenter.addView(mPauseButton);
 
         // add game view, left action bar, and right action bar to the main frame
         layout.addView(mPlayView);
         layout.addView(actionBarLeft);
         layout.addView(actionBarRight);
+        layout.addView(actionBarCenter);
 
         //add layout to ContentView
         setContentView(layout);
