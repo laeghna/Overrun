@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.Log;
 import android.view.Display;
 import android.view.SurfaceHolder;
@@ -52,6 +53,9 @@ public class PlayView extends SurfaceView implements Runnable{
     /** Adding 3 zombies for testing. */
     private int zombieCount = 3;
 
+    /** The barrier between the survivor and the zombies. */
+    private Barrier mBarrier;
+
 
     /**
      * Constructor for the PlayView class.
@@ -82,6 +86,7 @@ public class PlayView extends SurfaceView implements Runnable{
             zombies[i] = new ZombieCrawler(context, mScreen);
         }
 
+        mBarrier = new Barrier(mScreen, mSurvivor);
     }
 
     /**
@@ -116,7 +121,12 @@ public class PlayView extends SurfaceView implements Runnable{
 
         // update zombie positions.
         for(int i=0; i < zombies.length; i++){
-            zombies[i].updateMovement();
+
+            if(mBarrier.detectCollisions(zombies[i])) {
+                // do not update position
+            } else {
+                zombies[i].updateMovement();
+            }
         }
 
         //check for collisions between bullets and zombies.
@@ -126,7 +136,6 @@ public class PlayView extends SurfaceView implements Runnable{
                     for (int z = 0; z < zombieCount; z++) {
                         //if collision occurs with bullet
                         if (Rect.intersects(mBullets[i].getDetectBullet(), zombies[z].getDetectZombie())) {
-
                             //moving enemy outside the bottom edge and setting bullet isActive to false
                             zombies[z].setXCoord(mScreen.y + zombies[z].getBitmap().getHeight());
                             mBullets[i].setIsActive(false);
@@ -151,6 +160,8 @@ public class PlayView extends SurfaceView implements Runnable{
             mBackground.drawColor(Color.BLACK); // color the background black
             mBackground.drawBitmap(mSurvivor.getmBmap(), mSurvivor.getmX(),
                     mSurvivor.getmY(), mPaintBrush);
+
+            mBarrier.drawBarrier(mPaintBrush, mBackground);
 
             //Draw zombies
             for (int i = 0; i < zombies.length; i++) {
@@ -235,10 +246,6 @@ public class PlayView extends SurfaceView implements Runnable{
         }
         return false;
     }
-
-    /** Checks the survivor's collision detector to see if a collision occured. */
-    public void checkSurvivorCollision() {
-        mSurvivor.getmDetectCollisions();
-    }
-
 }
+
+
