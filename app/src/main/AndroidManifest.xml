@@ -30,7 +30,8 @@
         <activity
             android:name=".Game.GameActivity"
             android:screenOrientation="landscape" />
-        <activity android:name=".Leaderboard.LeaderboardActivity"></activity>
+        <activity android:name=".Leaderboard.LeaderboardActivity"
+            android:screenOrientation="landscape"/>
     </application>
 
 </manifest>
