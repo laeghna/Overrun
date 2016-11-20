@@ -12,6 +12,10 @@ import android.widget.TextView;
  * @version 9 Nov 2016
  */
 abstract class TextValidator implements TextWatcher {
+
+    /**
+     * The textview to validate.
+     */
     private final TextView textView;
 
     TextValidator(TextView textView) {
@@ -24,6 +28,14 @@ abstract class TextValidator implements TextWatcher {
      * @return Whether the text is valid or not.
      */
     public abstract boolean validate(TextView textView);
+
+    /**
+     * Returns the instance of the textfield assigned to this validator.
+     * @return a text view
+     */
+    public TextView getMyTextView() {
+        return textView;
+    }
 
     @Override
     final public void afterTextChanged(Editable s) {

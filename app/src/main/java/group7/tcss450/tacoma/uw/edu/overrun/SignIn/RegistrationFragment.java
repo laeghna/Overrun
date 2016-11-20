@@ -4,11 +4,9 @@ package group7.tcss450.tacoma.uw.edu.overrun.SignIn;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -16,16 +14,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
 import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
+import group7.tcss450.tacoma.uw.edu.overrun.BuildConfig;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
-import group7.tcss450.tacoma.uw.edu.overrun.Validation.PasswordValidator;
 import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailValidator;
+import group7.tcss450.tacoma.uw.edu.overrun.Validation.PasswordValidator;
+import timber.log.Timber;
 
 
 /**
@@ -34,13 +37,29 @@ import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailValidator;
  * @author Ethan Rowell
  * @version 9 Nov 2016
  */
-public class RegistrationFragment extends Fragment implements View.OnClickListener {
+public class RegistrationFragment extends Fragment {
 
     private static final String TAG = "RegistrationActivity";
 
-    EditText username;
-    EditText pass;
-    EditText confirm_pass;
+    /**
+     * The user's emailText.
+     */
+    @BindView(R.id.reg_email) EditText emailText;
+
+    /**
+     * The user's password.
+     */
+    @BindView(R.id.reg_password) EditText passText;
+
+    /**
+     * The user's confirmation password.
+     */
+    @BindView(R.id.reg_confirm_password) EditText confirmPassText;
+
+    /**
+     * Unbinds the views.
+     */
+    private Unbinder unbinder;
 
     public RegistrationFragment() {
         // Required empty public constructor
@@ -51,34 +70,29 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_registration, container, false);
+        unbinder = ButterKnife.bind(this, view);
 
-        username = (EditText) view.findViewById(R.id.reg_email);
-        pass = (EditText) view.findViewById(R.id.reg_password);
-        confirm_pass = (EditText) view.findViewById(R.id.reg_confirm_password);
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
 
-
-        addTextValidators(view);
-
-
-        Button submitButton = (Button) view.findViewById(R.id.register_button);
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                submitRegistrationForm(v);
-            }
-        });
+        addTextValidators();
 
         // Inflate the layout for this fragment
         return view;
     }
 
+    @OnClick(R.id.register_button) void submit() {
+        submitRegistrationForm();
+    }
+
     /**
      * Handles the submission of the registration form.
      */
-    public void submitRegistrationForm(View v) {
+    private void submitRegistrationForm() {
 
         if (validForm()) {
-            new RegisterAsync().execute(username.getText().toString(), pass.getText().toString());
+            new RegisterAsync().execute(emailText.getText().toString(), passText.getText().toString());
 
             Toast.makeText(getContext(), "Registration form submitted.", Toast.LENGTH_LONG).show();
         } else {
@@ -94,14 +108,14 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
         boolean registrationValid = true;
 
         // fields shouldn't be empty
-        if (username.getError() != null && !username.getError().toString().isEmpty() ||
-                pass.getError() != null && !pass.getError().toString().isEmpty() ||
-                confirm_pass.getError() != null && !confirm_pass.getError().toString().isEmpty()) {
+        if (emailText.getError() != null && !emailText.getError().toString().isEmpty() ||
+                passText.getError() != null && !passText.getError().toString().isEmpty() ||
+                confirmPassText.getError() != null && !confirmPassText.getError().toString().isEmpty()) {
             registrationValid = false;
         }
 
         // passwords should match
-        if (!pass.getText().toString().equals(confirm_pass.getText().toString())) {
+        if (!passText.getText().toString().equals(confirmPassText.getText().toString())) {
             registrationValid = false;
         }
 
@@ -111,20 +125,27 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
     /**
      * Sets up validators for the text inputs.
      */
-    private void addTextValidators(View view) {
-        username.addTextChangedListener(new EmailValidator(username));
-        username.setOnFocusChangeListener(new EmailValidator(username));
+    private void addTextValidators() {
+        emailText.addTextChangedListener(new EmailValidator(emailText));
+        emailText.setOnFocusChangeListener(new EmailValidator(emailText));
 
-        pass.addTextChangedListener(new PasswordValidator(pass));
-        pass.setOnFocusChangeListener(new PasswordValidator(pass));
+        PasswordValidator pwValidator = new PasswordValidator(passText);
+        PasswordValidator pwConfValidator = new PasswordValidator(confirmPassText);
 
-        confirm_pass.addTextChangedListener(new PasswordValidator(confirm_pass));
-        confirm_pass.setOnFocusChangeListener(new PasswordValidator(confirm_pass));
+        // have this validator match passText
+        pwConfValidator.addPasswordField(passText);
+
+        passText.addTextChangedListener(pwValidator);
+        passText.setOnFocusChangeListener(pwValidator);
+
+        confirmPassText.addTextChangedListener(pwConfValidator);
+        confirmPassText.setOnFocusChangeListener(pwConfValidator);
     }
 
     @Override
-    public void onClick(View v) {
-
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     /**
@@ -147,35 +168,28 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
             StringBuilder sb = new StringBuilder();
 
             try {
-                sb.append(getString(R.string.PROD_API_URL));
-                sb.append("api/user");
-                URL url = new URL(sb.toString());
-                sb.setLength(0);
+                sb.append(getString(R.string.DEV_API_URL));
+                sb.append("api/user?");
 
                 sb.append("email=").append(email).append("&");
-                sb.append("pass=").append(password).append("&");
+                sb.append("pass=").append(password);
+                URL url = new URL(sb.toString());
+
 
                 urlCon = (HttpURLConnection) url.openConnection();
                 urlCon.setRequestMethod("POST");
                 urlCon.setDoOutput(true);
 
-                DataOutputStream dataOutputStream = new DataOutputStream(urlCon.getOutputStream());
-                dataOutputStream.flush();
-                dataOutputStream.writeBytes(sb.toString());
-
-                dataOutputStream.flush();
-                dataOutputStream.close();
-
                 int statusCode = urlCon.getResponseCode();
-                Log.d(TAG, "Status: " + statusCode);
+                Timber.d("Status: %d", statusCode);
                 sb.setLength(0);
 
                 if (statusCode != HttpURLConnection.HTTP_OK) {
                     // TODO: handle error
-                    Log.d(TAG, "Error during registration.");
+                    Timber.d("Error during registration.");
                     sb.append("Error during login. Status code: ").append(statusCode);
                 } else {
-                    Log.d(TAG, "Successful registration.");
+                    Timber.d("Successful registration.");
 
                     BufferedReader reader = new BufferedReader(new InputStreamReader(urlCon.getInputStream()));
                     String s;
@@ -192,7 +206,7 @@ public class RegistrationFragment extends Fragment implements View.OnClickListen
                 }
             }
 
-            Log.d(TAG, "String that was built: " + sb.toString());
+            Timber.d("String that was built: %s", sb.toString());
 
             return sb.toString();
         }

@@ -7,6 +7,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Optional;
 import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
@@ -24,26 +27,20 @@ public class SignInActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
+        ButterKnife.bind(this);
+
         if (findViewById(R.id.fragment_container) != null) {
             if (savedInstanceState != null) {
                 return;
             }
 
             showLoginFragment();
-
         }
+    }
 
-        Button button = (Button) findViewById(R.id.register_button);
-
-        if (button != null) {
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showRegistrationFragment();
-                }
-            });
-        }
-
+    @Optional @OnClick(R.id.register_button)
+    void showRegFrag() {
+        showRegistrationFragment();
     }
 
     @Override

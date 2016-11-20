@@ -5,7 +5,7 @@
     <string name="login_description">Sign in</string>
     <string name="sign_in_to_play">Please sign in with your Google account to play</string>
 
-    <string name="sign_in_or_reg">Don\'t have an account?\n Sign in with your Google account or register below.</string>
+    <string name="sign_in_or_reg">Don\'t have an account?\n Register or sign in with your Google account below.</string>
 
     <string name="shared_prefs">group7.tcss450.tacoma.uw.edu.overrun.SHARED_PREFS</string>
     <string name="logged_in">LOGGED_IN</string>
@@ -27,12 +27,12 @@
     <string name="diff_three">Brain Dead</string>
 
     <string-array name="difficulty_array">
-        <item >Slow and Steady</item>
+        <item>Slow and Steady</item>
         <item>Food for Thought</item>
         <item>Brain Dead</item>
     </string-array>
 
-    <string name="server_client_id">711195024447-ltgs11u6ho1otmfsocoeql0le3e9n4hm.apps.googleusercontent.com</string>
+    <string name="server_client_id">417571724567-e4us94dgu6eah1p0icr3bvbgtmgulqqp.apps.googleusercontent.com</string>
 
     <string name="password_hint">Password</string>
     <string name="confirm_password_hint">Confirm Password</string>
@@ -45,6 +45,15 @@
     <string name="login_text">Login</string>
     <string name="register_text">Register</string>
     <string name="registration_alt_text">Or you can create an account here:</string>
-    <string name="PROD_API_URL">http://cssgate.insttech.washington.edu:8080/</string>
+    <string name="PROD_API_URL">http://cssgate.insttech.washington.edu:8081/</string>
+    <string name="DEV_API_URL">http://10.0.2.2:8081/</string>
+
+    <string name="left_button">LEFT</string>
+    <string name="right_button">RIGHT</string>
+    <string name="fire_button">FIRE!</string>
+
+    <string name="pause_dialog">GAME PAUSED</string>
+    <string name="resume_button">Resume</string>
+
 
 </resources>
