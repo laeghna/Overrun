@@ -55,6 +55,8 @@ public class PlayerStatsDetailFragment extends Fragment {
 
     public final static String PLAYER_ITEM_SELECTED = "player_selected";
 
+
+    
     private TextView mPlayerIdView;
     private TextView mPlayerScoreView;
 

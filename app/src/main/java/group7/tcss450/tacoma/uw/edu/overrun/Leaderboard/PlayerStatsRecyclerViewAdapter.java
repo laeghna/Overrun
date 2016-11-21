@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.PlayerStats.PlayerStatsContent;
@@ -36,6 +38,8 @@ public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerS
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
+        holder.mPlayerNumber.setText(Integer.toString(position + 1) + '.');
+        System.out.println(position);
         holder.mIdView.setText(mValues.get(position).getPlayerId());
         holder.mContentView.setText(mValues.get(position).getPlayerScore());
 
@@ -58,6 +62,7 @@ public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerS
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
+        public TextView mPlayerNumber;
         public final TextView mIdView;
         public final TextView mContentView;
 
@@ -66,6 +71,7 @@ public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerS
         public ViewHolder(View view) {
             super(view);
             mView = view;
+            mPlayerNumber = (TextView) view.findViewById(R.id.player_number);
             mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.content);
         }

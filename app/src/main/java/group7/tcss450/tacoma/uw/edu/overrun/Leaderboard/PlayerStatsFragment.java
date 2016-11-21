@@ -108,7 +108,7 @@ public class PlayerStatsFragment extends Fragment {
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            DownloadCoursesTask task = new DownloadCoursesTask();
+            DownloadScoresTask task = new DownloadScoresTask();
             task.execute(new String[]{SCORES_URL});
         }
         else {
@@ -161,7 +161,7 @@ public class PlayerStatsFragment extends Fragment {
 
 
 
-    private class DownloadCoursesTask extends AsyncTask<String, Void, String> {
+    private class DownloadScoresTask extends AsyncTask<String, Void, String> {
 
 
         @Override
@@ -208,7 +208,6 @@ public class PlayerStatsFragment extends Fragment {
             if (result != null) {
                 Toast.makeText(getActivity().getApplicationContext(), result, Toast.LENGTH_LONG)
                         .show();
-                System.out.println("BAM");
                 return;
             }
 
