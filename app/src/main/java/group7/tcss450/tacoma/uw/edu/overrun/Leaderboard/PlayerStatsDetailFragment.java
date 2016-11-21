@@ -72,7 +72,7 @@ public class PlayerStatsDetailFragment extends Fragment {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_player_stats_detail, container, false);
         mPlayerIdView = (TextView) view.findViewById(R.id.player_stats_item_id);
-        mPlayerScoreView = (TextView) view.findViewById(R.id.player_stats_item_title);
+        mPlayerScoreView = (TextView) view.findViewById(R.id.player_stats_item_score);
 
 
         return view;
