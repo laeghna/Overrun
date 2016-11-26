@@ -96,7 +96,7 @@ public class GameActivity extends AppCompatActivity {
         mFireButton_L = new Button(this);
         mFireButton_R = new Button(this);
         mFireButton_L.setText("FIRE!");
-        mFireButton_R.setText("FIRE");
+        mFireButton_R.setText("FIRE!");
         mFireButton_L.setOnTouchListener(new ButtonListener(0, 0, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
