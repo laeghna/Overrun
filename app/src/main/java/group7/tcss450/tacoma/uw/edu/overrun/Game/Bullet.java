@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.util.Log;
 
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
@@ -146,9 +147,10 @@ public class Bullet {
      * @param startY - the y coordinate of the bullet fired.
      */
     public void shootWeapon(int theX, int startY) {
+        Log.d("shooting:", theX + " " + startY);
         if (!mIsActive) {
             mX = theX;
-            mY = startY;
+            mY = startY - mBMP.getHeight();
             mDetectBullet = new Rect(mX, mY, mX + mBMP.getWidth(), mY - mBMP.getHeight());
             mIsActive = true;
         }

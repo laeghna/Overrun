@@ -48,9 +48,10 @@
     <string name="PROD_API_URL">http://cssgate.insttech.washington.edu:8081/</string>
     <string name="DEV_API_URL">http://10.0.2.2:8081/</string>
 
-    <string name="left_button">LEFT</string>
-    <string name="right_button">RIGHT</string>
-    <string name="fire_button">FIRE!</string>
+    <string name="left_button_txt">LEFT</string>
+    <string name="right_button_txt">RIGHT</string>
+    <string name="fire_button_txt">FIRE!</string>
+    <string name="pause_button_txt">| |</string>
 
     <string name="pause_dialog">GAME PAUSED</string>
     <string name="resume_button">Resume</string>

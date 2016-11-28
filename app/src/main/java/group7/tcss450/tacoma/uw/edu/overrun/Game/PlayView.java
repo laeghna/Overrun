@@ -237,7 +237,8 @@ public class PlayView extends SurfaceView implements Runnable{
      */
     public boolean fire() {
         Bullet b = new Bullet(1, mScreen, getContext());
-        b.shootWeapon(mSurvivor.getmX(), mSurvivor.getmY());
+        Log.d("firing", String.valueOf(mBarrier.getmStartY()));
+        b.shootWeapon(mSurvivor.getmX(), (int) mBarrier.getmStartY());
         for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
             if(mBullets[i] == null || !mBullets[i].getIsActive()) {
                 mBullets[i] = b;
