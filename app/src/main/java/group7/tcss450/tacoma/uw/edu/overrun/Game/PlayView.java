@@ -105,6 +105,11 @@ public class PlayView extends SurfaceView implements Runnable{
 
         //zombies
         zombies = new Zombie[zombieCount];
+        for(int i = 0; i < zombies.length; i++) {
+
+            zombies[i] = new ZombieWalker(context, mScreen);
+            zombies[i].setIsActive(true);
+        }
 
         mBarrier = new Barrier(mScreen, mSurvivor);
     }
