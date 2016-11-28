@@ -2,14 +2,17 @@ package group7.tcss450.tacoma.uw.edu.overrun.Game;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.drawable.GradientDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Listeners.ButtonListener;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
@@ -47,12 +50,57 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int choose_layout = 0; //default setting
+        //Initialize the play view object
+        mPlayView = new PlayView(this);
+        FrameLayout layout = getLayout_1();
 
+        if(choose_layout == 1) {
+            layout = getLayout_2();
+        } else if(choose_layout == 2) {
+            layout = getLayout_3();
+        }
+
+
+        //add layout to ContentView
+        setContentView(layout);
+
+        // start game
+        mPlayView.run();
+    }
+
+    /**
+     * Creates and returns the following UI layout :
+     *  |-------------PAUSE-------------|
+     *  |                               |
+     *  |                               |
+     *  *********************************
+     *  | F                           F |
+     *  | L                           R |
+     *  ---------------------------------.
+     * @return the UI layout.
+     */
+    public FrameLayout getLayout_1() {
         //The main layout for the game
         FrameLayout layout = new FrameLayout(this);
+
+        //The center action bar
         LinearLayout actionBarCenter = new LinearLayout(this);
         actionBarCenter.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
-        actionBarCenter.setVerticalGravity(Gravity.BOTTOM);
+        actionBarCenter.setVerticalGravity(Gravity.TOP);
+
+        mPauseButton = new Button(this);
+        mPauseButton.setText(R.string.pause_button_txt);
+        mPauseButton.setBackgroundResource(R.drawable.pause_button);
+        mPauseButton.setTextColor(getResources().getColor(R.color.gray));
+        mPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onPause();
+            }
+        });
+
+        actionBarCenter.addView(mPauseButton);
 
         // The left action bar
         LinearLayout actionBarLeft = new LinearLayout(this);
@@ -63,6 +111,34 @@ public class GameActivity extends AppCompatActivity {
         LinearLayout buttonsLeft = new LinearLayout(this);
         buttonsLeft.setOrientation(LinearLayout.VERTICAL);
 
+        // Create the buttons
+        mLeftButton = new Button(this);
+        mLeftButton.setBackgroundResource(R.drawable.move_button);
+        mLeftButton.setTextColor(getResources().getColor(R.color.gray));
+//        mLeftButton = (Button) findViewById(R.id.left_button);
+        mLeftButton.setText(R.string.left_button_txt);
+        mLeftButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                mPlayView.moveLeft();
+            }
+        }));
+
+        mFireButton_L = new Button(this);
+        mFireButton_L.setText(R.string.fire_button_txt);
+        mFireButton_L.setBackgroundResource(R.drawable.fire_button);
+        mFireButton_L.setOnTouchListener(new ButtonListener(0, 0, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayView.fire();
+            }
+        }));
+
+
+        //add the buttons to the proper layout
+        buttonsLeft.addView(mFireButton_L);
+        buttonsLeft.addView(mLeftButton);
+
         // The right action bar
         LinearLayout actionBarRight = new LinearLayout(this);
         actionBarRight.setHorizontalGravity(Gravity.RIGHT);
@@ -72,12 +148,92 @@ public class GameActivity extends AppCompatActivity {
         LinearLayout buttonsRight = new LinearLayout(this);
         buttonsRight.setOrientation(LinearLayout.VERTICAL);
 
-        //Initialize the play view object
-        mPlayView = new PlayView(this);
+        mRightButton = new Button(this);
+        mRightButton.setText(R.string.right_button_txt);
+        mRightButton.setBackgroundResource(R.drawable.move_button);
+        mRightButton.setTextColor(getResources().getColor(R.color.gray));
+        mRightButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                mPlayView.moveRight();
+            }
+        }));
+
+        mFireButton_R = new Button(this);
+        mFireButton_R.setText(R.string.fire_button_txt);
+        mFireButton_R.setBackgroundResource(R.drawable.fire_button);
+
+        mFireButton_R.setOnTouchListener(new ButtonListener(0, 0, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayView.fire();
+            }
+        }));
+
+        buttonsRight.addView(mFireButton_R);
+        buttonsRight.addView(mRightButton);
+
+        //add the button layouts to the action bars
+        actionBarLeft.addView(buttonsLeft);
+        actionBarRight.addView(buttonsRight);
+
+        layout.addView(mPlayView);
+        layout.addView(actionBarCenter);
+        layout.addView(actionBarLeft);
+        layout.addView(actionBarRight);
+
+        return layout;
+    }
+
+    /**
+     * Creates and returns the following UI layout :
+     *  |-------------PAUSE-------------|
+     *  |                               |
+     *  |                               |
+     *  *********************************
+     *  |                            F  |
+     *  |                          L  R |
+     *  ---------------------------------.
+     * @return the UI layout.
+     */
+    public FrameLayout getLayout_2() {
+
+        FrameLayout layout = new FrameLayout(this);
+
+        LinearLayout actionBarCenter = new LinearLayout(this);
+        actionBarCenter.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
+        actionBarCenter.setVerticalGravity(Gravity.TOP);
+
+        mPauseButton = new Button(this);
+        mPauseButton.setText(R.string.pause_button_txt);
+        mPauseButton.setBackgroundResource(R.drawable.pause_button);
+        mPauseButton.setTextColor(getResources().getColor(R.color.gray));
+//        mPauseButton = (Button) findViewById(R.id.pause_button);
+        mPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onPause();
+            }
+        });
+
+        actionBarCenter.addView(mPauseButton);
+
+        LinearLayout actionBarLow = new LinearLayout(this);
+        actionBarLow.setOrientation(LinearLayout.VERTICAL);
+        actionBarLow.setHorizontalGravity(Gravity.RIGHT);
+        actionBarLow.setVerticalGravity(Gravity.BOTTOM);
+
+        LinearLayout move_buttons_low = new LinearLayout(this);
+        move_buttons_low.setOrientation(LinearLayout.HORIZONTAL);
+        move_buttons_low.setVerticalGravity(Gravity.BOTTOM);
+        move_buttons_low.setHorizontalGravity(Gravity.RIGHT);
 
         // Create the buttons
         mLeftButton = new Button(this);
-        mLeftButton.setText("LEFT");
+        mLeftButton.setBackgroundResource(R.drawable.move_button);
+        mLeftButton.setTextColor(getResources().getColor(R.color.gray));
+//        mLeftButton = (Button) findViewById(R.id.left_button);
+        mLeftButton.setText(R.string.left_button_txt);
         mLeftButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
             public void onClick(View view){
@@ -86,32 +242,69 @@ public class GameActivity extends AppCompatActivity {
         }));
 
         mRightButton = new Button(this);
-        mRightButton.setText("RIGHT");
+        mRightButton.setText(R.string.right_button_txt);
+        mRightButton.setBackgroundResource(R.drawable.move_button);
+        mRightButton.setTextColor(getResources().getColor(R.color.gray));
         mRightButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
             public void onClick(View view){
                 mPlayView.moveRight();
             }
         }));
-        mFireButton_L = new Button(this);
+        move_buttons_low.addView(mLeftButton);
+        move_buttons_low.addView(mRightButton);
+
+        LinearLayout fire = new LinearLayout(this);
+        fire.setOrientation(LinearLayout.HORIZONTAL);
+        fire.setHorizontalGravity(Gravity.RIGHT);
+        fire.setVerticalGravity(Gravity.BOTTOM);
         mFireButton_R = new Button(this);
-        mFireButton_L.setText("FIRE!");
-        mFireButton_R.setText("FIRE!");
-        mFireButton_L.setOnTouchListener(new ButtonListener(0, 0, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPlayView.fire();
-            }
-        }));
+        mFireButton_R.setText(R.string.fire_button_txt);
+        mFireButton_R.setBackgroundResource(R.drawable.fire_button);
         mFireButton_R.setOnTouchListener(new ButtonListener(0, 0, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mPlayView.fire();
             }
         }));
+        mFireButton_R.setWidth(mLeftButton.getWidth() + mRightButton.getWidth());
+        fire.addView(mFireButton_R);
+
+        actionBarLow.addView(fire);
+        actionBarLow.addView(move_buttons_low);
+
+        layout.addView(mPlayView);
+        layout.addView(actionBarCenter);
+        layout.addView(actionBarLow);
+
+        return layout;
+    }
+
+
+    /**
+     * Creates and returns the following UI layout :
+     *  |-------------PAUSE-------------|
+     *  |                               |
+     *  |                               |
+     *  *********************************
+     *  | F                             |
+     *  |L R                            |
+     *  ---------------------------------.
+     * @return the UI layout.
+     */
+    public FrameLayout getLayout_3() {
+
+        FrameLayout layout = new FrameLayout(this);
+
+        LinearLayout actionBarCenter = new LinearLayout(this);
+        actionBarCenter.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
+        actionBarCenter.setVerticalGravity(Gravity.TOP);
 
         mPauseButton = new Button(this);
-        mPauseButton.setText("PAUSE");
+        mPauseButton.setText(R.string.pause_button_txt);
+        mPauseButton.setBackgroundResource(R.drawable.pause_button);
+        mPauseButton.setTextColor(getResources().getColor(R.color.gray));
+//        mPauseButton = (Button) findViewById(R.id.pause_button);
         mPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,28 +312,68 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
-        //add the buttons to the proper layout
-        buttonsLeft.addView(mFireButton_L);
-        buttonsLeft.addView(mLeftButton);
-
-        buttonsRight.addView(mFireButton_R);
-        buttonsRight.addView(mRightButton);
-
-        //add the button layouts to the action bars
-        actionBarLeft.addView(buttonsLeft);
-        actionBarRight.addView(buttonsRight);
         actionBarCenter.addView(mPauseButton);
 
-        // add game view, left action bar, and right action bar to the main frame
-        layout.addView(mPlayView);
-        layout.addView(actionBarLeft);
-        layout.addView(actionBarRight);
-        layout.addView(actionBarCenter);
+        LinearLayout actionBarLow = new LinearLayout(this);
+        actionBarLow.setOrientation(LinearLayout.VERTICAL);
+        actionBarLow.setHorizontalGravity(Gravity.LEFT);
+        actionBarLow.setVerticalGravity(Gravity.BOTTOM);
 
-        //add layout to ContentView
-        setContentView(layout);
-        // start game
-        mPlayView.run();
+        LinearLayout move_buttons_low = new LinearLayout(this);
+        move_buttons_low.setOrientation(LinearLayout.HORIZONTAL);
+        move_buttons_low.setVerticalGravity(Gravity.BOTTOM);
+        move_buttons_low.setHorizontalGravity(Gravity.LEFT);
+
+        // Create the buttons
+        mLeftButton = new Button(this);
+        mLeftButton.setBackgroundResource(R.drawable.move_button);
+        mLeftButton.setTextColor(getResources().getColor(R.color.gray));
+//        mLeftButton = (Button) findViewById(R.id.left_button);
+        mLeftButton.setText(R.string.left_button_txt);
+        mLeftButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                mPlayView.moveLeft();
+            }
+        }));
+
+        mRightButton = new Button(this);
+        mRightButton.setText(R.string.right_button_txt);
+        mRightButton.setBackgroundResource(R.drawable.move_button);
+        mRightButton.setTextColor(getResources().getColor(R.color.gray));
+        mRightButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                mPlayView.moveRight();
+            }
+        }));
+        move_buttons_low.addView(mLeftButton);
+        move_buttons_low.addView(mRightButton);
+
+        LinearLayout fire = new LinearLayout(this);
+        fire.setOrientation(LinearLayout.HORIZONTAL);
+        fire.setHorizontalGravity(Gravity.LEFT);
+        fire.setVerticalGravity(Gravity.BOTTOM);
+        mFireButton_R = new Button(this);
+        mFireButton_R.setText(R.string.fire_button_txt);
+        mFireButton_R.setBackgroundResource(R.drawable.fire_button);
+        mFireButton_R.setOnTouchListener(new ButtonListener(0, 0, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayView.fire();
+            }
+        }));
+        mFireButton_R.setWidth(mLeftButton.getWidth() + mRightButton.getWidth());
+        fire.addView(mFireButton_R);
+
+        actionBarLow.addView(fire);
+        actionBarLow.addView(move_buttons_low);
+
+        layout.addView(mPlayView);
+        layout.addView(actionBarCenter);
+        layout.addView(actionBarLow);
+
+        return layout;
     }
 
     /**
@@ -159,7 +392,6 @@ public class GameActivity extends AppCompatActivity {
                 });
         AlertDialog dialog = dialog_builder.create();
         dialog.show();
-        //TODO: finish
     }
 
     /**
