@@ -17,9 +17,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
 public class Health extends GameCharacter {
 
     /** Constant for scaling health */
-    private static final int X_SCALE = 15;
-
-
+    private static final int SCALE = 25;
 
     /** Constant for survivor's max health. */
     private static final int MAX_HEALTH = 5;
@@ -28,7 +26,7 @@ public class Health extends GameCharacter {
     private int currHealth;
 
     /** The bitmap for the health sprite image. */
-    private Bitmap mBmap;
+    private Bitmap healthBitmap;
 
     /** Health coordinates. */
     private int xCoord;
@@ -42,12 +40,9 @@ public class Health extends GameCharacter {
 
         currHealth = MAX_HEALTH;
 
-        //resize the bitmap
-        float w_scale = ((float) screenSize.y) / SCALE; // Swap x and y due to forced landscape view
-        float h_scale = ((float) screenSize.x) / SCALE;
-        // Get the player graphic from drawable:
-        mBmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.brain); // a placeholder graphic
-        mBmap = getResizedBmp(mBmap, w_scale, h_scale);
+        // Get the health graphic from drawable
+        healthBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.brain);
+        healthBitmap = getResizedBmp(healthBitmap, screenSize.x/SCALE, screenSize.x/SCALE);
         xCoord = 0;
         yCoord = 0;
     }
@@ -64,19 +59,11 @@ public class Health extends GameCharacter {
         return xCoord;
     }
 
-    public void setxCoord(int xCoord) {
-        this.xCoord = xCoord;
-    }
-
     public int getyCoord() {
         return yCoord;
     }
 
-    public void setyCoord(int yCoord) {
-        this.yCoord = yCoord;
-    }
-
-    public Bitmap getmBmap() {
-        return mBmap;
+    public Bitmap getmBitmap() {
+        return healthBitmap;
     }
 }

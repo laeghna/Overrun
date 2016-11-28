@@ -47,12 +47,10 @@ public class Survivor extends GameCharacter{
     public Survivor(Context context, Point screenSize) {
 
         mSpeed = 2; // test speed may need to adjust
-        //resize the bitmap
-        float w_scale = ((float) screenSize.y) / SCALE; // Swap x and y due to forced landscape view
-        float h_scale = ((float) screenSize.x) / SCALE;
+
         // Get the player graphic from drawable:
         mBmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie); // a placeholder graphic
-        mBmap = getResizedBmp(mBmap, w_scale, h_scale);
+        mBmap = getResizedBmp(mBmap, screenSize.x/SCALE, screenSize.x/SCALE);
         mX = mBmap.getWidth();
         mY = screenSize.y - (mBmap.getHeight() + mPadBott);
         mDetectCollisions = new Rect(mX, mY, mX + mBmap.getWidth(), mY + mBmap.getHeight());

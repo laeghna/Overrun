@@ -200,8 +200,8 @@ public class PlayView extends SurfaceView implements Runnable{
             //Draw current health
             for(int h = 0; h < health.getCurrHealth(); h++) {
 
-                mBackground.drawBitmap(health.getmBmap(), health.getxCoord() +
-                        (health.getmBmap().getWidth() * h),
+                mBackground.drawBitmap(health.getmBitmap(), health.getxCoord() +
+                        (health.getmBitmap().getWidth() * h),
                         health.getyCoord(), mPaintBrush);
             }
 
