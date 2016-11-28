@@ -16,7 +16,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 8 November 2016
+ * @version 22 November 2016
  */
 public class Survivor extends GameCharacter{
 
@@ -33,9 +33,6 @@ public class Survivor extends GameCharacter{
     /** The move speed of the survivor. */
     private int mSpeed;
 
-    /** Boolean for determining if the game is running. */
-    private boolean mIsRunning;
-
     /** Padding for the top and bottom of the game screen. */
     private int mPadBott = 165;
 
@@ -48,6 +45,7 @@ public class Survivor extends GameCharacter{
      * @param context - the context for the application this game is played from
      */
     public Survivor(Context context, Point screenSize) {
+
         mSpeed = 2; // test speed may need to adjust
         //resize the bitmap
         float w_scale = ((float) screenSize.y) / SCALE; // Swap x and y due to forced landscape view
@@ -57,25 +55,8 @@ public class Survivor extends GameCharacter{
         mBmap = getResizedBmp(mBmap, w_scale, h_scale);
         mX = mBmap.getWidth();
         mY = screenSize.y - (mBmap.getHeight() + mPadBott);
-        mIsRunning = false;
         mDetectCollisions = new Rect(mX, mY, mX + mBmap.getWidth(), mY + mBmap.getHeight());
         //TODO: replace with correct graphics
-    }
-
-    /**
-     * Gets mIsRunning.
-     * @return true if game is running, else false
-     */
-    public boolean getmIsRunning() {
-        return mIsRunning;
-    }
-
-    /**
-     * Sets mIsRunning
-     * @param mIsRunning new boolean value
-     */
-    public void setmIsRunning(boolean mIsRunning) {
-        this.mIsRunning = mIsRunning;
     }
 
     /**
