@@ -2,25 +2,38 @@ package group7.tcss450.tacoma.uw.edu.overrun.Game;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.Log;
 import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
+import group7.tcss450.tacoma.uw.edu.overrun.R;
+
 /** This class is intended for use in the game Overrun. A fun and fast-paced survival
  * game. This class holds the view for the in-app gameplay.
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 8 Nov 2016
+ * @version 22 Nov 2016
  */
 public class PlayView extends SurfaceView implements Runnable{
+
+    /** The zombie count capacity for the level 1 difficulty. */
+    private static final int COUNT_LEVEL_1 = 40;
+
+    /** The zombie count capacity for the level 2 difficulty. */
+    private static final int COUNT_LEVEL_2 = 65;
+
+    /** The zombie count capacity for the level 3 difficulty. */
+    private static final int COUNT_LEVEL_3 = 90;
 
     /** A volatile boolean for controlling multithreaded play. */
     private volatile boolean mIsPlaying; // True when game is in-play, false otherwise
@@ -30,6 +43,9 @@ public class PlayView extends SurfaceView implements Runnable{
 
     /** The player's character of the game. */
     private Survivor mSurvivor;
+
+    /** the survivor's health. */
+    private Health health;
 
     /** The paint object for use in drawing. */
     private Paint mPaintBrush;
@@ -52,6 +68,11 @@ public class PlayView extends SurfaceView implements Runnable{
     /** Adding 3 zombies for testing. */
     private int zombieCount = 3;
 
+    /** The barrier between the survivor and the zombies. */
+    private Barrier mBarrier;
+
+    private SharedPreferences mSharedPref;
+
 
     /**
      * Constructor for the PlayView class.
@@ -63,9 +84,14 @@ public class PlayView extends SurfaceView implements Runnable{
         Display d = wm.getDefaultDisplay();
         mScreen = new Point();
         d.getSize(mScreen);
+        mSharedPref = context.getSharedPreferences(
+                context.getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
         // create survivor object
         mSurvivor = new Survivor(context, mScreen);
+
+        // create health object
+        health = new Health(context, mScreen);
 
         // create paint object for rendering
         mPaintBrush = new Paint();
@@ -75,13 +101,17 @@ public class PlayView extends SurfaceView implements Runnable{
 
         mBullets = new Bullet[Bullet.AMMO_CAPACITY];
 
+        setupLevelDifficulty();
+
         //zombies
         zombies = new Zombie[zombieCount];
-        for (int i = 0; i < zombieCount; i++) {
+        for(int i = 0; i < zombies.length; i++) {
 
-            zombies[i] = new ZombieCrawler(context, mScreen);
+            zombies[i] = new ZombieWalker(context, mScreen);
+            zombies[i].setIsActive(true);
         }
 
+        mBarrier = new Barrier(mScreen, mSurvivor);
     }
 
     /**
@@ -105,8 +135,9 @@ public class PlayView extends SurfaceView implements Runnable{
 
     /** Updates the frame for the PlayView. */
     private void update(){
+
         // update active bullet positions.
-        for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
+        for(int i = 0; i < mBullets.length; i++) {
             if(mBullets[i] != null) {
                 if (mBullets[i].getIsActive()) {
                     mBullets[i].updateBulletPosition();
@@ -116,27 +147,44 @@ public class PlayView extends SurfaceView implements Runnable{
 
         // update zombie positions.
         for(int i=0; i < zombies.length; i++){
-            zombies[i].updateMovement();
+
+            //check if zombie is at barrier
+            if(zombies[i] != null) {
+
+                if(mBarrier.detectCollisions(zombies[i])) {
+                    // do not update position
+                } else if(zombies[i].getIsActive()) {
+                    zombies[i].updateMovement();
+                }
+            }
         }
 
         //check for collisions between bullets and zombies.
-        for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
-            if (mBullets[i] != null) {
-                if (mBullets[i].getIsActive()) {
-                    for (int z = 0; z < zombieCount; z++) {
-                        //if collision occurs with bullet
-                        if (Rect.intersects(mBullets[i].getDetectBullet(), zombies[z].getDetectZombie())) {
+        for(int i = 0; i < mBullets.length; i++) {
+            if (mBullets[i] != null && mBullets[i].getIsActive()) {
 
-                            //moving enemy outside the bottom edge and setting bullet isActive to false
-                            zombies[z].setXCoord(mScreen.y + zombies[z].getBitmap().getHeight());
-                            mBullets[i].setIsActive(false);
+                for (int z = 0; z < zombieCount; z++) {
+                    //if collision occurs with bullet
+                    if (Rect.intersects(mBullets[i].getDetectBullet(), zombies[z].getDetectZombie())) {
+                        //Increase zombie's hit count and set bullet's isActive to false
+                        zombies[z].addHit();
+                        mBullets[i].setIsActive(false);
+                        //If hit count is equal to zombie's health, set isActive to false
+                        if (zombies[z].getTimesHit() == zombies[z].getHP()) {
+                            zombies[z].setIsActive(false);
                         }
                     }
                 }
             }
         }
+
+        //check for collisions between survivor and zombies
+        //lower health if collision occurs
         for(int i = 0; i < zombieCount; i++) {
-            if(Rect.intersects(zombies[i].getDetectZombie(), mSurvivor.getmDetectCollisions())) {
+            if(zombies[i] != null && Rect.intersects(zombies[i].getDetectZombie(),
+                    mSurvivor.getmDetectCollisions())) {
+
+                health.setCurrHealth(health.getCurrHealth() - 1);
                 Log.d("PlayView", "Survivor is hit!");
             }
         }
@@ -152,22 +200,32 @@ public class PlayView extends SurfaceView implements Runnable{
             mBackground.drawBitmap(mSurvivor.getmBmap(), mSurvivor.getmX(),
                     mSurvivor.getmY(), mPaintBrush);
 
+            mBarrier.drawBarrier(mPaintBrush, mBackground);
+
+            //Draw current health
+            for(int h = 0; h < health.getCurrHealth(); h++) {
+
+                mBackground.drawBitmap(health.getmBitmap(), health.getxCoord() +
+                        (health.getmBitmap().getWidth() * h),
+                        health.getyCoord(), mPaintBrush);
+            }
+
             //Draw zombies
             for (int i = 0; i < zombies.length; i++) {
-                mBackground.drawBitmap(
-                        zombies[i].getBitmap(),
-                        zombies[i].getXCoord(),
-                        zombies[i].getYCoord(),
-                        mPaintBrush
-                );
+                if (zombies[i] != null && zombies[i].getIsActive()) {
+                    mBackground.drawBitmap(
+                            zombies[i].getBitmap(),
+                            zombies[i].getXCoord(),
+                            zombies[i].getYCoord(),
+                            mPaintBrush);
+                }
             }
             // draws bullets
-            for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
-                if (mBullets[i] != null) {
-                    if (mBullets[i].getIsActive()) {
-                        mBackground.drawBitmap(mBullets[i].getBMP(), mBullets[i].getX(),
-                                mBullets[i].getY(), mPaintBrush);
-                    }
+            for(int i = 0; i < mBullets.length; i++) {
+                if (mBullets[i] != null && mBullets[i].getIsActive()) {
+
+                    mBackground.drawBitmap(mBullets[i].getBMP(), mBullets[i].getX(),
+                            mBullets[i].getY(), mPaintBrush);
                 }
             }
             mHolder.unlockCanvasAndPost(mBackground); // drawing done -> unlock background
@@ -226,7 +284,8 @@ public class PlayView extends SurfaceView implements Runnable{
      */
     public boolean fire() {
         Bullet b = new Bullet(1, mScreen, getContext());
-        b.shootWeapon(mSurvivor.getmX(), mSurvivor.getmY());
+        Log.d("firing", String.valueOf(mBarrier.getmStartY()));
+        b.shootWeapon(mSurvivor.getmX(), (int) mBarrier.getmStartY());
         for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
             if(mBullets[i] == null || !mBullets[i].getIsActive()) {
                 mBullets[i] = b;
@@ -236,9 +295,24 @@ public class PlayView extends SurfaceView implements Runnable{
         return false;
     }
 
-    /** Checks the survivor's collision detector to see if a collision occured. */
-    public void checkSurvivorCollision() {
-        mSurvivor.getmDetectCollisions();
-    }
+    /**
+     * Method for initializing zombieCount based on level difficulty.
+     */
+    private void setupLevelDifficulty() {
 
+        int level = mSharedPref.getInt("saved_difficulty", 1);
+
+        switch(level) {
+            case 1: zombieCount = COUNT_LEVEL_1;
+                break;
+            case 2: zombieCount = COUNT_LEVEL_2;
+                break;
+            case 3: zombieCount = COUNT_LEVEL_3;
+                break;
+            default: zombieCount = COUNT_LEVEL_1;
+                break;
+        }
+    }
 }
+
+

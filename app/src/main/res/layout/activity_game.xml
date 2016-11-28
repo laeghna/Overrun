@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_game"
     android:layout_width="match_parent"
@@ -10,5 +10,79 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="group7.tcss450.tacoma.uw.edu.overrun.Game.GameActivity">
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top"
+        android:id="@+id/center_top">
 
-</RelativeLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/pause_button"
+            android:text="@string/pause_button_txt"
+            android:textColor="@color/pause_button_colors"
+            style="@style/pause_button"
+            android:onClick="GameActivity.onPause"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="left"
+        android:id="@+id/left_bar">
+
+
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fire_left_button"
+            android:text="@string/fire_button_txt"
+            android:textColor="@color/fire_button_colors"
+            style="@style/fire_button"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/left_button"
+            android:text="@string/left_button_txt"
+            android:textColor="@color/move_button_colors"
+            style="@style/move_button"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:id="@+id/right_bar">
+
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fire_right_button"
+            android:text="@string/fire_button_txt"
+            android:textColor="@color/fire_button_colors"
+            style="@style/fire_button"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/right_button"
+            android:text="@string/right_button_txt"
+            android:textColor="@color/move_button_colors"
+            style="@style/move_button"/>
+    </LinearLayout>
+
+    <SurfaceView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/game_view"/>
+
+</FrameLayout>

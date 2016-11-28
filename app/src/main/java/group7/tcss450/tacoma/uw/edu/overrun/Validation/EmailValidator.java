@@ -3,6 +3,8 @@ package group7.tcss450.tacoma.uw.edu.overrun.Validation;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.regex.Pattern;
+
 
 /**
  * Validator for the email.
@@ -12,7 +14,18 @@ import android.widget.TextView;
  */
 public class EmailValidator extends TextValidator implements View.OnFocusChangeListener {
 
-    private static int MIN_EMAIL_LENGTH = 3;
+    /**
+     * Email validation pattern.
+     */
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
+                    "\\@" +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
+                    "(" +
+                    "\\." +
+                    "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
+                    ")+"
+    );
 
     public EmailValidator(TextView textView) {
         super(textView);
@@ -27,15 +40,15 @@ public class EmailValidator extends TextValidator implements View.OnFocusChangeL
 
     @Override
     public boolean validate(TextView textView) {
-        String text = textView.getText().toString();
+        String text = textView.getText().toString().trim();
         boolean valid = true;
 
         if (text.isEmpty()) {
             textView.setError(textView.getHint() + " is required.");
             valid = false;
         } else {
-            if (text.length() < MIN_EMAIL_LENGTH) {
-                textView.setError(textView.getHint() + " must be " + MIN_EMAIL_LENGTH +  " characters or more.");
+            if (!EMAIL_PATTERN.matcher(text).matches()) {
+                textView.setError(textView.getHint() + " must be a valid email.");
                 valid = false;
             }
         }
