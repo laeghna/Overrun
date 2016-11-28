@@ -7,6 +7,8 @@ import android.graphics.Point;
 import android.graphics.RectF;
 import android.util.Log;
 
+import java.util.Random;
+
 /**
  * This class represents the barrier between the Survivor and the zombies.
  * @author Leslie Pedro
@@ -28,6 +30,9 @@ public class Barrier {
 
     /** The array of blocks making up the barrier. */
     private BarrierBlock[][] mBarrier;
+
+    /** The starting y position for the barrier. */
+    private float mStartY;
 
     /**
      * Creates a barrier between the survivor and the attacking zombies.
@@ -73,6 +78,12 @@ public class Barrier {
     }
 
     /**
+     * Gets the starting y - coordinate for the barrier.
+     * @return the starting y coordinate for the barrier.
+     */
+    public float getmStartY() {return mStartY;}
+
+    /**
      * Assembles the barrier based on the screen size of the device being used.
      * @return a 2-d array of RectF objects making up the barrier.
      */
@@ -81,6 +92,7 @@ public class Barrier {
         float barrier_height = portionOfScreen * mScreen.y;
         float rect_height = barrier_height / BARRIER_ROWS;
         float startPosY = mSurvivor.getmY() - 1 - barrier_height;
+        mStartY= startPosY;
         float endPosY = mSurvivor.getmY() - 1;
         float startPosX = 1f;
         float endPosX = mScreen.x - 1;
@@ -104,10 +116,10 @@ public class Barrier {
      */
     public void drawBarrier(Paint brush, Canvas bg) {
         int oldColor = brush.getColor();
-        brush.setColor(Color.GRAY);
         for(int i = 0; i < BARRIER_ROWS; i++) {
             for(int j = 0; j < BARRIER_COLS; j++) {
                 if(!mBarrier[i][j].getmIsDestroyed()) {
+                    brush.setColor(mBarrier[i][j].getmColor());
                     bg.drawRect(mBarrier[i][j].getmBlock(), brush);
                 }
             }
@@ -142,6 +154,8 @@ public class Barrier {
         /** True if the block has been destroyed by zombies, false otherwise. */
         private boolean mIsDestroyed;
 
+        private int mColor;
+
         /**
          * Constructs the block with the passed parameters.
          * @param left the left coordinate of the block.
@@ -153,6 +167,27 @@ public class Barrier {
             mHealth = MAX_HEALTH;
             mIsDestroyed = false;
             mBlock = new RectF(left, top, right, bottom);
+            Random r = new Random();
+            int color_change = r.nextInt(6);
+            switch(color_change) {
+                case 0:
+                    mColor = Color.argb(0xff, 0x52, 0x2b, 0x00);
+                    break;
+                case 1:
+                    mColor = Color.argb(0xff, 0x7a, 0x21, 0x00);
+                    break;
+                case 2:
+                    mColor = Color.argb(0xff, 0x61, 0x14, 0x00);
+                    break;
+                case 3:
+                    mColor = Color.argb(0xff, 0x84, 0x17, 0x0f);
+                    break;
+                case 4:
+                    mColor = Color.argb(0xff, 0x44, 0x44, 0x44);
+                    break;
+                case 5:
+                    mColor = Color.argb(0xff, 0x69, 0x1f, 0x2e);
+            }
         }
 
         /**
@@ -190,5 +225,11 @@ public class Barrier {
         private void setmIsDestroyed(boolean isDestroyed) {
             mIsDestroyed = isDestroyed;
         }
+
+        /**
+         * Gets the color for this block.
+         * @return the color of the block.
+         */
+        private int getmColor() { return mColor;};
     }
 }
