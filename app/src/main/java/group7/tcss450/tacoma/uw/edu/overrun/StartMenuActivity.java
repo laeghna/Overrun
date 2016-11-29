@@ -1,5 +1,6 @@
 package group7.tcss450.tacoma.uw.edu.overrun;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -68,6 +69,7 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
             mMediaPlayer.start();
         }
     }
+
 
     /**
      * The onResume callback method for this activity adjusts
