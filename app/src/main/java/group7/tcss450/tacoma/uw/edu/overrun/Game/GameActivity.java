@@ -1,7 +1,9 @@
 package group7.tcss450.tacoma.uw.edu.overrun.Game;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -43,6 +45,9 @@ public class GameActivity extends AppCompatActivity {
     private Button mFireButton_L;
     private Button mFireButton_R;
 
+    private SharedPreferences mSharedPref;
+
+
     /**
      * To perform on creation of this Activity.
      * @param savedInstanceState the saved instance state.
@@ -50,7 +55,13 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int choose_layout = 0; //default setting
+
+        mSharedPref = getSharedPreferences(
+                getString(R.string.shared_prefs), Context.MODE_PRIVATE);
+
+//        int choose_layout = mSharedPref.getInt("saved_controls", 0);
+
+        int choose_layout = 0;
         //Initialize the play view object
         mPlayView = new PlayView(this);
         FrameLayout layout = getLayout_1();
