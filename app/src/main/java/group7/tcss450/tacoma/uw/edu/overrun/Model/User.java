@@ -7,32 +7,45 @@ public class User {
     @SerializedName("email")
     private String email;
 
-    @SerializedName("salt")
-    private String salt;
+    @SerializedName("firstName")
+    private String firstName;
 
-    @SerializedName("hash")
-    private String hash;
+    @SerializedName("lastName")
+    private String lastName;
 
-    public User(String email, String salt, String hash) {
+    @SerializedName("email_verified")
+    private String emailVerified;
+
+    public User(String email, String firstName, String lastName, String  emailVerified) {
         this.email = email;
-        this.salt = salt;
-        this.hash = hash;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.emailVerified = emailVerified;
     }
 
-    public String getHash() {
-        return hash;
+
+    public String getEmailVerified() {
+        return emailVerified;
     }
 
-    public void setHash(String hash) {
-        this.hash = hash;
+    public void setEmailVerified(String emailVerified) {
+        this.emailVerified = emailVerified;
     }
 
-    public String getSalt() {
-        return salt;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setSalt(String salt) {
-        this.salt = salt;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public String getEmail() {

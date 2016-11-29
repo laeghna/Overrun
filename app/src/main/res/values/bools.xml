@@ -2,4 +2,8 @@
 <resources>
     <bool name="logged_in_default">false</bool>
     <bool name="logged_in">false</bool>
+
+    <bool name="has_internet">true</bool>
+    <bool name="unsynced_content">false</bool>
+    <bool name="currently_syncing">false</bool>
 </resources>

@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * @author Ethan Rowell
  * @version 9 Nov 2016
  */
-public class EmailValidator extends TextValidator implements View.OnFocusChangeListener {
+public class EmailTextWatcher extends TextValidator implements View.OnFocusChangeListener {
 
     /**
      * Email validation pattern.
@@ -27,7 +27,7 @@ public class EmailValidator extends TextValidator implements View.OnFocusChangeL
                     ")+"
     );
 
-    public EmailValidator(TextView textView) {
+    public EmailTextWatcher(TextView textView) {
         super(textView);
     }
 

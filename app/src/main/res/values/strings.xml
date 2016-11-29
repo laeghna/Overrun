@@ -47,5 +47,13 @@
     <string name="registration_alt_text">Or you can create an account here:</string>
     <string name="PROD_API_URL">http://cssgate.insttech.washington.edu:8081/</string>
     <string name="DEV_API_URL">http://10.0.2.2:8081/</string>
+    <string name="invalid_reg_form">Registration form is not valid.</string>
+    <string name="need_network_register">A network connection is required to register.</string>
+    <string name="our_server_messed_up">Sorry, our server messed up.</string>
+    <string name="signing_in">Signing in...</string>
+    <string name="need_network_login">A network connection is required to login.</string>
+    <string name="failed_signin">Failed to sign in.</string>
+    <string name="no_netowrk_upload_later">No network detected. Stats will be saved and uploaded later.</string>
+    <string name="has_internet">hasInternet</string>
 
 </resources>

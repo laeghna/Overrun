@@ -51,6 +51,17 @@ public final class OverrunDbContract {
         public static final String COLUMN_NAME_SHOTS_FIRED = "shotsFired";
 
 
+        public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" +
+                COLUMN_NAME_GAMEID + " " + INT_TYPE + " PRIMARY KEY AUTOINCREMENT" + COMMA_SEP +
+                COLUMN_NAME_EMAIL + " " + NVARCHAR_TYPE + COMMA_SEP +
+                COLUMN_NAME_SCORE + " " + INT_TYPE + COMMA_SEP +
+                COLUMN_NAME_ZOMBIES_KILLED + " " + INT_TYPE + COMMA_SEP +
+                COLUMN_NAME_LEVEL + " " + INT_TYPE + COMMA_SEP +
+                COLUMN_NAME_SHOTS_FIRED + " " + INT_TYPE +
+                ");";
+
+        public static final String DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME + ";";
+
     }
 
 }

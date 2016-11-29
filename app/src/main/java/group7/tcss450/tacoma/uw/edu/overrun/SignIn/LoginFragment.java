@@ -13,11 +13,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
-import group7.tcss450.tacoma.uw.edu.overrun.BuildConfig;
+import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbHelper;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
-import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailValidator;
+import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailTextWatcher;
 import timber.log.Timber;
 
 /**
@@ -51,7 +50,7 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        if (((BaseActivity) getActivity()).isLoggedIn()) {
+        if (((SignInActivity) getActivity()).isLoggedIn()) {
             Intent intent = new Intent(getActivity().getApplicationContext(), StartMenuActivity.class);
             startActivity(intent);
             getActivity().finish();
@@ -60,27 +59,30 @@ public class LoginFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
-        }
-
-        EmailValidator emailValidator = new EmailValidator(emailText);
-        emailText.addTextChangedListener(emailValidator);
-        emailText.setOnFocusChangeListener(emailValidator);
+        EmailTextWatcher emailTextWatcher = new EmailTextWatcher(emailText);
+        emailText.addTextChangedListener(emailTextWatcher);
+        emailText.setOnFocusChangeListener(emailTextWatcher);
 
         // Inflate the layout for this fragment
         return view;
     }
 
+    @OnClick(R.id.test_sync_button)
+    void test() {
+        OverrunDbHelper db = new OverrunDbHelper(getContext());
+        db.seedDb();
+        db.scheduleDBSync();
+    }
+
     @OnClick(R.id.google_sign_in_button)
     void googleSignIn() {
-        ((BaseActivity) getActivity()).googleSignIn();
+        ((SignInActivity) getActivity()).googleSignIn();
     }
 
     @OnClick(R.id.login_button)
     void signIn() {
-        Timber.d("Signing in...");
-        ((BaseActivity) getActivity()).signIn(emailText.getText().toString(),
+        Timber.d(getString(R.string.signing_in));
+        ((SignInActivity) getActivity()).signIn(emailText.getText().toString(),
                 passwordText.getText().toString());
     }
 

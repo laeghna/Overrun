@@ -59,5 +59,11 @@
         android:layout_below="@id/register_button"
         android:layout_centerHorizontal="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Test Sync"
+        android:id="@+id/test_sync_button"/>
+
 
 </RelativeLayout>

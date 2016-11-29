@@ -14,7 +14,7 @@ import java.util.List;
  * @author Ethan Rowell
  * @version 9 Nov 2016
  */
-public class PasswordValidator extends TextValidator implements View.OnFocusChangeListener {
+public class PasswordTextWatcher extends TextValidator implements View.OnFocusChangeListener {
 
     /**
      * Minimum password length.
@@ -35,7 +35,7 @@ public class PasswordValidator extends TextValidator implements View.OnFocusChan
     /**
      * @param textView The text view to watch.
      */
-    public PasswordValidator(TextView textView) {
+    public PasswordTextWatcher(TextView textView) {
         super(textView);
         otherPasswordFields = new ArrayList<>();
     }
