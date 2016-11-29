@@ -22,26 +22,27 @@ public class LeaderboardActivity extends AppCompatActivity implements PlayerStat
     }
 
     @Override
-    public void onListFragmentInteraction(PlayerStatsContent.PlayerStats item) {
-        PlayerStatsFragment playerStatsFragment = (PlayerStatsFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.fragment_container);
+    public void onListFragmentInteraction(PlayerStatsContent thePlayer) {
 
-        if (playerStatsFragment != null) {
-            // If playerStatsFragment is available, we're in two-pane layout...
+            // If the frag is not available, we're in the one-pane layout and must swap frags...
 
-            // Call a method in the player stats fragment to update its content
-            //playerStatsFragment.updatePlayerStatsItemView(item);
-        } else {
-            playerStatsFragment = new PlayerStatsFragment();
+            // Create fragment and give it an argument for the selected student
+            // Replace whatever is in the fragment_container view with this fragment,
+            // and add the transaction to the back stack so the user can navigate back
+
+            PlayerStatsDetailFragment playerDetailFragment = new PlayerStatsDetailFragment();
             Bundle args = new Bundle();
-            args.putSerializable(PlayerStatsDetailFragment.PLAYER_NAME, item);
-            playerStatsFragment.setArguments(args);
+            args.putSerializable(playerDetailFragment.PLAYER_ITEM_SELECTED, thePlayer);
+            playerDetailFragment.setArguments(args);
             FragmentTransaction transaction = getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragment_container, playerStatsFragment)
+                    .replace(R.id.fragment_container, playerDetailFragment)
                     .addToBackStack(null);
 
+            // Commit the transaction
             transaction.commit();
-        }
+
+
+
     }
 }

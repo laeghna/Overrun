@@ -1,73 +1,73 @@
 package group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.PlayerStats;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Helper class for providing sample content for user interfaces created by
- * Android template wizards.
- * <p>
- * TODO: Replace all uses of this class before publishing your app.
+ * Created by Andrew on 10/24/16.
  */
-public class PlayerStatsContent {
 
-    /**
-     * An array of sample (PlayerStats) items.
-     */
-    public static final List<PlayerStats> ITEMS = new ArrayList<>();
+public class PlayerStatsContent implements Serializable {
+    public static final String ID = "email", PLAYER_SCORE = "score";
 
-    /**
-     * A map of sample (PlayerStats) items, by ID.
-     */
-    public static final Map<String, PlayerStats> ITEM_MAP = new HashMap<>();
 
-    private static final int COUNT = 25;
+    public String mPlayerId;
+    public String mPlayerScore;
 
-    static {
-        // Add some sample items.
-        for (int i = 1; i <= COUNT; i++) {
-            addItem(createDummyItem(i));
-        }
+
+    public PlayerStatsContent(String thePlayerId, String thePlayerScore) {
+        this.mPlayerId = thePlayerId;
+        this.mPlayerScore = thePlayerScore;
     }
 
-    private static void addItem(PlayerStats item) {
-        ITEMS.add(item);
-        ITEM_MAP.put(item.id, item);
+    public String getPlayerId() {
+        return mPlayerId;
     }
 
-    private static PlayerStats createDummyItem(int position) {
-        return new PlayerStats(String.valueOf(position), "Item " + position, makeDetails(position));
+    public void setPlayerId(String mcourseId) {
+        this.mPlayerId = mcourseId;
     }
 
-    private static String makeDetails(int position) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Details about Item: ").append(position);
-        for (int i = 0; i < position; i++) {
-            builder.append("\nMore details information here.");
-        }
-        return builder.toString();
+    public String getPlayerScore() {
+        return mPlayerScore;
+    }
+
+    public void setPlayerScore(String mshortDescription) {
+        this.mPlayerScore = mshortDescription;
     }
 
     /**
-     * A dummy item representing a piece of content.
+     * Parses the json string, returns an error message if unsuccessful.
+     * Returns course list if success.
+     * @param courseJSON
+     * @return reason or null if successful.
      */
-    public static class PlayerStats implements Serializable {
-        public final String id;
-        public final String content;
-        public final String details;
+    public static String parseCourseJSON(String courseJSON, List<PlayerStatsContent> playerList) {
+        String reason = null;
+        if (courseJSON != null) {
+            try {
+                JSONArray arr = new JSONArray(courseJSON);
 
-        public PlayerStats(String id, String content, String details) {
-            this.id = id;
-            this.content = content;
-            this.details = details;
-        }
+                for (int i = 0; i < arr.length(); i++) {
+                    JSONObject obj = arr.getJSONObject(i);
+                    PlayerStatsContent player = new PlayerStatsContent(obj.getString(PlayerStatsContent.ID),
+                            obj.getString(PlayerStatsContent.PLAYER_SCORE));
 
-        @Override
-        public String toString() {
-            return content;
+                    playerList.add(player);
+                }
+            } catch (JSONException e) {
+                reason =  "Unable to parse data, Reason: " + e.getMessage();
+            }
+
         }
+        return reason;
+
     }
+
+
 }
+
