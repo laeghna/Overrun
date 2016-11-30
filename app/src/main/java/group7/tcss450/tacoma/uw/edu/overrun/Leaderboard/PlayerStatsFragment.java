@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import group7.tcss450.tacoma.uw.edu.overrun.Database.LeaderboardDb;
 import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.PlayerStats.PlayerStatsContent;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
@@ -44,6 +45,7 @@ public class PlayerStatsFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
     private RecyclerView mRecyclerView;
     private PlayerStatsContent mFirstPlayer;
+    private LeaderboardDb mLeaderboardDB;
     private List<PlayerStatsContent> mPlayerList;
 
     /**
@@ -75,20 +77,6 @@ public class PlayerStatsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-//        View view = inflater.inflate(R.layout.fragment_playerstats_list, container, false);
-//
-//        // Set the adapter
-//        if (view instanceof RecyclerView) {
-//            Context context = view.getContext();
-//            RecyclerView recyclerView = (RecyclerView) view;
-//            if (mColumnCount <= 1) {
-//                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-//            } else {
-//                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-//            }
-//            recyclerView.setAdapter(new PlayerStatsRecyclerViewAdapter(PlayerStatsContent.PLAYERS, mListener));
-//        }
-//        return view;
 
         View view = inflater.inflate(R.layout.fragment_playerstats_list, container, false);
 
@@ -113,15 +101,15 @@ public class PlayerStatsFragment extends Fragment {
         }
         else {
             Toast.makeText(view.getContext(),
-                    "No network connection available.",
-                    Toast.LENGTH_SHORT) .show();
+                    "No network connection available. Displaying locally recent leaderboard.",
+                    Toast.LENGTH_LONG) .show();
 
-//            if (mCourseDB == null) {
-//                mCourseDB = new CourseDB(getActivity());
-//            }
-//            if (mPlayerList == null) {
-//                mPlayerList = mCourseDB.getCourses();
-//            }
+            if (mLeaderboardDB == null) {
+                mLeaderboardDB = new LeaderboardDb(getActivity());
+            }
+            if (mPlayerList == null) {
+                mPlayerList = mLeaderboardDB.getPlayers();
+            }
             mRecyclerView.setAdapter(new PlayerStatsRecyclerViewAdapter(mPlayerList, mListener));
         }
         return view;
@@ -182,7 +170,7 @@ public class PlayerStatsFragment extends Fragment {
                     }
 
                 } catch (Exception e) {
-                    response = "Unable to download the list of courses, Reason: "
+                    response = "Unable to download the list of players, Reason: "
                             + e.getMessage();
                 }
                 finally {
@@ -214,24 +202,20 @@ public class PlayerStatsFragment extends Fragment {
             // Everything is good, show the list of courses.
             if (!mPlayerList.isEmpty()) {
 
-//                if (mCourseDB == null) {
-//                    mCourseDB = new CourseDB(getActivity());
-//                }
+                if (mLeaderboardDB == null) {
+                    mLeaderboardDB = new LeaderboardDb(getActivity());
+                }
 
-                // Delete old data so that you can refresh the local
-                // database with the network data.
-//                mCourseDB.deleteCourses();
+//                 Delete old data so that you can refresh the local
+//                 database with the network data.
+                mLeaderboardDB.deletePlayer();
 
-//                // Also, add to the local database
-//                for (int i = 0; i< mPlayerList.size(); i++) {
-//                    Course course = mPlayerList.get(i);
-//                    mCourseDB.insertCourse(course.getCourseId(),
-//                            course.getShortDescription(),
-//                            course.getLongDescription(),
-//                            course.getPrereqs());
-//                }
-
-
+                // Also, add to the local database
+                for (int i = 0; i< mPlayerList.size(); i++) {
+                    PlayerStatsContent course = mPlayerList.get(i);
+                    mLeaderboardDB.insertPlayer(course.getPlayerId(),
+                            course.getPlayerScore());
+                }
                 mFirstPlayer = mPlayerList.get(0);
                 mRecyclerView.setAdapter(new PlayerStatsRecyclerViewAdapter(mPlayerList, mListener));
             }

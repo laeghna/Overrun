@@ -39,7 +39,7 @@ public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerS
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mPlayerNumber.setText(Integer.toString(position + 1) + '.');
-        System.out.println(position);
+  
         holder.mIdView.setText(mValues.get(position).getPlayerId());
         holder.mContentView.setText(mValues.get(position).getPlayerScore());
 
