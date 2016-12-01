@@ -3,6 +3,7 @@ package group7.tcss450.tacoma.uw.edu.overrun;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.nfc.Tag;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +29,8 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
 
     private SharedPreferences mSharedPref;
     private Spinner mDiffSpinner;
+    private Spinner mControlsSpinner;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,7 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
         mDiffSpinner = (Spinner) findViewById(R.id.diff_spinner);
+        mControlsSpinner = (Spinner) findViewById(R.id.control_spinner);
 
         Button cancel_button = (Button) findViewById(R.id.cancel_button_options);
         Button ok_button = (Button) findViewById(R.id.ok_button_options);
@@ -50,17 +54,22 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         int current_difficulty = mSharedPref.getInt(
                 getString(R.string.saved_difficulty_setting), 1);
 
+        int current_controls = mSharedPref.getInt("saved_controls", 1);
+
         double current_volume = mSharedPref.getFloat(
                 getString(R.string.saved_volume_setting), 1);
 
         // Set volume to an integer to properly display on Slider.
         int volume_int = (int) (current_volume * 100);
 
-        Spinner mySpinner = (Spinner) findViewById(R.id.diff_spinner);
+        Spinner mydiffSpinner = (Spinner) findViewById(R.id.diff_spinner);
+        Spinner myControlsSpinner = (Spinner) findViewById(R.id.control_spinner);
         SeekBar volumeBar = (SeekBar) findViewById(R.id.volume_bar);
 
         volumeBar.setProgress(volume_int);
-        mySpinner.setSelection(current_difficulty - 1);
+        mydiffSpinner.setSelection(current_difficulty - 1);
+        myControlsSpinner.setSelection(current_controls);
+
 
     }
 
@@ -78,20 +87,23 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.ok_button_options:
 
                 // Get the current values of the settings.
-                String text = mDiffSpinner.getSelectedItem().toString();
+                String diffText = mDiffSpinner.getSelectedItem().toString();
+                String controlsText = mControlsSpinner.getSelectedItem().toString();
                 float volume_level = updateVolume();
-                int difficulty = updateDifficulty(text);
+                int controls = updateControls(controlsText);
+                int difficulty = updateDifficulty(diffText);
 
                 // Save the current settings to Preferences.
                 SharedPreferences.Editor editor = mSharedPref.edit();
                 editor.putInt(getString(R.string.saved_difficulty_setting), difficulty);
                 editor.putFloat(getString(R.string.saved_volume_setting), volume_level);
+                editor.putInt(getString(R.string.saved_controls_setting), controls);
                 editor.commit();
 
                 // Provide feedback to User to show that
                 // the settings have been changed and saved.
                 Toast.makeText(this
-                        , "Difficulty set to: " + text + "\nVolume set to: " +
+                        , "Difficulty set to: " + diffText + "\nVolume set to: " +
                                 (int)(volume_level * 100) + "%",
                         Toast.LENGTH_SHORT) .show();
                 finish();
@@ -124,6 +136,26 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         return difficulty;
+
+    }
+
+    private int updateControls(String theText) {
+
+        int controls = 0;
+
+        switch (theText) {
+            case "Control Layout One":
+                controls = 0;
+                break;
+            case "Control Layout Two":
+                controls = 1;
+                break;
+            case "Control Layout Three":
+                controls = 2;
+                break;
+        }
+
+        return controls;
 
     }
 
