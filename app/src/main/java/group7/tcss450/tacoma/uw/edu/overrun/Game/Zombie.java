@@ -86,4 +86,9 @@ public interface Zombie {
      * @return pointValue the zombie's point value
      */
     int getPointValue();
+
+    /**
+     * Resets zombie and rectangle start position.
+     */
+    public void resetZombie();
 }

@@ -15,7 +15,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 22 November 2016
+ * @version 30 November 2016
  */
 public class Survivor extends BitmapResizer {
 
@@ -36,7 +36,7 @@ public class Survivor extends BitmapResizer {
     private int mPadBott = 165;
 
     /** Collision detector for the survivor. */
-    private Rect mDetectCollisions;
+    private Rect mDetectSurvivor;
 
 
     /**
@@ -52,7 +52,7 @@ public class Survivor extends BitmapResizer {
         mBmap = getResizedBmp(mBmap, screenSize.x/SCALE, screenSize.x/SCALE);
         mX = mBmap.getWidth();
         mY = screenSize.y - (mBmap.getHeight() + mPadBott);
-        mDetectCollisions = new Rect(mX, mY, mX + mBmap.getWidth(), mY + mBmap.getHeight());
+        mDetectSurvivor = new Rect(mX, mY, mX + mBmap.getWidth(), mY + mBmap.getHeight());
     }
 
     /**
@@ -96,12 +96,15 @@ public class Survivor extends BitmapResizer {
     }
 
     /** Gets the collision detector for the survivor. */
-    public Rect getmDetectCollisions() {
-        return mDetectCollisions;
+    public Rect getmDetectSurvivor() {
+        return mDetectSurvivor;
     }
 
     /** Update the collision detector to the new position. */
-    public void updateCollisionDetector() {
-        mDetectCollisions = new Rect(mX, mY, mX + mBmap.getWidth(), mY + mBmap.getHeight());
+    public void updateDetectSurvivor() {
+        mDetectSurvivor.left = mX;
+        mDetectSurvivor.top = mY;
+        mDetectSurvivor.right = mX + mBmap.getWidth();
+        mDetectSurvivor.bottom = mY - mBmap.getHeight();
     }
 }

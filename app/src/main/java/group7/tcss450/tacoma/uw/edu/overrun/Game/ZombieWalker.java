@@ -26,7 +26,7 @@ public class ZombieWalker extends BitmapResizer implements Zombie {
     private static final int HP = 2;
 
     /** Zombie's point value for adding to the game score. */
-    private static final int POINTS = 25;
+    private static final int POINTS = 15;
 
     /** Zombie crawler's speed. */
     private static final int SPEED = 2;
@@ -63,8 +63,6 @@ public class ZombieWalker extends BitmapResizer implements Zombie {
     /** Constructor to initialize variables. */
     public ZombieWalker(Context context, Point screenSize) {
 
-        walkerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
-
         xMin = 0;
         xMax = screenSize.x;
         yMin = 0;
@@ -76,7 +74,7 @@ public class ZombieWalker extends BitmapResizer implements Zombie {
         Log.d("OVERRUN: Walker", "Screen: (" + screenSize.x + "," + screenSize.y + ")");
 
         // a placeholder graphic
-        walkerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
+        walkerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.walker);
         Log.d("OVERRUN: Walker", "Before Resize: (" +  walkerBitmap.getWidth() +","+ walkerBitmap.getHeight() + ")");
 
         walkerBitmap = getResizedBmp(walkerBitmap, screenSize.x/SCALE, screenSize.x/SCALE);
@@ -169,6 +167,18 @@ public class ZombieWalker extends BitmapResizer implements Zombie {
     @Override
     public int getPointValue() {
         return POINTS;
+    }
+
+    @Override
+    public void resetZombie() {
+
+        xCoord = genRandom.nextInt(xMax - walkerBitmap.getWidth());
+        yCoord = yMin;
+        detectZombie.left = xCoord;
+        detectZombie.top = yCoord;
+        detectZombie.right = xCoord + walkerBitmap.getWidth();
+        detectZombie.bottom = yCoord + walkerBitmap.getHeight();
+        isActive = false;
     }
 }
 

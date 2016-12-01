@@ -23,7 +23,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
 public class ZombieColossus extends BitmapResizer implements Zombie {
 
     /** Zombie's hit points - the shots needed to destroy zombie. */
-    private static final int HP = 3;
+    private static final int HP = 2;
 
     /** Zombie's point value for adding to the game score. */
     private static final int POINTS = 50;
@@ -63,8 +63,6 @@ public class ZombieColossus extends BitmapResizer implements Zombie {
     /** Constructor to initialize variables. */
     public ZombieColossus(Context context, Point screenSize) {
 
-        colossusBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
-
         xMin = 0;
         xMax = screenSize.x;
         yMin = 0;
@@ -76,7 +74,7 @@ public class ZombieColossus extends BitmapResizer implements Zombie {
         Log.d("OVERRUN: Colossus", "Screen: (" + screenSize.x + "," + screenSize.y + ")");
 
         // a placeholder graphic
-        colossusBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
+        colossusBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.colossus);
         Log.d("OVERRUN: Colossus", "Before Resize: (" +  colossusBitmap.getWidth() +","+ colossusBitmap.getHeight() + ")");
 
         colossusBitmap = getResizedBmp(colossusBitmap, screenSize.x/SCALE, screenSize.x/SCALE);
@@ -169,6 +167,18 @@ public class ZombieColossus extends BitmapResizer implements Zombie {
     @Override
     public int getPointValue() {
         return POINTS;
+    }
+
+    @Override
+    public void resetZombie() {
+
+        xCoord = genRandom.nextInt(xMax - colossusBitmap.getWidth());
+        yCoord = yMin;
+        detectZombie.left = xCoord;
+        detectZombie.top = yCoord;
+        detectZombie.right = xCoord + colossusBitmap.getWidth();
+        detectZombie.bottom = yCoord + colossusBitmap.getHeight();
+        isActive = false;
     }
 }
 

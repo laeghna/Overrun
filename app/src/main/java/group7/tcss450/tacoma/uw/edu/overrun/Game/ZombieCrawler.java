@@ -3,7 +3,6 @@ package group7.tcss450.tacoma.uw.edu.overrun.Game;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
@@ -32,7 +31,7 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
     private static final int SPEED = 1;
 
     /** Constant for scaling zombie crawler. */
-    private static final int SCALE = 15;
+    private static final int SCALE = 18;
 
     /** Zombie crawler image. */
     private Bitmap crawlerBitmap;
@@ -74,7 +73,7 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
         Log.d("OVERRUN: Crawler", "Screen: (" + screenSize.x + "," + screenSize.y + ")");
 
         // a placeholder graphic
-        crawlerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
+        crawlerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.crawler);
         Log.d("OVERRUN: Crawler", "Before Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
 
         crawlerBitmap = getResizedBmp(crawlerBitmap, screenSize.x/SCALE, screenSize.x/SCALE);
@@ -167,5 +166,17 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
     @Override
     public int getPointValue() {
         return POINTS;
+    }
+
+    @Override
+    public void resetZombie() {
+
+        xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
+        yCoord = yMin;
+        detectZombie.left = xCoord;
+        detectZombie.top = yCoord;
+        detectZombie.right = xCoord + crawlerBitmap.getWidth();
+        detectZombie.bottom = yCoord + crawlerBitmap.getHeight();
+        isActive = false;
     }
 }
