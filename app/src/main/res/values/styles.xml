@@ -14,4 +14,21 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="move_button">
+        <item name="android:background">@drawable/move_button</item>
+        <item name="android:textColor">@color/move_button_colors</item>
+    </style>
+
+    <style name="pause_button">
+        <item name="android:background">@drawable/pause_button</item>
+        <item name="android:textColor">@color/pause_button_colors</item>
+    </style>
+
+    <style name="fire_button">
+        <item name="android:background">@drawable/fire_button</item>
+        <item name="android:textColor">@color/fire_button_colors</item>
+    </style>
+
+
+
 </resources>

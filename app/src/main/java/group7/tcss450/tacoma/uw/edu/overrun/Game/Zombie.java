@@ -1,4 +1,4 @@
-package group7.tcss450.tacoma.uw.edu.overrun;
+package group7.tcss450.tacoma.uw.edu.overrun.Game;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -7,10 +7,16 @@ import android.graphics.Rect;
  * This interface specifies the behavior for a zombie enemy.
  *
  * @author Lisa Taylor
- * @version 8 Nov 2016
+ * @version 12 Nov 2016
  */
 
 public interface Zombie {
+
+    /**
+     * Gets the zombie's hit points.
+     * @return the hit points
+     */
+    int getHP();
 
     /**
      * Gets resized bitmap image.
@@ -18,11 +24,11 @@ public interface Zombie {
      * @param newHeight the height of the resized bitmap
      * @return the resized bitmap
      */
-    public Bitmap getResizedBmp(float newWidth, float newHeight);
+    Bitmap getResizedBmp(float newWidth, float newHeight);
 
     /** Updates the image's coordinates.
      */
-    public void updateMovement();
+    void updateMovement();
 
     /**
      * Gets the zombie bitmap image.
@@ -59,4 +65,27 @@ public interface Zombie {
      * @return the zombie rectangle
      */
     Rect getDetectZombie();
+
+    /**
+     * Gets the status of the crawler being drawn currently.
+     * @return isActive - true if the crawler is active, false otherwise.
+     */
+    boolean getIsActive();
+
+    /**
+     * Sets the status of the current crawler.
+     * @param status true if the crawler is active, false otherwise.
+     */
+    void setIsActive(boolean status);
+
+    /**
+     * Gets the number of times the zombie has been hit.
+     * @return timesHit the number of times a bullet hit the zombie
+     */
+    int getTimesHit();
+
+    /**
+     * Increments the hit count for when a bullet hits the zombie.
+     */
+    void addHit();
 }

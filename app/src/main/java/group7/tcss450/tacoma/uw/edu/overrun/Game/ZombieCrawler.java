@@ -1,4 +1,4 @@
-package group7.tcss450.tacoma.uw.edu.overrun;
+package group7.tcss450.tacoma.uw.edu.overrun.Game;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,15 +10,20 @@ import android.util.Log;
 
 import java.util.Random;
 
+import group7.tcss450.tacoma.uw.edu.overrun.R;
+
 /**
  * This class specifies the behavior for a zombie crawler enemy.
- * This is the slowest enemy.
+ * This is the slowest and weakest enemy.
  *
  * @author Lisa Taylor
- * @version 6 Nov 2016
+ * @version 22 Nov 2016
  */
 
 public class ZombieCrawler implements Zombie {
+
+    /** Zombie's hit points - the shots needed to destroy zombie. */
+    private static final int HP = 1;
 
     /** Zombie crawler's speed. */
     private static final int SPEED = 1;
@@ -40,39 +45,44 @@ public class ZombieCrawler implements Zombie {
     private int yMin;
     private int yMax;
 
+    /** A random generator for placing new crawlers. */
+    private Random genRandom;
+
     /** Rectangle for crawler to determine collisions. */
     private Rect detectZombie;
 
+    /** Boolean to determine if crawler should be drawn or not. */
+    private boolean isActive;
+
+    /** The number of times the zombie has been hit by a bullet. */
+    private int timesHit = 0;
+
     /** Constructor to initialize variables. */
     public ZombieCrawler(Context context, Point screenSize) {
-
-        crawlerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
 
         xMin = 0;
         xMax = screenSize.x;
         yMin = 0;
         yMax = screenSize.y;
 
-        Random genRandom = new Random();
-
-        //resize the bitmap, swap x and y due to force landscape view
-        float wScale = ((float) screenSize.y) / SCALE;
-        float hScale = ((float) screenSize.x) / SCALE;
+        genRandom = new Random();
 
         // Get the zombie graphic from drawable:
-        Log.d("OVERRUN: SURVIVOR", "Screen: (" + screenSize.x + "," + screenSize.y + ")");
+        Log.d("OVERRUN: Crawler", "Screen: (" + screenSize.x + "," + screenSize.y + ")");
 
         // a placeholder graphic
         crawlerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
-        Log.d("OVERRUN: SURVIVOR", "Before Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
+        Log.d("OVERRUN: Crawler", "Before Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
 
-        crawlerBitmap = getResizedBmp(wScale, hScale);
-        Log.d("OVERRUN: SURVIVOR", "After Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
+        crawlerBitmap = getResizedBmp(screenSize.x/SCALE, screenSize.x/SCALE);
+        Log.d("OVERRUN: Crawler", "After Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
 
         xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
         yCoord = yMin;
 
-        detectZombie =  new Rect(xCoord, yCoord, crawlerBitmap.getWidth(), crawlerBitmap.getHeight());
+        detectZombie =  new Rect(xCoord, yCoord, xCoord + crawlerBitmap.getWidth(), yCoord + crawlerBitmap.getHeight());
+
+        isActive = false;
     }
 
     @Override
@@ -91,7 +101,13 @@ public class ZombieCrawler implements Zombie {
     @Override
     public void updateMovement() {
 
-        yCoord += SPEED;
+        if (yCoord + 1 < yMax) {
+            yCoord += SPEED;
+        } else {
+            xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
+            yCoord = yMin;
+            setIsActive(true);
+        }
 
         //adding top, left, bottom and right to the rect object
         detectZombie.left = xCoord;
@@ -101,6 +117,11 @@ public class ZombieCrawler implements Zombie {
 
         //do something if enemy reaches bottom edge
         //such as creating new zombie and reducing survivor health
+    }
+
+    @Override
+    public int getHP() {
+        return HP;
     }
 
     @Override
@@ -131,5 +152,25 @@ public class ZombieCrawler implements Zombie {
     @Override
     public Rect getDetectZombie() {
         return detectZombie;
+    }
+
+    @Override
+    public boolean getIsActive() {
+        return isActive;
+    }
+
+    @Override
+    public void setIsActive(boolean status) {
+        isActive = status;
+    }
+
+    @Override
+    public int getTimesHit() {
+        return timesHit;
+    }
+
+    @Override
+    public void addHit() {
+        timesHit++;
     }
 }

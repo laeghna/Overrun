@@ -15,10 +15,12 @@
     <string name="loading">Loading…</string>
 
     <string name="diff_text">Difficulty</string>
+    <string name="controls_text">Controls</string>
     <string name="title_activity_options">OptionsActivity</string>
 
 
     <string name="saved_difficulty_setting">saved_difficulty</string>
+    <string name="saved_controls_setting">saved_controls</string>
     <string name="saved_volume_setting">saved_volume</string>
 
 
@@ -33,6 +35,11 @@
     </string-array>
 
     <string name="server_client_id">711195024447-fthg4h2qidakukdus8fscsb8868ld3ph.apps.googleusercontent.com</string>
+    <string-array name="controls_array">
+        <item>Control Layout One</item>
+        <item>Control Layout Two</item>
+        <item>Control Layout Three</item>
+    </string-array>
 
     <string name="password_hint">Password</string>
     <string name="confirm_password_hint">Confirm Password</string>
@@ -55,5 +62,27 @@
     <string name="failed_signin">Failed to sign in.</string>
     <string name="no_netowrk_upload_later">No network detected. Stats will be saved and uploaded later.</string>
     <string name="has_internet">hasInternet</string>
+
+    <string name="left_button_txt">LEFT</string>
+    <string name="right_button_txt">RIGHT</string>
+    <string name="fire_button_txt">FIRE!</string>
+    <string name="pause_button_txt">| |</string>
+
+    <string name="pause_dialog">GAME PAUSED</string>
+    <string name="resume_button">Resume</string>
+
+
+
+
+    <!--SQL STRINGS-->
+    <string name="CREATE_PLAYER_SQL">
+    CREATE TABLE IF NOT EXISTS Player
+    (id TEXT PRIMARY KEY, score TEXT)
+    </string>
+
+    <string name="DROP_PLAYER_SQL">
+    DROP TABLE IF EXISTS Player
+    </string>
+
 
 </resources>
