@@ -17,16 +17,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        unit_test {
-            debuggable true
-            jniDebuggable true
-        }
     }
 
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+            exclude group: 'com.android.support', module: 'suport-annotations'})
     compile 'com.google.android.gms:play-services-auth:9.8.0'
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
@@ -45,6 +43,7 @@ dependencies {
     compile 'org.mindrot:jbcrypt:0.3m'
     testCompile 'org.robolectric:robolectric:3.1.4'
     testCompile 'junit:junit:4.12'
+
     compile 'com.google.guava:guava:19.0'
 }
 
