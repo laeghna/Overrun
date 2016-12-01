@@ -7,12 +7,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Optional;
 import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
+
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
  * Activity that encapsulates the login and registration for the user.
@@ -22,10 +28,18 @@ import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
  */
 public class SignInActivity extends BaseActivity {
 
+    public CallbackManager callbackManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+
+
+        callbackManager = CallbackManager.Factory.create();
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(getApplication());
 
         ButterKnife.bind(this);
 
