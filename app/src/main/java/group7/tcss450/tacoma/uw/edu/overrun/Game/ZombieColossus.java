@@ -3,6 +3,7 @@ package group7.tcss450.tacoma.uw.edu.overrun.Game;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
@@ -12,29 +13,29 @@ import java.util.Random;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 /**
- * This class specifies the behavior for a zombie crawler enemy.
- * This is the slowest and weakest enemy.
+ * This class specifies the behavior for a zombie colossus enemy.
+ * This is the toughest enemy.
  *
  * @author Lisa Taylor
  * @version 30 Nov 2016
  */
 
-public class ZombieCrawler extends BitmapResizer implements Zombie{
+public class ZombieColossus extends BitmapResizer implements Zombie {
 
     /** Zombie's hit points - the shots needed to destroy zombie. */
-    private static final int HP = 1;
+    private static final int HP = 2;
 
     /** Zombie's point value for adding to the game score. */
-    private static final int POINTS = 10;
+    private static final int POINTS = 50;
 
     /** Zombie crawler's speed. */
-    private static final int SPEED = 1;
+    private static final int SPEED = 3;
 
-    /** Constant for scaling zombie crawler. */
-    private static final int SCALE = 18;
+    /** Constant for scaling zombie colossus. */
+    private static final int SCALE = 15;
 
     /** Zombie crawler image. */
-    private Bitmap crawlerBitmap;
+    private Bitmap colossusBitmap;
 
     /** Zombie crawler coordinates. */
     private int xCoord;
@@ -60,7 +61,7 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
     private int timesHit = 0;
 
     /** Constructor to initialize variables. */
-    public ZombieCrawler(Context context, Point screenSize) {
+    public ZombieColossus(Context context, Point screenSize) {
 
         xMin = 0;
         xMax = screenSize.x;
@@ -70,19 +71,19 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
         genRandom = new Random();
 
         // Get the zombie graphic from drawable:
-        Log.d("OVERRUN: Crawler", "Screen: (" + screenSize.x + "," + screenSize.y + ")");
+        Log.d("OVERRUN: Colossus", "Screen: (" + screenSize.x + "," + screenSize.y + ")");
 
         // a placeholder graphic
-        crawlerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.crawler);
-        Log.d("OVERRUN: Crawler", "Before Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
+        colossusBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.colossus);
+        Log.d("OVERRUN: Colossus", "Before Resize: (" +  colossusBitmap.getWidth() +","+ colossusBitmap.getHeight() + ")");
 
-        crawlerBitmap = getResizedBmp(crawlerBitmap, screenSize.x/SCALE, screenSize.x/SCALE);
-        Log.d("OVERRUN: Crawler", "After Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
+        colossusBitmap = getResizedBmp(colossusBitmap, screenSize.x/SCALE, screenSize.x/SCALE);
+        Log.d("OVERRUN: Colossus", "After Resize: (" +  colossusBitmap.getWidth() +","+ colossusBitmap.getHeight() + ")");
 
-        xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
+        xCoord = genRandom.nextInt(xMax - colossusBitmap.getWidth());
         yCoord = yMin;
 
-        detectZombie =  new Rect(xCoord, yCoord, xCoord + crawlerBitmap.getWidth(), yCoord + crawlerBitmap.getHeight());
+        detectZombie =  new Rect(xCoord, yCoord, xCoord + colossusBitmap.getWidth(), yCoord + colossusBitmap.getHeight());
 
         isActive = false;
     }
@@ -93,7 +94,7 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
         if (yCoord + 1 < yMax) {
             yCoord += SPEED;
         } else {
-            xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
+            xCoord = genRandom.nextInt(xMax - colossusBitmap.getWidth());
             yCoord = yMin;
             setIsActive(true);
         }
@@ -101,8 +102,8 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
         //adding top, left, bottom and right to the rect object
         detectZombie.left = xCoord;
         detectZombie.top = yCoord;
-        detectZombie.right = xCoord + crawlerBitmap.getWidth();
-        detectZombie.bottom = yCoord + crawlerBitmap.getHeight();
+        detectZombie.right = xCoord + colossusBitmap.getWidth();
+        detectZombie.bottom = yCoord + colossusBitmap.getHeight();
 
         //do something if enemy reaches bottom edge
         //such as creating new zombie and reducing survivor health
@@ -115,7 +116,7 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
 
     @Override
     public Bitmap getBitmap() {
-        return crawlerBitmap;
+        return colossusBitmap;
     }
 
     @Override
@@ -171,12 +172,13 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
     @Override
     public void resetZombie() {
 
-        xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
+        xCoord = genRandom.nextInt(xMax - colossusBitmap.getWidth());
         yCoord = yMin;
         detectZombie.left = xCoord;
         detectZombie.top = yCoord;
-        detectZombie.right = xCoord + crawlerBitmap.getWidth();
-        detectZombie.bottom = yCoord + crawlerBitmap.getHeight();
+        detectZombie.right = xCoord + colossusBitmap.getWidth();
+        detectZombie.bottom = yCoord + colossusBitmap.getHeight();
         isActive = false;
     }
 }
+

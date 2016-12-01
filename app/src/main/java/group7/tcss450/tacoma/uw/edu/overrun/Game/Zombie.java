@@ -7,22 +7,20 @@ import android.graphics.Rect;
  * This interface specifies the behavior for a zombie enemy.
  *
  * @author Lisa Taylor
- * @version 8 Nov 2016
+ * @version 30 Nov 2016
  */
 
 public interface Zombie {
 
     /**
-     * Gets resized bitmap image.
-     * @param newWidth the width of the resized bitmap
-     * @param newHeight the height of the resized bitmap
-     * @return the resized bitmap
+     * Gets the zombie's hit points.
+     * @return the hit points
      */
-    public Bitmap getResizedBmp(float newWidth, float newHeight);
+    int getHP();
 
     /** Updates the image's coordinates.
      */
-    public void updateMovement();
+    void updateMovement();
 
     /**
      * Gets the zombie bitmap image.
@@ -60,7 +58,37 @@ public interface Zombie {
      */
     Rect getDetectZombie();
 
+    /**
+     * Gets the status of the crawler being drawn currently.
+     * @return isActive - true if the crawler is active, false otherwise.
+     */
     boolean getIsActive();
 
-    void setIsActive(boolean b);
+    /**
+     * Sets the status of the current crawler.
+     * @param status true if the crawler is active, false otherwise.
+     */
+    void setIsActive(boolean status);
+
+    /**
+     * Gets the number of times the zombie has been hit.
+     * @return timesHit the number of times a bullet hit the zombie
+     */
+    int getTimesHit();
+
+    /**
+     * Increments the hit count for when a bullet hits the zombie.
+     */
+    void addHit();
+
+    /**
+     * Gets the zombie's point value for adding to the game's score.
+     * @return pointValue the zombie's point value
+     */
+    int getPointValue();
+
+    /**
+     * Resets zombie and rectangle start position.
+     */
+    public void resetZombie();
 }

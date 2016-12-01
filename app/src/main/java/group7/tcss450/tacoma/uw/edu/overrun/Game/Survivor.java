@@ -3,7 +3,6 @@ package group7.tcss450.tacoma.uw.edu.overrun.Game;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 
@@ -16,9 +15,9 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 8 November 2016
+ * @version 30 November 2016
  */
-public class Survivor extends GameCharacter{
+public class Survivor extends BitmapResizer {
 
     /** Constant for scaling survivor */
     private static final int SCALE = 15;
@@ -33,14 +32,11 @@ public class Survivor extends GameCharacter{
     /** The move speed of the survivor. */
     private int mSpeed;
 
-    /** Boolean for determining if the game is running. */
-    private boolean mIsRunning;
-
     /** Padding for the top and bottom of the game screen. */
     private int mPadBott = 165;
 
     /** Collision detector for the survivor. */
-    private Rect mDetectCollisions;
+    private Rect mDetectSurvivor;
 
 
     /**
@@ -48,34 +44,15 @@ public class Survivor extends GameCharacter{
      * @param context - the context for the application this game is played from
      */
     public Survivor(Context context, Point screenSize) {
+
         mSpeed = 2; // test speed may need to adjust
-        //resize the bitmap
-        float w_scale = ((float) screenSize.y) / SCALE; // Swap x and y due to forced landscape view
-        float h_scale = ((float) screenSize.x) / SCALE;
+
         // Get the player graphic from drawable:
         mBmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie); // a placeholder graphic
-        mBmap = getResizedBmp(mBmap, w_scale, h_scale);
+        mBmap = getResizedBmp(mBmap, screenSize.x/SCALE, screenSize.x/SCALE);
         mX = mBmap.getWidth();
         mY = screenSize.y - (mBmap.getHeight() + mPadBott);
-        mIsRunning = false;
-        mDetectCollisions = new Rect(mX, mY, mX + mBmap.getWidth(), mY + mBmap.getHeight());
-        //TODO: replace with correct graphics
-    }
-
-    /**
-     * Gets mIsRunning.
-     * @return true if game is running, else false
-     */
-    public boolean getmIsRunning() {
-        return mIsRunning;
-    }
-
-    /**
-     * Sets mIsRunning
-     * @param mIsRunning new boolean value
-     */
-    public void setmIsRunning(boolean mIsRunning) {
-        this.mIsRunning = mIsRunning;
+        mDetectSurvivor = new Rect(mX, mY, mX + mBmap.getWidth(), mY + mBmap.getHeight());
     }
 
     /**
@@ -119,12 +96,15 @@ public class Survivor extends GameCharacter{
     }
 
     /** Gets the collision detector for the survivor. */
-    public Rect getmDetectCollisions() {
-        return mDetectCollisions;
+    public Rect getmDetectSurvivor() {
+        return mDetectSurvivor;
     }
 
     /** Update the collision detector to the new position. */
-    public void updateCollisionDetector() {
-        mDetectCollisions = new Rect(mX, mY, mX + mBmap.getWidth(), mY + mBmap.getHeight());
+    public void updateDetectSurvivor() {
+        mDetectSurvivor.left = mX;
+        mDetectSurvivor.top = mY;
+        mDetectSurvivor.right = mX + mBmap.getWidth();
+        mDetectSurvivor.bottom = mY - mBmap.getHeight();
     }
 }

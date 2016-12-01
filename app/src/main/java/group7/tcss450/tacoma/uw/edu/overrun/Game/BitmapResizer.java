@@ -11,7 +11,7 @@ import android.graphics.Matrix;
  * @version 23 October 2016
  */
 
-public abstract class GameCharacter {
+public abstract class BitmapResizer {
 
     /**
      * Resizes the bitmap to the proper size for the screen in use.

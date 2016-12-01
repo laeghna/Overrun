@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.util.Log;
 
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
@@ -14,12 +15,18 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 8 November 2016
+ * @version 30 November 2016
  */
 
-public class Bullet {
+public class Bullet extends BitmapResizer {
 
     public static final int AMMO_CAPACITY = 25;
+
+    /** Bullet's speed. */
+    private static final int SPEED = 15;
+
+    /** Constant for scaling bullet. */
+    private static final int SCALE = 25;
 
     /** The amt of damage the weapon does with each hit. */
     private int mDamage;
@@ -56,7 +63,8 @@ public class Bullet {
         mScreenSize = screenSize;
         mDamage = dmg;
 
-        mBMP = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.bullets); // a placeholder graphic
+        mBMP = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.bullet); // a placeholder graphic
+        mBMP = getResizedBmp(mBMP, screenSize.x/SCALE, screenSize.x/SCALE);
 
         mIsActive = false;
     }
@@ -114,7 +122,7 @@ public class Bullet {
      */
     public void updateBulletPosition() {
         if(mY - 1 > 0) {
-            mY-=15;
+            mY -= SPEED;
         } else {
             mIsActive = false;
         }
@@ -146,12 +154,26 @@ public class Bullet {
      * @param startY - the y coordinate of the bullet fired.
      */
     public void shootWeapon(int theX, int startY) {
+        Log.d("shooting:", theX + " " + startY);
         if (!mIsActive) {
             mX = theX;
-            mY = startY;
+            mY = startY - mBMP.getHeight();
             mDetectBullet = new Rect(mX, mY, mX + mBMP.getWidth(), mY - mBMP.getHeight());
             mIsActive = true;
         }
     }
 
+    /**
+     * Resets bullet position.
+     */
+    public void resetBullet() {
+
+        mX = mScreenSize.x;
+        mY = mScreenSize.y;
+        mDetectBullet.left = mX;
+        mDetectBullet.top = mY;
+        mDetectBullet.right = mX + mBMP.getWidth();
+        mDetectBullet.bottom = mY - mBMP.getHeight();
+        mIsActive = false;
+    }
 }
