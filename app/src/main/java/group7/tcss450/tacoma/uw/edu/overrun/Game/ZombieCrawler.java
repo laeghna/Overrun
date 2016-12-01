@@ -17,13 +17,16 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  * This is the slowest and weakest enemy.
  *
  * @author Lisa Taylor
- * @version 22 Nov 2016
+ * @version 30 Nov 2016
  */
 
-public class ZombieCrawler implements Zombie {
+public class ZombieCrawler extends BitmapResizer implements Zombie{
 
     /** Zombie's hit points - the shots needed to destroy zombie. */
     private static final int HP = 1;
+
+    /** Zombie's point value for adding to the game score. */
+    private static final int POINTS = 10;
 
     /** Zombie crawler's speed. */
     private static final int SPEED = 1;
@@ -74,7 +77,7 @@ public class ZombieCrawler implements Zombie {
         crawlerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
         Log.d("OVERRUN: Crawler", "Before Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
 
-        crawlerBitmap = getResizedBmp(screenSize.x/SCALE, screenSize.x/SCALE);
+        crawlerBitmap = getResizedBmp(crawlerBitmap, screenSize.x/SCALE, screenSize.x/SCALE);
         Log.d("OVERRUN: Crawler", "After Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
 
         xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
@@ -83,19 +86,6 @@ public class ZombieCrawler implements Zombie {
         detectZombie =  new Rect(xCoord, yCoord, xCoord + crawlerBitmap.getWidth(), yCoord + crawlerBitmap.getHeight());
 
         isActive = false;
-    }
-
-    @Override
-    public Bitmap getResizedBmp(float newWidth, float newHeight) {
-        int bmWidth = crawlerBitmap.getWidth();
-        int bmHeight = crawlerBitmap.getHeight();
-        float wScale = newWidth / bmWidth;
-        float hScale = newHeight / bmHeight;
-        Matrix matrix = new Matrix();
-        matrix.postScale(wScale, hScale);
-        Bitmap resizedBMP = Bitmap.createBitmap(crawlerBitmap, 0, 0, bmWidth, bmHeight, matrix, false);
-        crawlerBitmap.recycle();
-        return resizedBMP;
     }
 
     @Override
@@ -172,5 +162,10 @@ public class ZombieCrawler implements Zombie {
     @Override
     public void addHit() {
         timesHit++;
+    }
+
+    @Override
+    public int getPointValue() {
+        return POINTS;
     }
 }

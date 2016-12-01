@@ -15,12 +15,15 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 8 November 2016
+ * @version 30 November 2016
  */
 
 public class Bullet {
 
     public static final int AMMO_CAPACITY = 25;
+
+    /** Bullet's speed. */
+    private static final int SPEED = 15;
 
     /** The amt of damage the weapon does with each hit. */
     private int mDamage;
@@ -115,7 +118,7 @@ public class Bullet {
      */
     public void updateBulletPosition() {
         if(mY - 1 > 0) {
-            mY-=15;
+            mY -= SPEED;
         } else {
             mIsActive = false;
         }
@@ -151,7 +154,10 @@ public class Bullet {
         if (!mIsActive) {
             mX = theX;
             mY = startY - mBMP.getHeight();
-            mDetectBullet = new Rect(mX, mY, mX + mBMP.getWidth(), mY - mBMP.getHeight());
+            mDetectBullet.left = mX;
+            mDetectBullet.top = mY;
+            mDetectBullet.right = mX + mBMP.getWidth();
+            mDetectBullet.bottom = mY - mBMP.getHeight();
             mIsActive = true;
         }
     }

@@ -71,6 +71,9 @@ public class PlayView extends SurfaceView implements Runnable{
     /** The barrier between the survivor and the zombies. */
     private Barrier mBarrier;
 
+    /** The score for the game. */
+    private int gameScore;
+
     private SharedPreferences mSharedPref;
 
 
@@ -101,7 +104,8 @@ public class PlayView extends SurfaceView implements Runnable{
 
         mBullets = new Bullet[Bullet.AMMO_CAPACITY];
 
-        setupLevelDifficulty();
+        int level = mSharedPref.getInt("saved_difficulty", 1);
+        setupLevelDifficulty(level);
 
         //zombies
         zombies = new Zombie[zombieCount];
@@ -112,6 +116,8 @@ public class PlayView extends SurfaceView implements Runnable{
         }
 
         mBarrier = new Barrier(mScreen, mSurvivor);
+
+        gameScore = 0;
     }
 
     /**
@@ -298,9 +304,7 @@ public class PlayView extends SurfaceView implements Runnable{
     /**
      * Method for initializing zombieCount based on level difficulty.
      */
-    private void setupLevelDifficulty() {
-
-        int level = mSharedPref.getInt("saved_difficulty", 1);
+    private void setupLevelDifficulty(int level) {
 
         switch(level) {
             case 1: zombieCount = COUNT_LEVEL_1;

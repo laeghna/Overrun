@@ -3,7 +3,6 @@ package group7.tcss450.tacoma.uw.edu.overrun.Game;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 
@@ -18,7 +17,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  * @author Lisa Taylor
  * @version 22 November 2016
  */
-public class Survivor extends GameCharacter{
+public class Survivor extends BitmapResizer {
 
     /** Constant for scaling survivor */
     private static final int SCALE = 15;
@@ -54,7 +53,6 @@ public class Survivor extends GameCharacter{
         mX = mBmap.getWidth();
         mY = screenSize.y - (mBmap.getHeight() + mPadBott);
         mDetectCollisions = new Rect(mX, mY, mX + mBmap.getWidth(), mY + mBmap.getHeight());
-        //TODO: replace with correct graphics
     }
 
     /**

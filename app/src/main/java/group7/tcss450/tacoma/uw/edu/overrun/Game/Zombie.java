@@ -7,7 +7,7 @@ import android.graphics.Rect;
  * This interface specifies the behavior for a zombie enemy.
  *
  * @author Lisa Taylor
- * @version 12 Nov 2016
+ * @version 30 Nov 2016
  */
 
 public interface Zombie {
@@ -17,14 +17,6 @@ public interface Zombie {
      * @return the hit points
      */
     int getHP();
-
-    /**
-     * Gets resized bitmap image.
-     * @param newWidth the width of the resized bitmap
-     * @param newHeight the height of the resized bitmap
-     * @return the resized bitmap
-     */
-    Bitmap getResizedBmp(float newWidth, float newHeight);
 
     /** Updates the image's coordinates.
      */
@@ -88,4 +80,10 @@ public interface Zombie {
      * Increments the hit count for when a bullet hits the zombie.
      */
     void addHit();
+
+    /**
+     * Gets the zombie's point value for adding to the game's score.
+     * @return pointValue the zombie's point value
+     */
+    int getPointValue();
 }

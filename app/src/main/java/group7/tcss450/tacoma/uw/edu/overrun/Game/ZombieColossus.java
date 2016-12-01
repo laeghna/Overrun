@@ -17,13 +17,16 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  * This is the toughest enemy.
  *
  * @author Lisa Taylor
- * @version 22 Nov 2016
+ * @version 30 Nov 2016
  */
 
-public class ZombieColossus implements Zombie {
+public class ZombieColossus extends BitmapResizer implements Zombie {
 
     /** Zombie's hit points - the shots needed to destroy zombie. */
     private static final int HP = 3;
+
+    /** Zombie's point value for adding to the game score. */
+    private static final int POINTS = 50;
 
     /** Zombie crawler's speed. */
     private static final int SPEED = 3;
@@ -76,7 +79,7 @@ public class ZombieColossus implements Zombie {
         colossusBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
         Log.d("OVERRUN: Colossus", "Before Resize: (" +  colossusBitmap.getWidth() +","+ colossusBitmap.getHeight() + ")");
 
-        colossusBitmap = getResizedBmp(screenSize.x/SCALE, screenSize.x/SCALE);
+        colossusBitmap = getResizedBmp(colossusBitmap, screenSize.x/SCALE, screenSize.x/SCALE);
         Log.d("OVERRUN: Colossus", "After Resize: (" +  colossusBitmap.getWidth() +","+ colossusBitmap.getHeight() + ")");
 
         xCoord = genRandom.nextInt(xMax - colossusBitmap.getWidth());
@@ -85,19 +88,6 @@ public class ZombieColossus implements Zombie {
         detectZombie =  new Rect(xCoord, yCoord, xCoord + colossusBitmap.getWidth(), yCoord + colossusBitmap.getHeight());
 
         isActive = false;
-    }
-
-    @Override
-    public Bitmap getResizedBmp(float newWidth, float newHeight) {
-        int bmWidth = colossusBitmap.getWidth();
-        int bmHeight = colossusBitmap.getHeight();
-        float wScale = newWidth / bmWidth;
-        float hScale = newHeight / bmHeight;
-        Matrix matrix = new Matrix();
-        matrix.postScale(wScale, hScale);
-        Bitmap resizedBMP = Bitmap.createBitmap(colossusBitmap, 0, 0, bmWidth, bmHeight, matrix, false);
-        colossusBitmap.recycle();
-        return resizedBMP;
     }
 
     @Override
@@ -174,6 +164,11 @@ public class ZombieColossus implements Zombie {
     @Override
     public void addHit() {
         timesHit++;
+    }
+
+    @Override
+    public int getPointValue() {
+        return POINTS;
     }
 }
 
