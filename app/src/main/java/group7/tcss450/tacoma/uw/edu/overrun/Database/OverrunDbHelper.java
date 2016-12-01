@@ -7,7 +7,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
@@ -36,12 +37,11 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
     private static final String TAG_TASK_SYNC_DB = "sync_db";
 
     private static final String TAG_TASK_SYNC_DB_RESCHEDULE = "sync_db_reschedule";
-
-    private GcmNetworkManager mGcmNetworkManager;
+    private Context mContext;
 
     public OverrunDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        mGcmNetworkManager = GcmNetworkManager.getInstance(context);
+        mContext = context;
     }
 
     /**
@@ -83,17 +83,49 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    // schedules a sync with DbSyncService for syncing later when network is available.
-    public void scheduleDBSync() {
-        OneoffTask task = new OneoffTask.Builder()
-                .setService(DbSyncService.class)
-                .setTag("sync_db")
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                .setExecutionWindow(0, 10)
-                .build();
-        mGcmNetworkManager.schedule(task);
+
+    /**
+     * Submits the score to the server if network is available. Otherwise, the score is stored
+     * locally and the scores will be uploaded once network is available.
+     *
+     * @param email         The user's email
+     * @param score         The score of the game.
+     * @param zombiesKilled The number of zombies killed.
+     * @param level         The level of difficulty that game was played with.
+     * @param shotsFired    The number of shots fired.
+     */
+    public void submitScore(String email, int score, int zombiesKilled, int level, int shotsFired) {
+        ConnectivityManager cm =
+                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+        if (isConnected) {
+            // upload to server
+            uploadGame(-1, email, score, zombiesKilled, level, shotsFired);
+        } else {
+            // creats local game and schedules for the DB to be synced once
+            // network becomes available
+            createGame(email, score, zombiesKilled, level, shotsFired);
+            scheduleDBSync();
+        }
     }
 
+
+    /**
+     * schedules a sync with DbSyncService for syncing later when network is available.
+     */
+    // TODO: switch back to private
+    public void scheduleDBSync() {
+        DbSyncService.scheduleDBSync(mContext);
+    }
+
+    /**
+     * Gets the number of games in the local database.
+     *
+     * @return The number of games in the local database.
+     */
     public int getNumberOfGames() {
         try {
             mDb = getReadableDatabase();
@@ -114,6 +146,11 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * Gets all the games stored in the local database.
+     *
+     * @return A list of Games stored in the local database.
+     */
     List<group7.tcss450.tacoma.uw.edu.overrun.Model.Game> getGames() {
         ArrayList<group7.tcss450.tacoma.uw.edu.overrun.Model.Game> games = new ArrayList<>();
 
@@ -125,10 +162,10 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
 
             String email;
             int gameId,
-                score,
-                zombiesKilled,
-                level,
-                shotsFired;
+                    score,
+                    zombiesKilled,
+                    level,
+                    shotsFired;
 
             for (int i = 0; i < c.getCount(); i++) {
                 email = c.getString(c.getColumnIndex(Game.COLUMN_NAME_EMAIL));
@@ -153,7 +190,13 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
         }
     }
 
-
+    /**
+     * Creats a user in the local database.
+     *
+     * @param email    The user's email.
+     * @param password The user's password.
+     * @return Whether the user was created successfully or not.
+     */
     public boolean createUser(String email, String password) {
         try {
             mDb = getWritableDatabase();
@@ -179,6 +222,13 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * Checks to see if the user's email and password match a record in the local database.
+     *
+     * @param email    The user's email.
+     * @param password The user's password.
+     * @return Whether the email and password match a record in the local database.
+     */
     public boolean passwordMatches(String email, String password) {
         try {
             mDb = getReadableDatabase();
@@ -205,6 +255,12 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * Retrieves the user's salt
+     *
+     * @param email The user's email.
+     * @return String representing the salt the user's password was salted with.
+     */
     private String getSalt(String email) {
         try {
             mDb = getReadableDatabase();
@@ -227,6 +283,12 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * Checks whether a user exists with the email provided.
+     *
+     * @param email The user's email.
+     * @return Whether the user exists in the local database.
+     */
     public boolean userExists(String email) {
         try {
             mDb = getReadableDatabase();
@@ -247,6 +309,15 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * Creats a game locally.
+     *
+     * @param email         The user's email
+     * @param score         The score of the game.
+     * @param zombiesKilled The number of zombies killed.
+     * @param level         The level of difficulty that game was played with.
+     * @param shotsFired    The number of shots fired.
+     */
     public boolean createGame(String email, int score, int zombiesKilled, int level, int shotsFired) {
         try {
             mDb = getWritableDatabase();
@@ -269,6 +340,17 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
     }
 
 
+    /**
+     * Uploads a game to the server.
+     *
+     * @param gameId        Should be supplied if the game was stored locally so that it can be removed
+     *                      after uploading to the server.
+     * @param email         The user's email
+     * @param score         The score of the game.
+     * @param zombiesKilled The number of zombies killed.
+     * @param level         The level of difficulty that game was played with.
+     * @param shotsFired    The number of shots fired.
+     */
     void uploadGame(final int gameId, String email, int score, int zombiesKilled,
                     int level, int shotsFired) {
 
@@ -292,6 +374,12 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
         });
     }
 
+    /**
+     * Deletes a game from the local database.
+     *
+     * @param gameId The game to be deleted.
+     * @return Whether the game was deleted or not.
+     */
     private boolean deleteGame(int gameId) {
         try {
             mDb = getWritableDatabase();
@@ -310,6 +398,9 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * Seeds the database with test data.
+     */
     public void seedDb() {
         mDb = getWritableDatabase();
         String selection = Game.COLUMN_NAME_EMAIL + " = ?";
