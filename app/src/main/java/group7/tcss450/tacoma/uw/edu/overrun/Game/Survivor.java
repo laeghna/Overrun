@@ -23,7 +23,7 @@ public class Survivor extends BitmapResizer {
     private static final int SCALE = 15;
 
     /** Padding for the top and bottom of the game screen. */
-    private static final int PADDING = 165;
+    private static final int PADDING = 130;
 
     /** The bitmap for the survivor sprite image. */
     private Bitmap mBmap;
