@@ -36,10 +36,9 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
     private ProgressDialog mProgressDialog;
 
     /**
-     *
+     * Google API Client for handling Google sign in.
      */
-    protected GoogleApiClient mGoogleApiClient = null;
-
+    private GoogleApiClient mGoogleApiClient = null;
 
 
     @Override
@@ -61,6 +60,10 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                 .build();
     }
 
+    /**
+     * Google API client instance.
+     * @return An instance of the Google API client.
+     */
     protected GoogleApiClient getGoogleApiClient() {
         return mGoogleApiClient;
     }
@@ -78,7 +81,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         super.onDestroy();
         hideProgressDialog();
     }
-
 
 
     /**

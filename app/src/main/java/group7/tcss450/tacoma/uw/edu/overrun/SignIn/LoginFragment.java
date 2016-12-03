@@ -30,12 +30,14 @@ public class LoginFragment extends Fragment {
     /**
      * View for the user's email.
      */
-    @BindView(R.id.email_login) EditText emailText;
+    @BindView(R.id.email_login)
+    EditText emailText;
 
     /**
      * View for the user's password.
      */
-    @BindView(R.id.password_login) EditText passwordText;
+    @BindView(R.id.password_login)
+    EditText passwordText;
 
     /**
      * Unbinds the view.
@@ -70,8 +72,7 @@ public class LoginFragment extends Fragment {
     @OnClick(R.id.test_sync_button)
     void test() {
         OverrunDbHelper db = new OverrunDbHelper(getContext());
-        db.seedDb();
-        db.scheduleDBSync();
+        db.submitScore("blah@blah.com", 500, 25, 3, 76);
     }
 
     @OnClick(R.id.google_sign_in_button)

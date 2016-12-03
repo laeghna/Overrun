@@ -41,8 +41,6 @@ import timber.log.Timber;
  */
 public class RegistrationFragment extends Fragment {
 
-    private static final String TAG = "RegistrationActivity";
-
     /**
      * The user's emailText.
      */
@@ -101,17 +99,9 @@ public class RegistrationFragment extends Fragment {
                         Toast.LENGTH_LONG).show();
                 return;
             }
-
-            // if they have an account "stats will be uploaded when network becomes available.
-            // else (they don't have an account)
-            // registration requires a network connection
-            // assign allow the user to create a local username
             register(emailText.getText().toString(), passText.getText().toString());
-            //testDb(emailText.getText().toString(), passText.getText().toString());
 
         } else {
-            //testDb(emailText.getText().toString(), passText.getText().toString());
-
             Toast.makeText(getContext(), R.string.invalid_reg_form, Toast.LENGTH_LONG).show();
         }
     }
@@ -130,7 +120,6 @@ public class RegistrationFragment extends Fragment {
             return false;
         }
 
-
         if (emailText.getText().toString().isEmpty() ||
                 passText.getText().toString().isEmpty() ||
                 confirmPassText.getText().toString().isEmpty()) {
@@ -138,10 +127,7 @@ public class RegistrationFragment extends Fragment {
         }
 
         // passwords should match
-        if (!passText.getText().toString().equals(confirmPassText.getText().toString())) {
-            return false;
-        }
-        return true;
+        return passText.getText().toString().equals(confirmPassText.getText().toString());
     }
 
     /**
@@ -170,11 +156,17 @@ public class RegistrationFragment extends Fragment {
         unbinder.unbind();
     }
 
+    /**
+     * Registers the user.
+     *
+     * @param email User's email.
+     * @param pass  User's password.
+     */
     private void register(final String email, String pass) {
         ((BaseActivity) getActivity()).showProgressDialog(getString(R.string.loading));
 
         ApiInterface apiService = ApiClient.getClient();
-        Call<User> call = apiService.createUser(email, pass);
+        Call<User> call = apiService.registerUser(email, pass);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, retrofit2.Response<User> response) {
@@ -210,6 +202,12 @@ public class RegistrationFragment extends Fragment {
         });
     }
 
+    /**
+     * Test method that creates a user in the local database.
+     *
+     * @param email    User's email
+     * @param password User's password
+     */
     private void testDb(final String email, String password) {
         OverrunDbHelper dbHelper = new OverrunDbHelper(getActivity());
         boolean result = dbHelper.createUser(email, password);

@@ -3,16 +3,32 @@
     <string name="start_description">Start Game</string>
     <string name="options_description">Settings</string>
     <string name="login_description">Sign in</string>
-    <string name="sign_in_to_play">Please sign in with your Google account to play</string>
 
     <string name="sign_in_or_reg">Don\'t have an account?\n Register or sign in with your Google account below.</string>
 
     <string name="shared_prefs">group7.tcss450.tacoma.uw.edu.overrun.SHARED_PREFS</string>
+    <string name="server_client_id">711195024447-fthg4h2qidakukdus8fscsb8868ld3ph.apps.googleusercontent.com</string>
     <string name="logged_in">LOGGED_IN</string>
     <string name="user_name">USER_NAME</string>
     <string name="user_email">USER_EMAIL</string>
     <string name="user_id">USER_ID</string>
     <string name="loading">Loading…</string>
+
+    <string name="login_text">Login</string>
+    <string name="register_text">Register</string>
+    <string name="registration_alt_text">Or you can create an account here:</string>
+    <string name="PROD_API_URL">http://cssgate.insttech.washington.edu:8081/</string>
+    <string name="DEV_API_URL">http://10.0.2.2:8081/</string>
+    <string name="invalid_reg_form">Registration form is not valid.</string>
+    <string name="need_network_register">A network connection is required to register.</string>
+    <string name="our_server_messed_up">Sorry, our server messed up.</string>
+    <string name="signing_in">Signing in...</string>
+    <string name="need_network_login">A network connection is required to login.</string>
+    <string name="failed_signin">Failed to sign in.</string>
+    <string name="no_netowrk_upload_later">No network detected. Stats will be saved and uploaded later.</string>
+    <string name="has_internet">hasInternet</string>
+
+
 
     <string name="diff_text">Difficulty</string>
     <string name="controls_text">Controls</string>
@@ -34,7 +50,6 @@
         <item>Brain Dead</item>
     </string-array>
 
-    <string name="server_client_id">711195024447-fthg4h2qidakukdus8fscsb8868ld3ph.apps.googleusercontent.com</string>
     <string-array name="controls_array">
         <item>Control Layout One</item>
         <item>Control Layout Two</item>
@@ -49,19 +64,7 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="or_text">OR</string>
-    <string name="login_text">Login</string>
-    <string name="register_text">Register</string>
-    <string name="registration_alt_text">Or you can create an account here:</string>
-    <string name="PROD_API_URL">http://cssgate.insttech.washington.edu:8081/</string>
-    <string name="DEV_API_URL">http://10.0.2.2:8081/</string>
-    <string name="invalid_reg_form">Registration form is not valid.</string>
-    <string name="need_network_register">A network connection is required to register.</string>
-    <string name="our_server_messed_up">Sorry, our server messed up.</string>
-    <string name="signing_in">Signing in...</string>
-    <string name="need_network_login">A network connection is required to login.</string>
-    <string name="failed_signin">Failed to sign in.</string>
-    <string name="no_netowrk_upload_later">No network detected. Stats will be saved and uploaded later.</string>
-    <string name="has_internet">hasInternet</string>
+
 
     <string name="left_button_txt">LEFT</string>
     <string name="right_button_txt">RIGHT</string>

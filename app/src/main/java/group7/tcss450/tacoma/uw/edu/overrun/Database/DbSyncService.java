@@ -1,101 +1,126 @@
 package group7.tcss450.tacoma.uw.edu.overrun.Database;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Handler;
-
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.GcmTaskService;
-import com.google.android.gms.gcm.OneoffTask;
-import com.google.android.gms.gcm.Task;
-import com.google.android.gms.gcm.TaskParams;
+import android.widget.Toast;
 
 import java.util.List;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Model.Game;
+import group7.tcss450.tacoma.uw.edu.overrun.R;
 import timber.log.Timber;
 
+/**
+ * Syncs to the server's database if internet connection was lost when a game was played. The
+ * record gets stored in the local database. Upon receiving an internet connection, DbSyncService
+ * initiates the sync if there are any games stored locally.
+ *
+ * @author Ethan Rowell
+ * @version 2 NDec 2016
+ */
+public class DbSyncService extends BroadcastReceiver {
 
-public class DbSyncService extends GcmTaskService {
-
-    public static String GCM_SYNC_TAG = "sync_db|[0,0]";
-
-    @Override
-    public void onCreate() {
-        Timber.d("In on create");
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int i, int i1) {
-        Timber.d("in on start");
-
-        return super.onStartCommand(intent, i, i1);
-    }
+    /**
+     * Current context
+     */
+    private Context mContext;
 
     @Override
-    public int onRunTask(TaskParams taskParams) {
-        Timber.d("Executing async upload");
+    public void onReceive(Context context, Intent intent) {
+        mContext = context;
 
-        Handler handler = new Handler(getMainLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                new UploadAsync().execute();
+        if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+            ConnectivityManager cm =
+                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+
+            // if connected, check to see if there is unsynced content.
+            if (isConnected) {
+
+                SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.shared_prefs), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+
+                editor.putBoolean("has_internet", true);
+
+
+                if (prefs.getBoolean("unsynced_content", false)) {
+                    Toast.makeText(context, "Syncing games...", Toast.LENGTH_SHORT).show();
+                    new UploadAsync().execute();
+                    editor.putBoolean("currently_syncing", true);
+                }
+
+                editor.apply();
+
+                Timber.d("Internet detected.");
+            } else {
+                Timber.d("No internet detected.");
             }
-        });
-
-        return GcmNetworkManager.RESULT_SUCCESS;
-    }
-
-    public static void scheduleDBSync(Context context) {
-
-        Timber.d("Scheduling sync");
-        try {
-            OneoffTask task = new OneoffTask.Builder()
-                    .setService(DbSyncService.class)
-                    .setTag(GCM_SYNC_TAG)
-                    .setExecutionWindow(0, 10)
-                    .setRequiredNetwork(Task.NETWORK_STATE_ANY)
-                    .setRequiresCharging(false)
-                    .setUpdateCurrent(true)
-                    .build();
-            GcmNetworkManager.getInstance(context.getApplicationContext()).schedule(task);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
-    public static void cancelSync(Context context) {
-        GcmNetworkManager.getInstance(context)
-                .cancelTask(GCM_SYNC_TAG, DbSyncService.class);
-    }
-
-    public static void cancelAllTasks(Context context) {
-        GcmNetworkManager.getInstance(context)
-                .cancelAllTasks(DbSyncService.class);
-    }
-
+    /**
+     * Class that uploads all game records in the local database, uploads them to
+     * the server's database and then removes them once they are successfully uploaded.
+     */
     private class UploadAsync extends AsyncTask<Void, Void, Void> {
+        private OverrunDbHelper db;
+        private List<Game> games;
+        private SharedPreferences prefs;
+        private SharedPreferences.Editor editor;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            prefs = mContext.getSharedPreferences(mContext.getString(
+                    R.string.shared_prefs), Context.MODE_PRIVATE);
+
+            db = new OverrunDbHelper(mContext.getApplicationContext());
+            editor = prefs.edit();
+        }
+
 
         @Override
         protected Void doInBackground(Void... params) {
-            OverrunDbHelper db = new OverrunDbHelper(getApplicationContext());
 
-            List<Game> games = db.getGames();
+
+            games = db.getGames();
             for (int i = 0; i < games.size(); i++) {
                 Game game = games.get(i);
                 db.uploadGame(game.getGameId(), game.getEmail(), game.getScore(),
                         game.getZombiesKilled(), game.getLevel(), game.getShotsFired());
             }
 
-            if (games.size() > 0) {
-                Timber.d("Games remaining: %d", games.size());
-            } else {
-                Timber.d("No games remaining.");
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            int numGames = db.getNumberOfGames();
+            boolean unsyncedContent = false;
+
+            if (numGames > 0) {
+                unsyncedContent = true;
             }
 
-            return null;
+            editor.putBoolean("unsynced_content", unsyncedContent);
+            editor.putBoolean("currently_syncing", false);
+
+            editor.apply();
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            Timber.d("Sync cancelled with %d games remaining.", games.size());
         }
     }
 }

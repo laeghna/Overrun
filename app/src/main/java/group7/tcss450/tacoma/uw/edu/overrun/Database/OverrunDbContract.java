@@ -2,12 +2,18 @@ package group7.tcss450.tacoma.uw.edu.overrun.Database;
 
 import android.provider.BaseColumns;
 
-public final class OverrunDbContract {
+/**
+ * Database contract.
+ *
+ * @author Ethan Rowell
+ * @version 9 Nov 2016
+ */
+final class OverrunDbContract {
+
 
     public static final String COMMA_SEP = ", ";
     public static final String NVARCHAR_TYPE = "NVARCHAR(255)";
     public static final String INT_TYPE = "INTEGER";
-//    public static final String PRIMARY_KEY = "PRIMARY KEY";
 
 
     public static final class User implements BaseColumns {
@@ -18,7 +24,6 @@ public final class OverrunDbContract {
         public static final String COLUMN_NAME_EMAIL = "email";
         public static final String COLUMN_NAME_SALT = "salt";
         public static final String COLUMN_NAME_HASH = "hash";
-        public static final String COLUMN_NAME_PASS = "pass";
 
         public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" +
                 COLUMN_NAME_EMAIL + " " + NVARCHAR_TYPE + "PRIMARY KEY " + COMMA_SEP +

@@ -46,15 +46,9 @@ public class SignInActivity extends BaseActivity {
     private static final int RC_GET_TOKEN = 9002;
 
     /**
-     *
+     * Google API Client for handling Google sign in.
      */
     private GoogleApiClient mGoogleApiClient = null;
-
-
-    /**
-     * Debug flag for testing Google sign in without database access.
-     */
-    private static boolean IS_DEBUG = false;
 
 
     @Override
@@ -74,7 +68,7 @@ public class SignInActivity extends BaseActivity {
         if (Timber.treeCount() == 0)
             Timber.plant(new Timber.DebugTree());
 
-        mGoogleApiClient = this.getGoogleApiClient();
+        mGoogleApiClient = getGoogleApiClient();
     }
 
     @Optional
@@ -158,11 +152,7 @@ public class SignInActivity extends BaseActivity {
             if (acct != null) {
                 Timber.d("IdToken: %s", acct.getIdToken());
 
-                if (IS_DEBUG) {
-                    debug_signin(acct);
-                } else {
-                    googleSignInAsync(acct.getIdToken());
-                }
+                googleSignInAsync(acct.getIdToken());
             }
         } else {
             Toast.makeText(getApplicationContext(), R.string.failed_signin,
@@ -175,29 +165,6 @@ public class SignInActivity extends BaseActivity {
 
 
     /**
-     * Sign in for Google account that doesn't require database access.
-     * Change static IS_DEBUG to true to debug.
-     *
-     * @param acct Google account information.
-     */
-    private void debug_signin(GoogleSignInAccount acct) {
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs),
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-
-        editor.putString(getString(R.string.user_email), acct.getEmail());
-        editor.putString(getString(R.string.user_name), acct.getDisplayName());
-        editor.putBoolean(getString(R.string.logged_in), true);
-        editor.apply();
-
-        Toast.makeText(getApplicationContext(), "Signed in as: " + acct.getEmail(),
-                Toast.LENGTH_LONG).show();
-
-        finish();
-    }
-
-
-    /**
      * Sign in with a registered account.
      *
      * @param email    User's email
@@ -205,8 +172,8 @@ public class SignInActivity extends BaseActivity {
      */
     private void signInAsync(String email, String password) {
         showProgressDialog("Logging in...");
-        ApiInterface apiService = ApiClient.getClient();
-        Call<User> call = apiService.login(email, password);
+        ApiInterface api = ApiClient.getClient();
+        Call<User> call = api.login(email, password);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, retrofit2.Response<User> response) {
@@ -227,8 +194,8 @@ public class SignInActivity extends BaseActivity {
      * @param token Token provided by Google API.
      */
     private void googleSignInAsync(String token) {
-        ApiInterface apiService = ApiClient.getClient();
-        Call<User> call = apiService.login(token);
+        ApiInterface api = ApiClient.getClient();
+        Call<User> call = api.login(token);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, retrofit2.Response<User> response) {

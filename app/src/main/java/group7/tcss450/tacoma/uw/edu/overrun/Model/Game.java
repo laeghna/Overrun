@@ -1,13 +1,31 @@
 package group7.tcss450.tacoma.uw.edu.overrun.Model;
 
-import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbContract;
+import com.google.gson.annotations.SerializedName;
 
+/**
+ * Game model for API client to serialize json objects into a Game object.
+ *
+ * @author Ethan Rowell
+ * @version 2 NDec 2016
+ */
 public class Game {
+
+    @SerializedName("gameId")
     private int gameId;
+
+    @SerializedName("email")
     private String email;
+
+    @SerializedName("score")
     private int score;
+
+    @SerializedName("zombiesKilled")
     private int zombiesKilled;
+
+    @SerializedName("level")
     private int level;
+
+    @SerializedName("shotsFired")
     private int shotsFired;
 
     public Game(int gameId, String email, int score, int zombiesKilled, int level, int shotsFired) {

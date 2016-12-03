@@ -2,6 +2,12 @@ package group7.tcss450.tacoma.uw.edu.overrun.Model;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * User model for API client to serialize json objects into a User object.
+ *
+ * @author Ethan Rowell
+ * @version 2 NDec 2016
+ */
 public class User {
 
     @SerializedName("email")

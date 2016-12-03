@@ -3,30 +3,36 @@ package group7.tcss450.tacoma.uw.edu.overrun.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.OneoffTask;
-import com.google.android.gms.gcm.Task;
+import android.widget.Toast;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbContract.Game;
 import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbContract.User;
+import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.Utils.ApiClient;
 import group7.tcss450.tacoma.uw.edu.overrun.Utils.ApiInterface;
 import retrofit2.Call;
 import retrofit2.Callback;
 import timber.log.Timber;
 
+/**
+ * Database helper class for handling database communication.
+ *
+ * @author Ethan Rowell
+ * @version 9 Nov 2016
+ */
 public class OverrunDbHelper extends SQLiteOpenHelper {
     private SQLiteDatabase mDb;
 
@@ -34,9 +40,6 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "Overrun.db";
 
-    private static final String TAG_TASK_SYNC_DB = "sync_db";
-
-    private static final String TAG_TASK_SYNC_DB_RESCHEDULE = "sync_db_reschedule";
     private Context mContext;
 
     public OverrunDbHelper(Context context) {
@@ -85,43 +88,6 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
 
 
     /**
-     * Submits the score to the server if network is available. Otherwise, the score is stored
-     * locally and the scores will be uploaded once network is available.
-     *
-     * @param email         The user's email
-     * @param score         The score of the game.
-     * @param zombiesKilled The number of zombies killed.
-     * @param level         The level of difficulty that game was played with.
-     * @param shotsFired    The number of shots fired.
-     */
-    public void submitScore(String email, int score, int zombiesKilled, int level, int shotsFired) {
-        ConnectivityManager cm =
-                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-
-        if (isConnected) {
-            // upload to server
-            uploadGame(-1, email, score, zombiesKilled, level, shotsFired);
-        } else {
-            // creats local game and schedules for the DB to be synced once
-            // network becomes available
-            createGame(email, score, zombiesKilled, level, shotsFired);
-            scheduleDBSync();
-        }
-    }
-
-
-    /**
-     * schedules a sync with DbSyncService for syncing later when network is available.
-     */
-    // TODO: switch back to private
-    public void scheduleDBSync() {
-        DbSyncService.scheduleDBSync(mContext);
-    }
-
-    /**
      * Gets the number of games in the local database.
      *
      * @return The number of games in the local database.
@@ -153,12 +119,14 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
      */
     List<group7.tcss450.tacoma.uw.edu.overrun.Model.Game> getGames() {
         ArrayList<group7.tcss450.tacoma.uw.edu.overrun.Model.Game> games = new ArrayList<>();
-
+        Cursor c = null;
         try {
             mDb = getReadableDatabase();
 
-            String[] projection = { Game.COLUMN_NAME_EMAIL };
-            Cursor c = mDb.query(Game.TABLE_NAME, projection, null, null, null, null, null);
+            String[] projection = { Game.COLUMN_NAME_EMAIL, Game.COLUMN_NAME_GAMEID,
+                    Game.COLUMN_NAME_SCORE, Game.COLUMN_NAME_ZOMBIES_KILLED,
+                    Game.COLUMN_NAME_LEVEL, Game.COLUMN_NAME_SHOTS_FIRED };
+            c = mDb.query(Game.TABLE_NAME, projection, null, null, null, null, null);
 
             String email;
             int gameId,
@@ -167,6 +135,7 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
                     level,
                     shotsFired;
 
+            c.moveToFirst();
             for (int i = 0; i < c.getCount(); i++) {
                 email = c.getString(c.getColumnIndex(Game.COLUMN_NAME_EMAIL));
                 gameId = c.getInt(c.getColumnIndex(Game.COLUMN_NAME_GAMEID));
@@ -179,15 +148,14 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
                         score, zombiesKilled, level, shotsFired));
                 c.moveToNext();
             }
-
-            c.close();
             return games;
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         } finally {
             mDb.close();
+            if (c != null) c.close();
         }
+        return null;
     }
 
     /**
@@ -310,7 +278,8 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Creats a game locally.
+     * Creates a game locally if no internet is available and will be uploaded to the server once
+     * network is available.
      *
      * @param email         The user's email
      * @param score         The score of the game.
@@ -318,23 +287,52 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
      * @param level         The level of difficulty that game was played with.
      * @param shotsFired    The number of shots fired.
      */
-    public boolean createGame(String email, int score, int zombiesKilled, int level, int shotsFired) {
-        try {
-            mDb = getWritableDatabase();
+    public boolean submitScore(String email, int score, int zombiesKilled, int level, int shotsFired) {
+        Timber.d("Creating game for %s", email);
 
-            ContentValues values = new ContentValues();
-            values.put(Game.COLUMN_NAME_EMAIL, email);
-            values.put(Game.COLUMN_NAME_SCORE, score);
-            values.put(Game.COLUMN_NAME_ZOMBIES_KILLED, zombiesKilled);
-            values.put(Game.COLUMN_NAME_LEVEL, level);
-            values.put(Game.COLUMN_NAME_SHOTS_FIRED, shotsFired);
+        ConnectivityManager cm =
+                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-            mDb.insertOrThrow(Game.TABLE_NAME, null, values);
-            mDb.close();
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
-        } catch (SQLiteException e) {
-            e.printStackTrace();
-            return false;
+        if (isConnected) {
+            uploadGame(-1, email, score, zombiesKilled, level, shotsFired);
+            Timber.d("Game upload started...");
+        } else {
+            try {
+                mDb = getWritableDatabase();
+
+                ContentValues values = new ContentValues();
+                values.put(Game.COLUMN_NAME_EMAIL, email);
+                values.put(Game.COLUMN_NAME_SCORE, score);
+                values.put(Game.COLUMN_NAME_ZOMBIES_KILLED, zombiesKilled);
+                values.put(Game.COLUMN_NAME_LEVEL, level);
+                values.put(Game.COLUMN_NAME_SHOTS_FIRED, shotsFired);
+
+                mDb.insertOrThrow(Game.TABLE_NAME, null, values);
+                mDb.close();
+
+                boolean hasUnsyncedContent = mContext.getResources().getBoolean(R.bool.unsynced_content);
+
+                // hasn't already been notified of future sync.
+                if (!hasUnsyncedContent) {
+                    SharedPreferences prefs = mContext.getSharedPreferences(mContext.getString(
+                            R.string.shared_prefs), Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+
+                    editor.putBoolean("unsynced_content", true);
+                    editor.apply();
+
+                    Toast.makeText(mContext, "No internet connection, game will be uploaded when" +
+                            " network is available.", Toast.LENGTH_LONG).show();
+                    Timber.d("Game stored locally...");
+                }
+
+            } catch (SQLiteException e) {
+                e.printStackTrace();
+                return false;
+            }
         }
         return true;
     }
@@ -344,7 +342,7 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
      * Uploads a game to the server.
      *
      * @param gameId        Should be supplied if the game was stored locally so that it can be removed
-     *                      after uploading to the server.
+     *                      after uploading to the server. If negative, no
      * @param email         The user's email
      * @param score         The score of the game.
      * @param zombiesKilled The number of zombies killed.
@@ -354,8 +352,8 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
     void uploadGame(final int gameId, String email, int score, int zombiesKilled,
                     int level, int shotsFired) {
 
-        ApiInterface apiService = ApiClient.getClient();
-        Call<group7.tcss450.tacoma.uw.edu.overrun.Model.Game> call = apiService.insertGame(email,
+        ApiInterface api = ApiClient.getClient();
+        Call<group7.tcss450.tacoma.uw.edu.overrun.Model.Game> call = api.uploadGameScore(email,
                 score, zombiesKilled, level, shotsFired);
 
         call.enqueue(new Callback<group7.tcss450.tacoma.uw.edu.overrun.Model.Game>() {
@@ -363,15 +361,18 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
             public void onResponse(Call<group7.tcss450.tacoma.uw.edu.overrun.Model.Game> call,
                                    retrofit2.Response<group7.tcss450.tacoma.uw.edu.overrun.Model.Game>
                                            response) {
-                deleteGame(gameId);
+                if (gameId > 0) deleteGame(gameId);
+                if (response.code() == HttpURLConnection.HTTP_CREATED)
+                    Timber.d("Game uploaded successfully.");
             }
 
             @Override
             public void onFailure(Call<group7.tcss450.tacoma.uw.edu.overrun.Model.Game> call,
                                   Throwable t) {
-                Timber.e("Could not remove game: %d", gameId);
+                Timber.d("Could not remove game: %d", gameId);
             }
         });
+
     }
 
     /**
@@ -399,7 +400,7 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Seeds the database with test data.
+     * Seeds the local database with test data.
      */
     public void seedDb() {
         mDb = getWritableDatabase();
@@ -409,9 +410,9 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
         mDb.delete(User.TABLE_NAME, selection, selectionArgs);
 
         createUser("blah@blah.com", "blahblah1@");
-        createGame("blah@blah.com", 500, 80, 10, 250);
-        createGame("blah@blah.com", 500, 80, 10, 250);
-        createGame("blah@blah.com", 500, 80, 10, 250);
+        submitScore("blah@blah.com", 500, 80, 10, 250);
+        submitScore("blah@blah.com", 500, 80, 10, 250);
+        submitScore("blah@blah.com", 500, 80, 10, 250);
 
         Timber.d("Num Games inserted: %d", getNumberOfGames());
     }

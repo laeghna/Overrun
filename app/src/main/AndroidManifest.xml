@@ -25,7 +25,7 @@
         </activity>
         <activity
             android:name=".SignIn.SignInActivity"
-            android:screenOrientation="landscape"></activity>
+            android:screenOrientation="landscape"/>
         <activity
             android:name=".OptionsActivity"
             android:screenOrientation="landscape" />
@@ -33,19 +33,17 @@
             android:name=".Game.GameActivity"
             android:screenOrientation="landscape" />
         <activity android:name=".Leaderboard.LeaderboardActivity"
-            android:screenOrientation="landscape"/>
+            android:screenOrientation="landscape"/><![CDATA[
             android:name=".GameActivity"
             android:screenOrientation="landscape"/>
 
-        <service
-            android:name=".Database.DbSyncService"
-            android:enabled="true"
-            android:exported="false"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
+        ]]>
+        <receiver
+            android:name=".Database.DbSyncService">
             <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
-        </service>
+        </receiver>
     </application>
 
 </manifest>
