@@ -23,7 +23,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 22 Nov 2016
+ * @version 30 Nov 2016
  */
 public class PlayView extends SurfaceView implements Runnable{
 
@@ -63,6 +63,9 @@ public class PlayView extends SurfaceView implements Runnable{
     /** The size of the screen being used to display the game. */
     private Point mScreen;
 
+    /** The game's Context. */
+    private Context gameContext;
+
     /** Array for holding zombie objects. */
     private Zombie[] zombies;
 
@@ -74,6 +77,9 @@ public class PlayView extends SurfaceView implements Runnable{
 
     /** The score for the game. */
     private int gameScore;
+
+    /** The current level setting. */
+    private int level;
 
     private SharedPreferences mSharedPref;
 
@@ -87,6 +93,7 @@ public class PlayView extends SurfaceView implements Runnable{
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display d = wm.getDefaultDisplay();
         mScreen = new Point();
+        gameContext = context;
         d.getSize(mScreen);
         mSharedPref = context.getSharedPreferences(
                 context.getString(R.string.shared_prefs), Context.MODE_PRIVATE);
@@ -109,33 +116,12 @@ public class PlayView extends SurfaceView implements Runnable{
             mBullets[i] = new Bullet(1, mScreen, context);
         }
 
-        int level = mSharedPref.getInt("saved_difficulty", 1);
+        level = mSharedPref.getInt("saved_difficulty", 1);
         setupLevelDifficulty(level);
 
         //zombies
         zombies = new Zombie[zombieCount];
-        //zombies[0] = new ZombieCrawler(context, mScreen);
-        //zombies[0].setIsActive(true);
-        Random random = new Random();
-        int zombie = 0;
-        for(int i = 0; i < zombies.length; i++) {
-
-            zombie = random.nextInt(3);
-            Log.d("RANDOM", "" + zombie);
-            switch(zombie) {
-
-                case 0: zombies[i] = new ZombieCrawler(context, mScreen);
-                    break;
-                case 1: zombies[i] = new ZombieWalker(context, mScreen);
-                    break;
-                case 2: zombies[i] = new ZombieColossus(context,mScreen);
-                    break;
-                default: zombies[i] = new ZombieCrawler(context, mScreen);
-                    break;
-            }
-
-            zombies[i].setIsActive(true);
-        }
+        spawnZombie();
 
         mBarrier = new Barrier(mScreen, mSurvivor);
 
@@ -193,13 +179,16 @@ public class PlayView extends SurfaceView implements Runnable{
 
                 for (int z = 0; z < zombieCount; z++) {
                     //if collision occurs with bullet
-                    if (Rect.intersects(mBullets[i].getDetectBullet(), zombies[z].getDetectZombie())) {
+                    if (zombies[z] != null && Rect.intersects(mBullets[i].getDetectBullet(),
+                            zombies[z].getDetectZombie())) {
                         //Increase zombie's hit count and set bullet's isActive to false
                         zombies[z].addHit();
                         mBullets[i].resetBullet();
-                        //If hit count is equal to zombie's health, reset zombie
+                        //If hit count is equal to zombie's health, reset zombie and increase score
                         if (zombies[z].getTimesHit() == zombies[z].getHP()) {
                             zombies[z].resetZombie();
+                            gameScore += zombies[z].getPointValue();
+                            Log.d("SCORE", "" + gameScore);
                         }
                     }
                 }
@@ -338,6 +327,49 @@ public class PlayView extends SurfaceView implements Runnable{
             default: zombieCount = COUNT_LEVEL_1;
                 break;
         }
+    }
+
+    /**
+     * Method for zombie spawning.
+     */
+    public boolean spawnZombie() {
+
+        Random random = new Random();
+        int zombie;
+
+        for(int i = 0; i < zombies.length; i++) {
+
+            boolean hasNewZombie = false;
+
+            if(zombies[i] == null || !zombies[i].getIsActive()) {
+
+                zombie = random.nextInt(3);
+                Log.d("RANDOM", "" + zombie);
+                switch(zombie) {
+
+                    case 0: zombies[i] = new ZombieCrawler(gameContext, mScreen);
+                        break;
+                    case 1: zombies[i] = new ZombieWalker(gameContext, mScreen);
+                        break;
+                    case 2: zombies[i] = new ZombieColossus(gameContext,mScreen);
+                        break;
+                    default: zombies[i] = new ZombieCrawler(gameContext, mScreen);
+                        break;
+                }
+
+                zombies[i].setIsActive(true);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get the game's current level.
+     * @return level the game level
+     */
+    public int getLevel() {
+        return level;
     }
 }
 

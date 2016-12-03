@@ -2,17 +2,14 @@ package group7.tcss450.tacoma.uw.edu.overrun.Game;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.drawable.GradientDrawable;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Layout;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Listeners.ButtonListener;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
@@ -24,7 +21,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 4 Nov 2016
+ * @version 30 Nov 2016
  */
 public class GameActivity extends AppCompatActivity {
 
@@ -42,6 +39,21 @@ public class GameActivity extends AppCompatActivity {
     /** The buttons (left and right) for firing the weapon. */
     private Button mFireButton_L;
     private Button mFireButton_R;
+
+    /** The timer delay for level 1. */
+    private static final int SPAWN_INTERVAL_1 = 5000;  // 5 seconds
+
+    /** The timer delay for level 2. */
+    private static final int SPAWN_INTERVAL_2 = 4000;  // 4 seconds
+
+    /** The timer delay for level 3. */
+    private static final int SPAWN_INTERVAL_3 = 2000;  // 2 seconds
+
+    /** The timer delay for spawning enemies. */
+    private int spawnInterval;
+
+    /** Handler for spawn timer. */
+    private Handler spawnHandler;
 
     /**
      * To perform on creation of this Activity.
@@ -65,8 +77,55 @@ public class GameActivity extends AppCompatActivity {
         //add layout to ContentView
         setContentView(layout);
 
+        setSpawnInterval();
+        spawnHandler = new Handler();
+        startSpawningTask();
+
         // start game
         mPlayView.run();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopSpawningTask();
+    }
+
+
+
+    protected void startSpawningTask() {
+        spawnChecker.run();
+    }
+
+    protected void stopSpawningTask() {
+        spawnHandler.removeCallbacks(spawnChecker);
+    }
+
+    Runnable spawnChecker = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                mPlayView.spawnZombie();
+            } finally {
+                // 100% guarantee that this always happens, even if
+                // your update method throws an exception
+                spawnHandler.postDelayed(spawnChecker, spawnInterval);
+            }
+        }
+    };
+
+    public void setSpawnInterval() {
+
+        switch(mPlayView.getLevel()) {
+            case 1: spawnInterval = SPAWN_INTERVAL_1;
+                break;
+            case 2: spawnInterval = SPAWN_INTERVAL_2;
+                break;
+            case 3: spawnInterval = SPAWN_INTERVAL_3;
+                break;
+            default: spawnInterval = SPAWN_INTERVAL_1;
+                break;
+        }
     }
 
     /**
@@ -382,6 +441,7 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        stopSpawningTask();
         mPlayView.pauseGame();
         AlertDialog.Builder dialog_builder = new AlertDialog.Builder(this);
         dialog_builder.setMessage(R.string.pause_dialog)
@@ -400,6 +460,7 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        startSpawningTask();
         mPlayView.resumeGame();
     }
 }
