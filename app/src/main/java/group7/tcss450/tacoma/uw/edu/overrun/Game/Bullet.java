@@ -3,7 +3,6 @@ package group7.tcss450.tacoma.uw.edu.overrun.Game;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
@@ -15,7 +14,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 30 November 2016
+ * @version 02 December 2016
  */
 
 public class Bullet extends BitmapResizer {
@@ -66,6 +65,7 @@ public class Bullet extends BitmapResizer {
         mBMP = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.bullet); // a placeholder graphic
         mBMP = getResizedBmp(mBMP, screenSize.x/SCALE, screenSize.x/SCALE);
 
+        mDetectBullet = new Rect();
         mIsActive = false;
     }
 
@@ -123,30 +123,23 @@ public class Bullet extends BitmapResizer {
     public void updateBulletPosition() {
         if(mY - 1 > 0) {
             mY -= SPEED;
+
+            //Adding the top, left, bottom and right to the rect object
+            mDetectBullet.left = mX;
+            mDetectBullet.top = mY - mBMP.getHeight();
+            mDetectBullet.right = mX + mBMP.getWidth();
+            mDetectBullet.bottom = mY;
         } else {
             mIsActive = false;
+            resetBullet();
         }
-
-        //Adding the top, left, bottom and right to the rect object
-        mDetectBullet.left = mX;
-        mDetectBullet.top = mY;
-        mDetectBullet.right = mX + mBMP.getWidth();
-        mDetectBullet.bottom = mY - mBMP.getHeight();
     }
-
-
 
     /**
      * Gets the status of the bullet being drawn currently.
      * @return mIsActive - true if the bullet is active, false otherwise.
      */
     public boolean getIsActive() {return mIsActive;}
-
-    /**
-     * Sets the status of the current bullet.
-     * @param status true if the bullet is active, false otherwise.
-     */
-    public void setIsActive(boolean status) { mIsActive = status;}
 
     /**
      * Shoots the weapon, adding a new bullet to recently fired from the specified position.
@@ -158,7 +151,10 @@ public class Bullet extends BitmapResizer {
         if (!mIsActive) {
             mX = theX;
             mY = startY - mBMP.getHeight();
-            mDetectBullet = new Rect(mX, mY, mX + mBMP.getWidth(), mY - mBMP.getHeight());
+            mDetectBullet.left = mX;
+            mDetectBullet.top = mY - mBMP.getHeight();
+            mDetectBullet.right = mX + mBMP.getWidth();
+            mDetectBullet.bottom = mY;
             mIsActive = true;
         }
     }
@@ -168,12 +164,12 @@ public class Bullet extends BitmapResizer {
      */
     public void resetBullet() {
 
-        mX = mScreenSize.x;
+        mX = 0;
         mY = mScreenSize.y;
         mDetectBullet.left = mX;
-        mDetectBullet.top = mY;
+        mDetectBullet.top = mY - mBMP.getHeight();
         mDetectBullet.right = mX + mBMP.getWidth();
-        mDetectBullet.bottom = mY - mBMP.getHeight();
+        mDetectBullet.bottom = mY;
         mIsActive = false;
     }
 }
