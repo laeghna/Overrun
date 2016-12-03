@@ -32,6 +32,9 @@ public class ZombieColossus extends BitmapResizer implements Zombie {
     /** Constant for scaling zombie colossus. */
     private static final int SCALE = 15;
 
+    /** Padding for the top and bottom of the game screen. */
+    private static final int PADDING = 80;
+
     /** Zombie crawler image. */
     private Bitmap colossusBitmap;
 
@@ -75,7 +78,7 @@ public class ZombieColossus extends BitmapResizer implements Zombie {
         colossusBitmap = getResizedBmp(colossusBitmap, screenSize.x/SCALE, screenSize.x/SCALE);
 
         xCoord = genRandom.nextInt(xMax - colossusBitmap.getWidth());
-        yCoord = yMin;
+        yCoord = yMin + PADDING;
 
         detectZombie =  new Rect(xCoord, yCoord, xCoord + colossusBitmap.getWidth(), yCoord + colossusBitmap.getHeight());
 
