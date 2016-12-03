@@ -32,6 +32,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import timber.log.Timber;
 
+import com.facebook.FacebookSdk;
+
 
 /**
  * Fragment that is responsible for registering accounts.

@@ -6,10 +6,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Game.*;
 
@@ -23,7 +27,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.SignIn.SignInActivity;
  * It handles the game's lifecycle by calling StartMenu's
  * methods when prompted by the OS. This activity provides
  * the User with the ability to start a new game, move to the
- * options menu, and move to the login/register menu.
+ * options menu, and move to the loginGoogle/register menu.
  *
  * @author Andrew Merz
  * @version 8 Nov 2016
@@ -43,10 +47,27 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
 
+        boolean loggedIn = mSharedPref.getBoolean(getString(R.string.logged_in), false);
+        // Check if the user is logged in then
+        // change the Sign in button.
+        Button sign_button = (Button) findViewById(R.id.login_button);
+        if (loggedIn) {
+
+            sign_button.setText("Log out");
+        }
+        else {
+            sign_button.setText("Sign in");
+
+        }
+
+
+
+
+
         // Setting onClickListeners for each button on layout.
         Button op_button = (Button) findViewById(R.id.options_button);
         Button start_button = (Button) findViewById(R.id.start_button);
-        Button sign_button = (Button) findViewById(R.id.login_button);
+        sign_button = (Button) findViewById(R.id.login_button);
         Button leaderboard_button = (Button) findViewById(R.id.leaderboard_button);
 
         op_button.setOnClickListener(this);
@@ -68,6 +89,9 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
             mMediaPlayer.setVolume(current_volume, current_volume);
             mMediaPlayer.start();
         }
+
+
+
     }
 
 
@@ -84,9 +108,13 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
         boolean loggedIn = mSharedPref.getBoolean(getString(R.string.logged_in), false);
         // Check if the user is logged in then
         // change the Sign in button.
+        Button sign_button = (Button) findViewById(R.id.login_button);
         if (loggedIn) {
-            Button sign_button = (Button) findViewById(R.id.login_button);
+
             sign_button.setText("Log out");
+        }
+        else {
+            sign_button.setText("Sign in");
         }
 
         float current_volume = mSharedPref.getFloat(
@@ -137,6 +165,9 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
                     mSharedPref.edit()
                             .putString(getString(R.string.user_email), "")
                             .apply();
+
+                    if (!FacebookSdk.isInitialized()) FacebookSdk.sdkInitialize(this);
+                    LoginManager.getInstance().logOut();
                 } else {
                     intent = new Intent(this, SignInActivity.class);
                     startActivity(intent);

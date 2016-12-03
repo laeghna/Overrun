@@ -30,8 +30,17 @@ public interface ApiInterface {
      * @param id_token Google JWT auth token.
      * @return Serialized User object.
      */
-    @POST("api/login")
-    Call<User> login(@Query("id_token") String id_token);
+    @POST("api/login/google")
+    Call<User> loginGoogle(@Query("id_token") String id_token);
+
+    /**
+     * Logs the user in through Facebook.
+     *
+     * @param email Facebook email.
+     * @return Serialized User object.
+     */
+    @POST("api/login/facebook")
+    Call<User> loginFacebook(@Query("email") String email);
 
     /**
      * Logs the user in through custom registration.

@@ -13,6 +13,7 @@ import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
@@ -65,7 +66,12 @@ public class LoginAndroidTest {
         mActivityRule.launchActivity(new Intent(getTargetContext(), StartMenuActivity.class));
 
         // wait for toasts to disappear
-        Thread.sleep(3000);
+        Thread.sleep(4000);
+    }
+
+    @After
+    public void tearDown() {
+        Intents.release();
     }
 
     @Ignore
@@ -79,7 +85,6 @@ public class LoginAndroidTest {
 
         assertCurrentActivityIsInstanceOf(StartMenuActivity.class);
         //intended(hasComponent(new ComponentName(getTargetContext(), StartMenuActivity.class.getName())));
-        Intents.release();
     }
 
     //@Ignore
@@ -95,13 +100,14 @@ public class LoginAndroidTest {
                 .check(matches(isDisplayed()));
     }
 
+    @Ignore
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    @Test
+    //@Test
     public void testLogin_NoNetworkConnection() throws InterruptedException {
         setMobileDataEnabled(getContext(), false);
         setWifiEnabled(getContext(), false);
 
-        Thread.sleep(2000);
+        Thread.sleep(3000);
 
         onView(withId(R.id.email_login)).perform(typeText(email));
         onView(withId(R.id.password_login)).perform(typeText(password));

@@ -4,7 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.widget.Toast;
+
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.appevents.AppEventsLogger;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -33,12 +42,14 @@ import retrofit2.Callback;
 import timber.log.Timber;
 
 /**
- * Activity that encapsulates the login and registration for the user.
+ * Activity that encapsulates the loginGoogle and registration for the user.
  *
  * @author Ethan Rowell
  * @version 9 Nov 2016
  */
 public class SignInActivity extends BaseActivity {
+
+    public CallbackManager callbackManager;
 
     /**
      * Code for retrieving a token for validation from Google API Client.
@@ -56,12 +67,19 @@ public class SignInActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
+
+        callbackManager = CallbackManager.Factory.create();
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AppEventsLogger.activateApp(getApplication());
+
         ButterKnife.bind(this);
 
         if (findViewById(R.id.fragment_container) != null) {
             if (savedInstanceState != null) {
                 return;
             }
+
             showLoginFragment();
         }
 
@@ -106,6 +124,44 @@ public class SignInActivity extends BaseActivity {
 
         if (isNetworkAvailable(this)) {
             signInAsync(email, password);
+        } else {
+            Toast.makeText(this, R.string.need_network_login,
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     * Sign the user in using facebook.
+     *
+     * @param accessToken Access token provided by the Facebook API.
+     */
+    public void facebookSignIn(AccessToken accessToken) {
+        showProgressDialog(getString(R.string.signing_in));
+
+        if (isNetworkAvailable(this)) {
+            GraphRequest request = GraphRequest.newMeRequest(
+                    accessToken,
+                    new GraphRequest.GraphJSONObjectCallback() {
+                        @Override
+                        public void onCompleted(
+                                JSONObject object,
+                                GraphResponse response) {
+                            Log.v("LoginActivity Response ", response.toString());
+
+                            try {
+                                String email = object.getString("email");
+                                Log.v("Email = ", " " + email);
+                                facebookSignInAsync(email);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+            Bundle parameters = new Bundle();
+            parameters.putString("fields", "id,name,email");
+            request.setParameters(parameters);
+            request.executeAsync();
         } else {
             Toast.makeText(this, R.string.need_network_login,
                     Toast.LENGTH_LONG).show();
@@ -195,7 +251,7 @@ public class SignInActivity extends BaseActivity {
      */
     private void googleSignInAsync(String token) {
         ApiInterface api = ApiClient.getClient();
-        Call<User> call = api.login(token);
+        Call<User> call = api.loginGoogle(token);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, retrofit2.Response<User> response) {
@@ -208,6 +264,23 @@ public class SignInActivity extends BaseActivity {
             }
         });
     }
+
+    private void facebookSignInAsync(String email) {
+        ApiInterface api = ApiClient.getClient();
+        Call<User> call = api.loginFacebook(email);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, retrofit2.Response<User> response) {
+                handleSignInResponse(response);
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                handleSignInError(call, t);
+            }
+        });
+    }
+
 
     /**
      * Handles the sign in from the API client.
@@ -230,14 +303,16 @@ public class SignInActivity extends BaseActivity {
             editor.apply();
 
             finish();
+            Timber.d("Signed in as: %s", email);
             Toast.makeText(getApplicationContext(), "Signed in as: " + email, Toast.LENGTH_LONG).show();
         } else {
             ResponseBody errorBody = response.errorBody();
             try {
                 String errorString = errorBody.string();
+                Timber.d(errorString);
                 String result = JSONHelper.tryGetString(new JSONObject(errorString), "error");
                 Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
-                Timber.d("Error string: %s", result);
+                Timber.d("Error string: %s", (result == null) ? "error parsing json" : result);
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
@@ -258,7 +333,7 @@ public class SignInActivity extends BaseActivity {
     }
 
     /**
-     * Shows the login fragment.
+     * Shows the loginGoogle fragment.
      */
     private void showLoginFragment() {
         getSupportFragmentManager().beginTransaction()
@@ -293,7 +368,7 @@ public class SignInActivity extends BaseActivity {
     }
 
     /**
-     * Checks the login status of the user. If logged in already, it will route the user
+     * Checks the loginGoogle status of the user. If logged in already, it will route the user
      * to the startMenu
      */
     private void checkLoginStatus() {

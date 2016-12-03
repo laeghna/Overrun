@@ -74,6 +74,9 @@
     <string name="pause_dialog">GAME PAUSED</string>
     <string name="resume_button">Resume</string>
 
+    <!--Facebook Strings-->
+
+    <string name="facebook_app_id">1325773164160592</string>
 
 
 

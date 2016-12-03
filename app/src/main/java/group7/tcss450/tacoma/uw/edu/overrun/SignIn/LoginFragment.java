@@ -4,18 +4,24 @@ package group7.tcss450.tacoma.uw.edu.overrun.SignIn;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbHelper;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
-import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailTextWatcher;
 import timber.log.Timber;
 
@@ -44,21 +50,58 @@ public class LoginFragment extends Fragment {
      */
     private Unbinder unbinder;
 
+
+    private CallbackManager callbackManager;
+
     public LoginFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
 
+        View view = inflater.inflate(R.layout.fragment_login, container, false);
+
+        //FacebookSdk.sdkInitialize(getApplicationContext());
+        FacebookSdk.sdkInitialize(getActivity().getApplicationContext());
+        //Facebook
+
+        callbackManager = CallbackManager.Factory.create();
+
+        final LoginButton loginButton = (LoginButton) view.findViewById(R.id.facebook_login_button);
+        loginButton.setReadPermissions("email");
+        // If using in a fragment
+        loginButton.setFragment(this);
+        // Other app specific specialization
+
+        // Callback registration
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.i("FACEBOOK", "onSuccess");
+                ((SignInActivity) getActivity()).facebookSignIn(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+                Log.i("FACEBOOK", "CANCELED");
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                Log.i("FACEBOOK", exception.getMessage());
+            }
+        });
+        //End Facebook
+
         if (((SignInActivity) getActivity()).isLoggedIn()) {
-            Intent intent = new Intent(getActivity().getApplicationContext(), StartMenuActivity.class);
-            startActivity(intent);
+            //Intent intent = new Intent(getActivity().getApplicationContext(), StartMenuActivity.class);
+            //startActivity(intent);
             getActivity().finish();
         }
 
-        View view = inflater.inflate(R.layout.fragment_login, container, false);
         unbinder = ButterKnife.bind(this, view);
 
         EmailTextWatcher emailTextWatcher = new EmailTextWatcher(emailText);
@@ -69,10 +112,10 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
-    @OnClick(R.id.test_sync_button)
-    void test() {
-        OverrunDbHelper db = new OverrunDbHelper(getContext());
-        db.submitScore("blah@blah.com", 500, 25, 3, 76);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     @OnClick(R.id.google_sign_in_button)

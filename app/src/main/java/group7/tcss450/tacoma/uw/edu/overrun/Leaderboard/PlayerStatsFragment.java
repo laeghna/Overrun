@@ -101,7 +101,7 @@ public class PlayerStatsFragment extends Fragment {
         }
         else {
             Toast.makeText(view.getContext(),
-                    "No network connection available. Displaying locally recent leaderboard.",
+                    "No network connection available. Displaying most recent leaderboard.",
                     Toast.LENGTH_LONG) .show();
 
             if (mLeaderboardDB == null) {

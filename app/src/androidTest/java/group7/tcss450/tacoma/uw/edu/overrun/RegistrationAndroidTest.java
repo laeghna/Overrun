@@ -1,6 +1,5 @@
 package group7.tcss450.tacoma.uw.edu.overrun;
 
-import android.support.test.espresso.ViewInteraction;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -10,6 +9,7 @@ import android.widget.EditText;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,6 +38,11 @@ public class RegistrationAndroidTest {
     public ActivityTestRule<SignInActivity> mActivityRule = new ActivityTestRule<>(
             SignInActivity.class);
 
+    @Before
+    public void setUp() {
+        TestHelperMethods.clearSharedPreferences(mActivityRule.getActivity());
+    }
+
     @Test
     public void testRegister_Valid() {
         onView(withId(R.id.register_button)).perform(click());
@@ -48,7 +53,6 @@ public class RegistrationAndroidTest {
                 + (random.nextInt(8) + 1) + (random.nextInt(9) + 1)
                 + (random.nextInt(100) + 1) + (random.nextInt(4) + 1)
                 + "@blah.edu";
-        //((EditText) signInActivity.findViewById(R.id.reg_email)).setText(email);
         onView(withId(R.id.reg_email)).perform(typeText(email));
         onView(withId(R.id.reg_password)).perform(typeText("blahblah1@"));
         onView(withId(R.id.reg_confirm_password)).perform(typeText("blahblah1@"));
@@ -116,8 +120,6 @@ public class RegistrationAndroidTest {
                 .inRoot(new ToastMatcher())
                 .check(matches(isDisplayed()));
     }
-
-
 
     private static Matcher<View> withError(final String expected) {
         return new TypeSafeMatcher<View>() {
