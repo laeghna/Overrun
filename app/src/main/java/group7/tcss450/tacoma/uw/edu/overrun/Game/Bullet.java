@@ -126,9 +126,9 @@ public class Bullet extends BitmapResizer {
 
             //Adding the top, left, bottom and right to the rect object
             mDetectBullet.left = mX;
-            mDetectBullet.top = mY - mBMP.getHeight();
+            mDetectBullet.top = mY;
             mDetectBullet.right = mX + mBMP.getWidth();
-            mDetectBullet.bottom = mY;
+            mDetectBullet.bottom = mY + mBMP.getHeight();
         } else {
             mIsActive = false;
             resetBullet();
@@ -152,9 +152,9 @@ public class Bullet extends BitmapResizer {
             mX = theX;
             mY = startY - mBMP.getHeight();
             mDetectBullet.left = mX;
-            mDetectBullet.top = mY - mBMP.getHeight();
+            mDetectBullet.top = mY;
             mDetectBullet.right = mX + mBMP.getWidth();
-            mDetectBullet.bottom = mY;
+            mDetectBullet.bottom = mY + mBMP.getHeight();
             mIsActive = true;
         }
     }
@@ -167,9 +167,9 @@ public class Bullet extends BitmapResizer {
         mX = 0;
         mY = mScreenSize.y;
         mDetectBullet.left = mX;
-        mDetectBullet.top = mY - mBMP.getHeight();
+        mDetectBullet.top = mY;
         mDetectBullet.right = mX + mBMP.getWidth();
-        mDetectBullet.bottom = mY;
+        mDetectBullet.bottom = mY + mBMP.getHeight();
         mIsActive = false;
     }
 }
