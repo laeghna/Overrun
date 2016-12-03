@@ -32,9 +32,6 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
     /** Constant for scaling zombie crawler. */
     private static final int SCALE = 18;
 
-    /** Padding for the top and bottom of the game screen. */
-    private static final int PADDING = 80;
-
     /** Zombie crawler image. */
     private Bitmap crawlerBitmap;
 
@@ -78,7 +75,7 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
         crawlerBitmap = getResizedBmp(crawlerBitmap, screenSize.x/SCALE, screenSize.x/SCALE);
 
         xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
-        yCoord = yMin + PADDING;
+        yCoord = yMin;
 
         detectZombie =  new Rect(xCoord, yCoord, xCoord + crawlerBitmap.getWidth(), yCoord + crawlerBitmap.getHeight());
 

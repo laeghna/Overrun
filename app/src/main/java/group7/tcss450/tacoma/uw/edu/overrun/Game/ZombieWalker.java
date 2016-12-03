@@ -32,9 +32,6 @@ public class ZombieWalker extends BitmapResizer implements Zombie {
     /** Constant for scaling zombie walker. */
     private static final int SCALE = 15;
 
-    /** Padding for the top and bottom of the game screen. */
-    private static final int PADDING = 80;
-
     /** Zombie crawler image. */
     private Bitmap walkerBitmap;
 
@@ -78,7 +75,7 @@ public class ZombieWalker extends BitmapResizer implements Zombie {
         walkerBitmap = getResizedBmp(walkerBitmap, screenSize.x/SCALE, screenSize.x/SCALE);
 
         xCoord = genRandom.nextInt(xMax - walkerBitmap.getWidth());
-        yCoord = yMin + PADDING;
+        yCoord = yMin;
 
         detectZombie =  new Rect(xCoord, yCoord, xCoord + walkerBitmap.getWidth(), yCoord + walkerBitmap.getHeight());
 
