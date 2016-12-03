@@ -45,6 +45,9 @@ public class Survivor extends BitmapResizer {
      */
     public Survivor(Context context, Point screenSize) {
 
+        if(screenSize.x < 0 || screenSize.y < 0) {
+            throw new IllegalArgumentException("cannot accept negative screen size.");
+        }
         mSpeed = 2; // test speed may need to adjust
 
         // Get the player graphic from drawable:
@@ -101,6 +104,7 @@ public class Survivor extends BitmapResizer {
     }
 
     /** Update the collision detector to the new position. */
+
     public void updateDetectSurvivor() {
         mDetectSurvivor.left = mX;
         mDetectSurvivor.top = mY;
