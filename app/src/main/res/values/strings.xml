@@ -70,6 +70,12 @@
 
 
 
+    <!--MediaPlayer Strings-->
+    <string name="music_position">position_music</string>
+    <string name="music_volume">volume_music</string>
+
+
+
     <!--SQL STRINGS-->
     <string name="CREATE_PLAYER_SQL">
     CREATE TABLE IF NOT EXISTS Player
