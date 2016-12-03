@@ -260,6 +260,12 @@ public class PlayView extends SurfaceView implements Runnable{
                                 (health.getmBitmap().getWidth() * h),
                         health.getyCoord(), paint);
             }
+
+            //Draw updated score
+            paint.setTextSize(60);
+            paint.setColor(Color.GREEN);
+            canvas.drawText("Score: " + gameScore, mScreen.x - 500, 60, paint);
+
             mHolder.unlockCanvasAndPost(canvas); // drawing done -> unlock background
         }
     }
