@@ -63,6 +63,9 @@
 
     <string name="pause_dialog">GAME PAUSED</string>
     <string name="resume_button">Resume</string>
+    <string name="game_over_text">GAME OVER!</string>
+    <string name="exit_button">Exit</string>
+    <string name="play_again_text">Play Again</string>
 
     <!--Facebook Strings-->
 

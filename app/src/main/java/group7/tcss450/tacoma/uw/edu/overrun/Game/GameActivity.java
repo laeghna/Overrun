@@ -7,12 +7,16 @@ import android.os.Handler;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Listeners.ButtonListener;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
@@ -26,7 +30,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  * @author Lisa Taylor
  * @version 02 December 2016
  */
-public class GameActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity implements PropertyChangeListener{
 
     /** The game's play view where all images are drawn. */
     private PlayView mPlayView;
@@ -58,6 +62,7 @@ public class GameActivity extends AppCompatActivity {
     /** Handler for spawn timer. */
     private Handler spawnHandler;
 
+    /** Shared preferences for the game. */
     private SharedPreferences mSharedPref;
 
     /**
@@ -72,8 +77,6 @@ public class GameActivity extends AppCompatActivity {
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
         int choose_layout = mSharedPref.getInt("saved_controls", 0);
-
-//        int choose_layout = 0;
         //Initialize the play view object
         mPlayView = new PlayView(this);
         FrameLayout layout = getLayout_1();
@@ -91,7 +94,6 @@ public class GameActivity extends AppCompatActivity {
         setSpawnInterval();
         spawnHandler = new Handler();
         startSpawningTask();
-
         // start game
         mPlayView.run();
     }
@@ -485,5 +487,37 @@ public class GameActivity extends AppCompatActivity {
         super.onResume();
         startSpawningTask();
         mPlayView.resumeGame();
+    }
+
+    /**
+     *
+     */
+    public void onGameOver() {
+        stopSpawningTask();
+        AlertDialog.Builder dialog_builder = new AlertDialog.Builder(this);
+        dialog_builder.setMessage(R.string.game_over_text)
+                .setPositiveButton(R.string.play_again_text, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface d, int id) {
+                        Log.d("GAME ACTIVITY", "Play again selected");
+                    }
+                }).setNegativeButton(R.string.exit_button, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Log.d("GAME ACTIVITY", "Exit selected.");
+            }
+        }) ;
+        AlertDialog dialog = dialog_builder.create();
+        dialog.show();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        Object src = evt.getSource();
+        Boolean newVal = (Boolean) evt.getNewValue();
+        Log.d("GameActivity", newVal.toString());
+        if(newVal) {
+            onGameOver();
+        }
     }
 }

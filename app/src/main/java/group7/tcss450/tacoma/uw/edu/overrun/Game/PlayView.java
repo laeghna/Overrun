@@ -16,7 +16,11 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Random;
+import java.util.concurrent.locks.Lock;
 
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
@@ -94,6 +98,10 @@ public class PlayView extends SurfaceView implements Runnable{
 
     private SharedPreferences mSharedPref;
 
+    private boolean isGameOver;
+
+    private PropertyChangeSupport changeSupport;
+
 
     /**
      * Constructor for the PlayView class.
@@ -101,9 +109,11 @@ public class PlayView extends SurfaceView implements Runnable{
      */
     public PlayView(Context context) {
         super(context);
+        changeSupport = new PropertyChangeSupport(this);
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display d = wm.getDefaultDisplay();
         mScreen = new Point();
+        isGameOver = false;
         gameContext = context;
         d.getSize(mScreen);
         bgImage = BitmapFactory.decodeResource(context.getResources(), R.drawable.dirty_road);
@@ -147,17 +157,24 @@ public class PlayView extends SurfaceView implements Runnable{
      */
     @Override
     public void run() {
+        if(isGameOver) {
+            try {
+                mGameThread.join();
+                PropertyChangeEvent p = new PropertyChangeEvent(this, "GameOver", Boolean.valueOf(false), Boolean.valueOf(true));
+//                p.notify();
+                changeSupport.firePropertyChange(p);
+            } catch (InterruptedException e) {
 
+            }
+        }
         // game control loop: while the user is playing continue to update the view
-        while(mIsPlaying) {
-
+        while(mIsPlaying && !isGameOver) {
             //update and draw frame
             update();
             draw();
             //update the frame controls
             framesPerSecond();
         }
-
     }
 
     /** Updates the frame for the PlayView. */
@@ -188,6 +205,10 @@ public class PlayView extends SurfaceView implements Runnable{
 
                     zombies[i].updateMovement();
                 }
+            }
+            if(health.getCurrHealth() <= 0) {
+                mIsPlaying = false;
+                isGameOver = true;
             }
         }
 
@@ -266,6 +287,10 @@ public class PlayView extends SurfaceView implements Runnable{
             paint.setColor(Color.GREEN);
             canvas.drawText("Score: " + gameScore, mScreen.x - 500, 60, paint);
 
+            if(isGameOver) {
+                canvas.drawText("GAME OVER", mScreen.x/2 - 10, mScreen.y/2, paint);
+
+            }
             mHolder.unlockCanvasAndPost(canvas); // drawing done -> unlock background
         }
     }
@@ -381,6 +406,10 @@ public class PlayView extends SurfaceView implements Runnable{
             }
         }
         return false;
+    }
+
+    public PropertyChangeSupport getPropertyChangeSupport() {
+        return changeSupport;
     }
 
     /**
