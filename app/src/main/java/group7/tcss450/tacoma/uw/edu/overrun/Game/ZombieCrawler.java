@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.util.Log;
 
 import java.util.Random;
 
@@ -16,7 +15,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  * This is the slowest and weakest enemy.
  *
  * @author Lisa Taylor
- * @version 30 Nov 2016
+ * @version 02 December 2016
  */
 
 public class ZombieCrawler extends BitmapResizer implements Zombie{
@@ -56,6 +55,9 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
     /** Boolean to determine if crawler should be drawn or not. */
     private boolean isActive;
 
+    /** Boolean to determine if zombie reahed bottom. */
+    private boolean hasReachedBottom;
+
     /** The number of times the zombie has been hit by a bullet. */
     private int timesHit = 0;
 
@@ -69,15 +71,8 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
 
         genRandom = new Random();
 
-        // Get the zombie graphic from drawable:
-        Log.d("OVERRUN: Crawler", "Screen: (" + screenSize.x + "," + screenSize.y + ")");
-
-        // a placeholder graphic
         crawlerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.crawler);
-        Log.d("OVERRUN: Crawler", "Before Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
-
         crawlerBitmap = getResizedBmp(crawlerBitmap, screenSize.x/SCALE, screenSize.x/SCALE);
-        Log.d("OVERRUN: Crawler", "After Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
 
         xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
         yCoord = yMin;
@@ -85,6 +80,7 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
         detectZombie =  new Rect(xCoord, yCoord, xCoord + crawlerBitmap.getWidth(), yCoord + crawlerBitmap.getHeight());
 
         isActive = false;
+        hasReachedBottom = false;
     }
 
     @Override
@@ -92,20 +88,19 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
 
         if (yCoord + 1 < yMax) {
             yCoord += SPEED;
+
+            //adding top, left, bottom and right to the rect object
+            detectZombie.left = xCoord;
+            detectZombie.top = yCoord;
+            detectZombie.right = xCoord + crawlerBitmap.getWidth();
+            detectZombie.bottom = yCoord + crawlerBitmap.getHeight();
+
         } else {
-            xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
-            yCoord = yMin;
-            setIsActive(true);
+
+            isActive = false;
+            hasReachedBottom = true;
+            resetZombie();
         }
-
-        //adding top, left, bottom and right to the rect object
-        detectZombie.left = xCoord;
-        detectZombie.top = yCoord;
-        detectZombie.right = xCoord + crawlerBitmap.getWidth();
-        detectZombie.bottom = yCoord + crawlerBitmap.getHeight();
-
-        //do something if enemy reaches bottom edge
-        //such as creating new zombie and reducing survivor health
     }
 
     @Override
@@ -154,6 +149,11 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
     }
 
     @Override
+    public boolean getHasReachedBottom() {
+        return hasReachedBottom;
+    }
+
+    @Override
     public int getTimesHit() {
         return timesHit;
     }
@@ -178,5 +178,6 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
         detectZombie.right = xCoord + crawlerBitmap.getWidth();
         detectZombie.bottom = yCoord + crawlerBitmap.getHeight();
         isActive = false;
+        hasReachedBottom = false;
     }
 }

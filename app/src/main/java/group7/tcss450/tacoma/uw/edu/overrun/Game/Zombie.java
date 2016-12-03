@@ -7,7 +7,7 @@ import android.graphics.Rect;
  * This interface specifies the behavior for a zombie enemy.
  *
  * @author Lisa Taylor
- * @version 30 Nov 2016
+ * @version 02 December 2016
  */
 
 public interface Zombie {
@@ -60,15 +60,21 @@ public interface Zombie {
 
     /**
      * Gets the status of the crawler being drawn currently.
-     * @return isActive - true if the crawler is active, false otherwise.
+     * @return isActive - true if the zombie is active, false otherwise.
      */
     boolean getIsActive();
 
     /**
      * Sets the status of the current crawler.
-     * @param status true if the crawler is active, false otherwise.
+     * @param status true if the zombie is active, false otherwise.
      */
     void setIsActive(boolean status);
+
+    /**
+     * Gets the status for whether zombie reached bottom or not.
+     * @return hasReachedBottom - true if the zombie reached bottom, false otherwise.
+     */
+    boolean getHasReachedBottom();
 
     /**
      * Gets the number of times the zombie has been hit.
