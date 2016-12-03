@@ -30,6 +30,8 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
     private SharedPreferences mSharedPref;
     private Spinner mDiffSpinner;
     private Spinner mControlsSpinner;
+    private static MediaPlayer mMediaPlayer;
+
 
 
     @Override
@@ -39,6 +41,9 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
 
         mSharedPref = getSharedPreferences(
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
+
+
+
 
         mDiffSpinner = (Spinner) findViewById(R.id.diff_spinner);
         mControlsSpinner = (Spinner) findViewById(R.id.control_spinner);
@@ -70,6 +75,45 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         mydiffSpinner.setSelection(current_difficulty - 1);
         myControlsSpinner.setSelection(current_controls);
 
+
+        mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
+        mMediaPlayer.setLooping(true);
+        mMediaPlayer.setVolume(volume_int, volume_int);
+        int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
+        mMediaPlayer.seekTo(music_position);
+        mMediaPlayer.start();
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (!mMediaPlayer.isPlaying()) {
+            int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
+            double current_volume = mSharedPref.getFloat(
+                    getString(R.string.saved_volume_setting), 1);
+
+            // Set volume to an integer to properly display on Slider.
+            int volume_int = (int) (current_volume * 100);
+            mMediaPlayer.setVolume(volume_int,volume_int);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.start();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (mMediaPlayer.isPlaying()) {
+            mSharedPref.edit()
+                    .putInt(getString(R.string.music_position), mMediaPlayer.getCurrentPosition())
+                    .apply();
+
+            mMediaPlayer.pause();
+
+        }
 
     }
 

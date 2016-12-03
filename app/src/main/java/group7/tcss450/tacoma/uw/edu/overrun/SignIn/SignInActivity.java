@@ -2,6 +2,8 @@ package group7.tcss450.tacoma.uw.edu.overrun.SignIn;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -29,11 +31,18 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 public class SignInActivity extends BaseActivity {
 
     public CallbackManager callbackManager;
+    private static MediaPlayer mMediaPlayer;
+    private SharedPreferences mSharedPref;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+
+        mSharedPref = getSharedPreferences(
+                getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
 
         callbackManager = CallbackManager.Factory.create();
@@ -50,6 +59,50 @@ public class SignInActivity extends BaseActivity {
 
             showLoginFragment();
         }
+
+        double current_volume = mSharedPref.getFloat(
+                getString(R.string.saved_volume_setting), 1);
+
+        // Set volume to an integer to properly display on Slider.
+        int volume_int = (int) (current_volume * 100);
+
+        mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
+        mMediaPlayer.setLooping(true);
+        mMediaPlayer.setVolume(volume_int, volume_int);
+        int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
+        mMediaPlayer.seekTo(music_position);
+        mMediaPlayer.start();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+            int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
+            double current_volume = mSharedPref.getFloat(
+                    getString(R.string.saved_volume_setting), 1);
+
+            // Set volume to an integer to properly display on Slider.
+            int volume_int = (int) (current_volume * 100);
+            mMediaPlayer.setVolume(volume_int,volume_int);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.start();
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (mMediaPlayer.isPlaying()) {
+            mSharedPref.edit()
+                    .putInt(getString(R.string.music_position), mMediaPlayer.getCurrentPosition())
+                    .apply();
+
+            mMediaPlayer.pause();
+
+        }
+
     }
 
     @Optional @OnClick(R.id.register_button)
