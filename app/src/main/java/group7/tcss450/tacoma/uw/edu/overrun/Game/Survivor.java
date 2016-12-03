@@ -15,12 +15,15 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 30 November 2016
+ * @version 02 December 2016
  */
 public class Survivor extends BitmapResizer {
 
     /** Constant for scaling survivor */
     private static final int SCALE = 15;
+
+    /** Padding for the top and bottom of the game screen. */
+    private static final int PADDING = 165;
 
     /** The bitmap for the survivor sprite image. */
     private Bitmap mBmap;
@@ -31,9 +34,6 @@ public class Survivor extends BitmapResizer {
 
     /** The move speed of the survivor. */
     private int mSpeed;
-
-    /** Padding for the top and bottom of the game screen. */
-    private int mPadBott = 165;
 
     /** Collision detector for the survivor. */
     private Rect mDetectSurvivor;
@@ -51,7 +51,7 @@ public class Survivor extends BitmapResizer {
         mBmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie); // a placeholder graphic
         mBmap = getResizedBmp(mBmap, screenSize.x/SCALE, screenSize.x/SCALE);
         mX = mBmap.getWidth();
-        mY = screenSize.y - (mBmap.getHeight() + mPadBott);
+        mY = screenSize.y - (mBmap.getHeight() + PADDING);
         mDetectSurvivor = new Rect(mX, mY, mX + mBmap.getWidth(), mY + mBmap.getHeight());
     }
 
@@ -105,6 +105,6 @@ public class Survivor extends BitmapResizer {
         mDetectSurvivor.left = mX;
         mDetectSurvivor.top = mY;
         mDetectSurvivor.right = mX + mBmap.getWidth();
-        mDetectSurvivor.bottom = mY - mBmap.getHeight();
+        mDetectSurvivor.bottom = mY + mBmap.getHeight();
     }
 }
