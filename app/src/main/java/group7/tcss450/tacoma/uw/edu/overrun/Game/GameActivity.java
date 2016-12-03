@@ -79,6 +79,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         int choose_layout = mSharedPref.getInt("saved_controls", 0);
         //Initialize the play view object
         mPlayView = new PlayView(this);
+        (mPlayView.getPropertyChangeSupport()).addPropertyChangeListener(this);
         FrameLayout layout = getLayout_1();
 
         if(choose_layout == 1) {
@@ -491,33 +492,20 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
 
     /**
      *
+     * @param evt
      */
-    public void onGameOver() {
-        stopSpawningTask();
-        AlertDialog.Builder dialog_builder = new AlertDialog.Builder(this);
-        dialog_builder.setMessage(R.string.game_over_text)
-                .setPositiveButton(R.string.play_again_text, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface d, int id) {
-                        Log.d("GAME ACTIVITY", "Play again selected");
-                    }
-                }).setNegativeButton(R.string.exit_button, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Log.d("GAME ACTIVITY", "Exit selected.");
-            }
-        }) ;
-        AlertDialog dialog = dialog_builder.create();
-        dialog.show();
-    }
-
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        Log.d("GameOver", "In prop change");
         Object src = evt.getSource();
         Boolean newVal = (Boolean) evt.getNewValue();
         Log.d("GameActivity", newVal.toString());
         if(newVal) {
-            onGameOver();
+//            onGameOver();
         }
+    }
+
+    public String getEmail() {
+        return mSharedPref.getString("user_email", "default");
     }
 }

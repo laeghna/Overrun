@@ -1,7 +1,9 @@
 package group7.tcss450.tacoma.uw.edu.overrun.Game;
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Display;
 import android.view.SurfaceHolder;
@@ -22,6 +25,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.Random;
 import java.util.concurrent.locks.Lock;
 
+import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbHelper;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 /** This class is intended for use in the game Overrun. A fun and fast-paced survival
@@ -103,6 +107,7 @@ public class PlayView extends SurfaceView implements Runnable{
     private PropertyChangeSupport changeSupport;
 
 
+
     /**
      * Constructor for the PlayView class.
      * @param context the context for the app.
@@ -158,22 +163,18 @@ public class PlayView extends SurfaceView implements Runnable{
     @Override
     public void run() {
         if(isGameOver) {
-            try {
-                mGameThread.join();
-                PropertyChangeEvent p = new PropertyChangeEvent(this, "GameOver", Boolean.valueOf(false), Boolean.valueOf(true));
-//                p.notify();
-                changeSupport.firePropertyChange(p);
-            } catch (InterruptedException e) {
-
+            OverrunDbHelper helper = new OverrunDbHelper(gameContext);
+            helper.createGame(((GameActivity) gameContext).getEmail(), gameScore, gameScore, level, gameScore);
+            changeSupport.firePropertyChange("GameActivity", false, true);
+        } else {
+            // game control loop: while the user is playing continue to update the view
+            while (mIsPlaying) {
+                //update and draw frame
+                update();
+                draw();
+                //update the frame controls
+                framesPerSecond();
             }
-        }
-        // game control loop: while the user is playing continue to update the view
-        while(mIsPlaying && !isGameOver) {
-            //update and draw frame
-            update();
-            draw();
-            //update the frame controls
-            framesPerSecond();
         }
     }
 
@@ -288,8 +289,8 @@ public class PlayView extends SurfaceView implements Runnable{
             canvas.drawText("Score: " + gameScore, mScreen.x - 500, 60, paint);
 
             if(isGameOver) {
+                paint.setTextSize(150);
                 canvas.drawText("GAME OVER", mScreen.x/2 - 10, mScreen.y/2, paint);
-
             }
             mHolder.unlockCanvasAndPost(canvas); // drawing done -> unlock background
         }
