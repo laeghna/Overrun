@@ -30,6 +30,8 @@ import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailValidator;
 import group7.tcss450.tacoma.uw.edu.overrun.Validation.PasswordValidator;
 import timber.log.Timber;
 
+import com.facebook.FacebookSdk;
+
 
 /**
  * Fragment that is responsible for registering accounts.

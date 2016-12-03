@@ -6,22 +6,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.PlayerStats.PlayerStatsContent;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link PlayerStatsContent.PlayerStats} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link PlayerStatsContent} and makes a call to the
  * specified {@link PlayerStatsFragment.OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerStatsRecyclerViewAdapter.ViewHolder> {
 
-    private final List<PlayerStatsContent.PlayerStats> mValues;
+    private final List<PlayerStatsContent> mValues;
     private final PlayerStatsFragment.OnListFragmentInteractionListener mListener;
 
-    public PlayerStatsRecyclerViewAdapter(List<PlayerStatsContent.PlayerStats> items, PlayerStatsFragment.OnListFragmentInteractionListener listener) {
+    public PlayerStatsRecyclerViewAdapter(List<PlayerStatsContent> items, PlayerStatsFragment.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -36,8 +38,10 @@ public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerS
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        holder.mPlayerNumber.setText(Integer.toString(position + 1) + '.');
+  
+        holder.mIdView.setText(mValues.get(position).getPlayerId());
+        holder.mContentView.setText(mValues.get(position).getPlayerScore());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,14 +62,16 @@ public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerS
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
+        public TextView mPlayerNumber;
         public final TextView mIdView;
         public final TextView mContentView;
 
-        public PlayerStatsContent.PlayerStats mItem;
+        public PlayerStatsContent mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
+            mPlayerNumber = (TextView) view.findViewById(R.id.player_number);
             mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.content);
         }

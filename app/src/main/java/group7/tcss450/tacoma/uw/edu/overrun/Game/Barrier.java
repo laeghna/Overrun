@@ -154,6 +154,7 @@ public class Barrier {
         /** True if the block has been destroyed by zombies, false otherwise. */
         private boolean mIsDestroyed;
 
+        /** The color of the block when drawn with the barrier. */
         private int mColor;
 
         /**
