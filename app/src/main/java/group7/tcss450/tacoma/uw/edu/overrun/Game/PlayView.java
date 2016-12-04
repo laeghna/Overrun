@@ -1,9 +1,7 @@
 package group7.tcss450.tacoma.uw.edu.overrun.Game;
 
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,21 +10,16 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Random;
-import java.util.concurrent.locks.Lock;
 
-import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbHelper;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 /** This class is intended for use in the game Overrun. A fun and fast-paced survival
@@ -34,7 +27,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 30 Nov 2016
+ * @version 04 December 2016
  */
 public class PlayView extends SurfaceView implements Runnable{
 
@@ -107,13 +100,8 @@ public class PlayView extends SurfaceView implements Runnable{
     /** Boolean indicating game state. True if game is over, false otherwise. */
     private volatile boolean isGameOver;
 
-    /** Handler for the game over actions. */
-    private Handler gameOverHandler;
-
     /** The property change support for this class. */
     private PropertyChangeSupport changeSupport;
-
-
 
     /**
      * Constructor for the PlayView class.
@@ -169,8 +157,10 @@ public class PlayView extends SurfaceView implements Runnable{
      */
     @Override
     public void run() {
+
             // game control loop: while the user is playing continue to update the view
             while (mIsPlaying) {
+
                 //update and draw frame
                 update();
                 draw();
@@ -241,6 +231,7 @@ public class PlayView extends SurfaceView implements Runnable{
 
     /** Draws the frame for the PlayView. */
     private void draw() {
+
         // draw all graphics
         // check holder
         if( mHolder.getSurface().isValid()) {
@@ -292,8 +283,7 @@ public class PlayView extends SurfaceView implements Runnable{
                 paint.setTextSize(150);
                 canvas.drawText("GAME OVER", mScreen.x/2 - 50, mScreen.y/2, paint);
                 mIsPlaying = false;
-                changeSupport.firePropertyChange(new PropertyChangeEvent(this,
-                        "GameOver", Boolean.valueOf(false), Boolean.valueOf(true)));
+                changeSupport.firePropertyChange("GameOver", false, true);
             }
             mHolder.unlockCanvasAndPost(canvas); // drawing done -> unlock background
         }
@@ -301,18 +291,25 @@ public class PlayView extends SurfaceView implements Runnable{
 
     /** Controls updating of the thread. */
     private void framesPerSecond() {
+
         try{
+
             mGameThread.sleep(15);
+
         } catch (InterruptedException e) {
+
             e.printStackTrace();
         }
     }
 
     /** Pauses the game. */
     public void pauseGame() {
+
         mIsPlaying = false;
         try {
+
             mGameThread.join();
+
         } catch (InterruptedException e) {
 
         }
@@ -320,6 +317,7 @@ public class PlayView extends SurfaceView implements Runnable{
 
     /** Resumes game after being paused. */
     public void resumeGame() {
+
         mIsPlaying = true;
         mGameThread = new Thread(this);
         mGameThread.start();
@@ -329,8 +327,11 @@ public class PlayView extends SurfaceView implements Runnable{
      * Moves the survivor toward the left end of the screen.
      */
     public void moveLeft() {
+
         if((mSurvivor.getmX() - mSurvivor.getmSpeed()) > 1) {
+
             mSurvivor.setmX(mSurvivor.getmX() - mSurvivor.getmSpeed());
+
         }
         mSurvivor.updateDetectSurvivor();
     }
@@ -340,7 +341,9 @@ public class PlayView extends SurfaceView implements Runnable{
      */
     public void moveRight() {
         if((mSurvivor.getmX() + mSurvivor.getmSpeed() + mSurvivor.getmBmap().getWidth()) < mScreen.x) {
+
             mSurvivor.setmX( mSurvivor.getmX() + mSurvivor.getmSpeed());
+
         }
         mSurvivor.updateDetectSurvivor();
     }
@@ -350,9 +353,11 @@ public class PlayView extends SurfaceView implements Runnable{
      * @return true if the bullet was fired (added to the bullet array), false otherwise.
      */
     public boolean fire() {
-        Log.d("firing", String.valueOf(mBarrier.getmStartY()));
+
         for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
+
             if(!mBullets[i].getIsActive()) {
+
                 mBullets[i].shootWeapon(mSurvivor.getmX() + (mSurvivor.getmBmap().getWidth() / 2),
                         mSurvivor.getmY());
                 return true;
@@ -388,8 +393,6 @@ public class PlayView extends SurfaceView implements Runnable{
 
         for(int i = 0; i < zombies.length; i++) {
 
-            boolean hasNewZombie = false;
-
             if(zombies[i] == null || !zombies[i].getIsActive()) {
 
                 zombie = random.nextInt(3);
@@ -417,6 +420,7 @@ public class PlayView extends SurfaceView implements Runnable{
      * @param listener the listener for this observer.
      */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
+
          changeSupport.addPropertyChangeListener(listener);
     }
 
@@ -426,6 +430,10 @@ public class PlayView extends SurfaceView implements Runnable{
      */
     public int getLevel() {
         return level;
+    }
+
+    public boolean getIsGameOver() {
+        return isGameOver;
     }
 
     /**
