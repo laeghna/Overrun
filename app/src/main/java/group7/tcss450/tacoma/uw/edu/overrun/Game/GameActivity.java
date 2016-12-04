@@ -5,15 +5,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Handler;
 import android.content.SharedPreferences;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Layout;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,8 +23,6 @@ import java.beans.PropertyChangeListener;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Listeners.ButtonListener;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
-import group7.tcss450.tacoma.uw.edu.overrun.SignIn.SignInActivity;
-import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
 
 /**
  * This is the activity for the actual game play.
@@ -35,7 +31,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 02 December 2016
+ * @version 04 December 2016
  */
 public class GameActivity extends AppCompatActivity implements PropertyChangeListener{
 
@@ -78,6 +74,9 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
     /** The handler for the gameover process. */
     private Handler gameOverHandler;
 
+    /** Dialog variable to be used for holding created dialogs. */
+    private Dialog dialog;
+
     /**
      * To perform on creation of this Activity.
      * @param savedInstanceState the saved instance state.
@@ -91,6 +90,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
         int choose_layout = mSharedPref.getInt("saved_controls", 0);
+
         //Initialize the play view object
         mPlayView = new PlayView(this);
         mPlayView.addPropertyChangeListener(this);
@@ -109,6 +109,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         setSpawnInterval();
         spawnHandler = new Handler();
         startSpawningTask();
+
         // start game
         mPlayView.run();
     }
@@ -130,11 +131,12 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         spawnHandler.removeCallbacks(spawnChecker);
     }
 
-    Runnable spawnChecker = new Runnable() {
+    private Runnable spawnChecker = new Runnable() {
         @Override
         public void run() {
             try {
                 mPlayView.spawnZombie();
+
             } finally {
                 // 100% guarantee that this always happens, even if
                 // your update method throws an exception
@@ -169,6 +171,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
      * @return the UI layout.
      */
     public FrameLayout getLayout_1() {
+
         //The main layout for the game
         FrameLayout layout = new FrameLayout(this);
 
@@ -180,10 +183,11 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         mPauseButton = new Button(this);
         mPauseButton.setText(R.string.pause_button_txt);
         mPauseButton.setBackgroundResource(R.drawable.pause_button);
-        mPauseButton.setTextColor(getResources().getColor(R.color.gray));
+        mPauseButton.setTextColor(Color.GRAY);
         mPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 onPause();
             }
         });
@@ -202,8 +206,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         // Create the buttons
         mLeftButton = new Button(this);
         mLeftButton.setBackgroundResource(R.drawable.move_button);
-        mLeftButton.setTextColor(getResources().getColor(R.color.gray));
-//        mLeftButton = (Button) findViewById(R.id.left_button);
+        mLeftButton.setTextColor(Color.GRAY);
         mLeftButton.setText(R.string.left_button_txt);
         mLeftButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
@@ -239,7 +242,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         mRightButton = new Button(this);
         mRightButton.setText(R.string.right_button_txt);
         mRightButton.setBackgroundResource(R.drawable.move_button);
-        mRightButton.setTextColor(getResources().getColor(R.color.gray));
+        mRightButton.setTextColor(Color.GRAY);
         mRightButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
             public void onClick(View view){
@@ -299,8 +302,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         mPauseButton = new Button(this);
         mPauseButton.setText(R.string.pause_button_txt);
         mPauseButton.setBackgroundResource(R.drawable.pause_button);
-        mPauseButton.setTextColor(getResources().getColor(R.color.gray));
-//        mPauseButton = (Button) findViewById(R.id.pause_button);
+        mPauseButton.setTextColor(Color.GRAY);
         mPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -323,8 +325,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         // Create the buttons
         mLeftButton = new Button(this);
         mLeftButton.setBackgroundResource(R.drawable.move_button);
-        mLeftButton.setTextColor(getResources().getColor(R.color.gray));
-//        mLeftButton = (Button) findViewById(R.id.left_button);
+        mLeftButton.setTextColor(Color.GRAY);
         mLeftButton.setText(R.string.left_button_txt);
         mLeftButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
@@ -336,7 +337,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         mRightButton = new Button(this);
         mRightButton.setText(R.string.right_button_txt);
         mRightButton.setBackgroundResource(R.drawable.move_button);
-        mRightButton.setTextColor(getResources().getColor(R.color.gray));
+        mRightButton.setTextColor(Color.GRAY);
         mRightButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
             public void onClick(View view){
@@ -399,8 +400,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         mPauseButton = new Button(this);
         mPauseButton.setText(R.string.pause_button_txt);
         mPauseButton.setBackgroundResource(R.drawable.pause_button);
-        mPauseButton.setTextColor(getResources().getColor(R.color.gray));
-//        mPauseButton = (Button) findViewById(R.id.pause_button);
+        mPauseButton.setTextColor(Color.GRAY);
         mPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -424,7 +424,6 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         mLeftButton = new Button(this);
         mLeftButton.setBackgroundResource(R.drawable.move_button);
         mLeftButton.setTextColor(getResources().getColor(R.color.gray));
-//        mLeftButton = (Button) findViewById(R.id.left_button);
         mLeftButton.setText(R.string.left_button_txt);
         mLeftButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
@@ -436,7 +435,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         mRightButton = new Button(this);
         mRightButton.setText(R.string.right_button_txt);
         mRightButton.setBackgroundResource(R.drawable.move_button);
-        mRightButton.setTextColor(getResources().getColor(R.color.gray));
+        mRightButton.setTextColor(Color.GRAY);
         mRightButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
             public void onClick(View view){
@@ -477,28 +476,31 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
     }
 
     /**
-     * Called when the game is paused.
+     * Pauses the game.
      */
     @Override
     protected void onPause() {
+
         super.onPause();
-        stopSpawningTask();
-        mPlayView.pauseGame();
-        AlertDialog.Builder db = new AlertDialog.Builder(GameActivity.this);
-        db.setMessage(R.string.pause_dialog)
-        .setPositiveButton(R.string.resume_button, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface di, int id) {
-                        onResume();
-                    }
-                });
-        Dialog d = db.create();
-        d.show();
+        if (!mPlayView.getIsGameOver()) {
+
+            stopSpawningTask();
+            mPlayView.pauseGame();
+            AlertDialog.Builder db = new AlertDialog.Builder(GameActivity.this);
+            db.setMessage(R.string.pause_dialog)
+                    .setPositiveButton(R.string.resume_button, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface di, int id) {
+                            onResume();
+                        }
+                    });
+            dialog = db.create();
+            dialog.show();
+        }
     }
 
     /**
      * Called when the game has ended. Pops up a dialog that gives
-     * the user options to either play again or quit. Both return
-     * to main menu.
+     * the user options to either play again or quit to the main menu.
      */
     protected void onGameOver() {
         stopSpawningTask();
@@ -514,11 +516,10 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
                             public void onClick(DialogInterface d, int id) {
                                 //do something
                                 try {
-                                    Intent i = new Intent(GameActivity.this, StartMenuActivity.class);
-                                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    mLayout.removeAllViews();
-                                    startActivity(i);
+                                    Intent intent = getIntent();
                                     finish();
+                                    startActivity(intent);
+
                                 } catch(Exception e) {
 
                                 }
@@ -528,8 +529,10 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
                             public void onClick(DialogInterface d, int id) {
                                 //do something
                                 try {
+
                                     mLayout.removeAllViews();
                                     finish();
+
                                 } catch (Exception e) {
 
                                 }
@@ -547,6 +550,8 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
     @Override
     protected void onResume() {
         super.onResume();
+
+        //dialog.dismiss();
         startSpawningTask();
         mPlayView.resumeGame();
     }
@@ -559,8 +564,10 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
      */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+
         Boolean newVal = (Boolean) evt.getNewValue();
-        if(Boolean.TRUE.equals(newVal)) {
+        if(newVal) {
+
             onGameOver();
         }
     }
