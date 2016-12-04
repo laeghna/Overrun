@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --debug server.js --ignore node_modules/"
+    "start": "nodemon --debug server.js --ignore node_modules/",
+    "apidoc": "apidoc -f server.js -o doc/"
   },
   "author": "",
   "license": "ISC",

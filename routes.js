@@ -1,7 +1,15 @@
-module.exports = function(app, client) {
+module.exports = (() => {
+    // const router = require('express').Router();
+    //
+    // // router.get('/', () => {
+    // //
+    // // });
+    // //
+    // // router.get('/', controller());
 
-    app.get('', (req, res) => {
+});
 
-    });
 
-};
+
+
+

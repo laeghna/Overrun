@@ -10,8 +10,6 @@ const app = express();
 const google = require('google-auth-library');
 const OAuth2 = new google().OAuth2;
 
-// const CLIENT_ID = '417571724567-e4us94dgu6eah1p0icr3bvbgtmgulqqp.apps.googleusercontent.com';
-// const CLIENT_SECRET = 'lc5XyqOSS71WUcccPQzDnkZJ';
 const CLIENT_ID = config.oauthConfig.CLIENT_ID;
 const CLIENT_SECRET = config.oauthConfig.CLIENT_SECRET;
 
@@ -19,9 +17,8 @@ const oauth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET);
 
 // express config
 const PORT = process.env.PORT || 8081;
-const apiurl = 'https://cssgate.insttech.washington.edu:8081/';
+const apiurl = 'http://cssgate.insttech.washington.edu:8081/';
 app.set("title", "Overrun");
-// require('./routes')(app, c);
 
 
 // body-parser config
@@ -50,14 +47,28 @@ const getUserStats = 'SELECT COUNT(*) AS TotalGames, ' +
     'MAX(shotsFired) AS MostShotsFired ' +
     'FROM Game WHERE email = ?; ';
 const getStats = 'SELECT email, ' +
-    'COUNT(*) AS TotalGames, ' +
-    'SUM(score) AS Totalscore, ' +
-    'MAX(score) AS Highscore, ' +
-    'MAX(zombiesKilled) AS MostZombiesKilled, ' +
-    'MAX(level) AS HighestLevel, ' +
-    'MAX(shotsFired) AS MostShotsFired ' +
+    'COUNT(*) AS totalGames, ' +
+    'SUM(score) AS totalscore, ' +
+    'MAX(score) AS highscore, ' +
+    'MAX(zombiesKilled) AS mostZombiesKilled, ' +
+    'MAX(level) AS highestLevel, ' +
+    'MAX(shotsFired) AS mostShotsFired ' +
     'FROM Game';
+const getGameScores = 'SELECT * FROM Game ORDER BY score DESC;';
+const getUsersGameScores = 'SELECT * FROM Game WHERE email = ? ORDER BY score DESC;';
 
+
+// prevents SQL injection
+function escapeCharMiddleware(req, res, next) {
+    if (req.query) {
+        req.query = escapeProps(req.query);
+    }
+
+    // keep executing the router middleware
+    next()
+}
+
+app.use(escapeCharMiddleware);
 
 /**
  * @api {POST} /api/user Create new user.
@@ -161,10 +172,13 @@ app.get('/api/users', (req, res, next) => {
     // email supplied, gets individual user
     else {
         c.query(getUser, [req.query.email], (err, rows) => {
-            res.send(JSON.stringify(rows));
-        });
+                if (err) return res.status(500).json({ 'error': 'Error fetching user.' });
+                res.send(JSON.stringify({ 'email': rows[0].email }));
+            }
+        );
     }
-});
+})
+;
 
 /**
  * @api {GET} /api/users Get user's information.
@@ -243,9 +257,53 @@ app.post('/api/game', (req, res) => {
     });
 });
 
+/**
+ * @api {GET} /api/games Get all users game scores.
+ * @apiName GetGameScores
+ * @apiGroup Game
+ *
+ * @apiParam email (Optional) Limits the game scores to this user.
+ * @apiParam limit (Optional) Limit the number of game scores returned.
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *          HTTP/1.1 200 OK
+ *          [{
+ *              "email": {String},
+ *              "score": {Number},
+ *              "zombiesKilled": {Number},
+ *              "level": {Number},
+ *              "shotsFired": {Number}
+ *          },
+ *          ...
+ *          ]
+ *
+ * @apiVersion 0.1.0
+ */
+app.get('/api/games', (req, res) => {
+
+    let sqlQuery;
+    if (req.query.email) {
+        sqlQuery = getUsersGameScores;
+    } else {
+        sqlQuery = getGameScores;
+    }
+
+    // add limit if provided and check if it is a number
+    if (req.query.limit && !isNaN(req.query.limit)) {
+        sqlQuery.replace(/;/, ' ').concat('LIMIT ', req.query.limit, ';');
+    }
+
+    c.query(sqlQuery, (err, result) => {
+        if (err) return res.status(500).json({ 'error': err.message });
+        else {
+            return res.status(200).json(result);
+        }
+    });
+});
+
 
 /**
- * @api {GET} /api/leaderboard Get all users leaderboard.
+ * @api {GET} /api/leaderboard Get all users leaderboard scores.
  * @apiName GetLeaderboardStats
  * @apiGroup Leaderboard
  *
@@ -253,11 +311,11 @@ app.post('/api/game', (req, res) => {
  *          HTTP/1.1 200 OK
  *          [{
  *              "email": {String},
- *              "TotalGames": {Number},
- *              "TotalScore": {Number},
- *              "Highscore": {Number},
- *              "MostZombiesKilled": {Number},
- *              "HighestLevel": {Number}
+ *              "totalGames": {Number},
+ *              "totalScore": {Number},
+ *              "highscore": {Number},
+ *              "mostZombiesKilled": {Number},
+ *              "highestLevel": {Number}
  *          },
  *          ...
  *          ]
@@ -285,11 +343,11 @@ app.get('/api/leaderboard', (req, res) => {
  * @apiSuccessExample {json} Success-Response:
  *          HTTP/1.1 200 OK
  *          {
- *              "TotalGames": {number},
- *              "TotalScore": {number},
- *              "Highscore": {number},
- *              "MostZombiesKilled": {number},
- *              "HighestLevel": {number}
+ *              "totalGames": {Number},
+ *              "totalScore": {Number},
+ *              "highscore": {Number},
+ *              "mostZombiesKilled": {Number},
+ *              "highestLevel": {Number}
  *          }
  * @apiErrorExample {json} Missing-Parameters
  *          HTTP/1.1 400 Bad Request
@@ -339,60 +397,61 @@ app.get('/api/leaderboard/user/:email', (req, res) => {
  *
  * @apiVersion 0.1.0
  */
-app.post('/api/login', (req, res, next) => {
+app.post('/api/login/google', (req, res) => {
 
-    // sign in with email and pass
-    if (!req.query.id_token) {
-        next();
-    }
     // sign in with google account by verifying id_token
-    else {
-        console.log("in validate token");
+    console.log("in validate token");
 
-        validateToken(req.query.id_token, (err, response) => {
-            console.log("verifying");
-            if (err) {
-                console.dir(err);
-                //return res.status(500).send('Token could not be verified.');
-                return res.status(500).json({ error: "Token could not be verified.", email_verified: false });
-            } else {
-                const tokenInfo = response.getPayload();
+    validateToken(req.query.id_token, (err, response) => {
+        console.log("verifying");
+        if (err) {
+            console.dir(err);
+            //return res.status(500).send('Token could not be verified.');
+            return res.status(500).json({ error: "Token could not be verified.", email_verified: false });
+        } else {
+            const tokenInfo = response.getPayload();
 
-                c.query(getUser, [tokenInfo.email],
-                    (error, result) => {
-                        if (error) console.dir(error);
-                        else console.log("result: %s", result);
+            c.query(getUser, [tokenInfo.email],
+                (error, result) => {
+                    if (error) console.dir(error);
+                    else console.log("result: %s", result);
 
-                        if (result.length) {
-                            console.log("user already created");
-                            result[0].email_verified = true;
-                            console.dir(tokenInfo);
-                            return res.status(200).json(result);
-                        } else {
-                            console.log("creating user: " + tokenInfo.email);
+                    if (result.length) {
+                        console.log("user already created");
+                        result[0].email_verified = true;
+                        console.dir(tokenInfo);
 
-                            //console.dir(tokenInfo);
-                            c.query(createUser, [
-                                tokenInfo.email,
-                                'google',
-                                ''
-                            ], (error, result) => {
-                                if (error) {
-                                    return res.status(500).json({ error: "Error occurred.", email_verified: false });
-                                }
-                                const responseObj = {
-                                    email_verified: true,
-                                    email         : tokenInfo.email,
-                                    firstName     : tokenInfo.given_name,
-                                    lastName      : tokenInfo.family_name
-                                };
-                                return res.status(200).json(responseObj);
-                            });
-                        }
-                    });
-            }
-        });
-    }
+                        const responseObj = {
+                            email_verified: true,
+                            email         : tokenInfo.email,
+                            firstName     : tokenInfo.given_name,
+                            lastName      : tokenInfo.family_name
+                        };
+                        return res.status(200).json(responseObj);
+                    } else {
+                        console.log("creating user: " + tokenInfo.email);
+
+                        //console.dir(tokenInfo);
+                        c.query(createUser, [
+                            tokenInfo.email,
+                            'google',
+                            ''
+                        ], (error, result) => {
+                            if (error) {
+                                return res.status(500).json({ error: "Error occurred.", email_verified: false });
+                            }
+                            const responseObj = {
+                                email_verified: true,
+                                email         : tokenInfo.email,
+                                firstName     : tokenInfo.given_name,
+                                lastName      : tokenInfo.family_name
+                            };
+                            return res.status(200).json(responseObj);
+                        });
+                    }
+                });
+        }
+    });
 });
 
 /**
@@ -457,6 +516,84 @@ app.post('/api/login', (req, res) => {
     });
 });
 
+
+/**
+ * @api {POST} /api/login Log user in (Facebook).
+ * @apiName Login (Facebook)
+ * @apiGroup User
+ * @apiDescription This will sign the user in with their Facebook account.
+ *
+ * @apiParam email User's Facebook email.
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *          HTTP/1.1 200 OK
+ *          {
+ *              "email": "john@facebook.com",
+ *              "firstName": "",
+ *              "lastName": "",
+ *              "email_verified": true
+ *          }
+ * @apiErrorExample {json} Missing-Parameters
+ *          HTTP/1.1 400 Bad Request
+ *          {
+ *              "error": "Some parameters were missing."
+ *          }
+ *
+ * @apiVersion 0.1.0
+ */
+app.post('/api/login/facebook', (req, res) => {
+
+    if (!req.query.email) {
+        return res.status(400).json({ 'error': 'Some parameters were missing.' });
+    } else {
+        c.query(getUser, [req.query.email],
+            (error, result) => {
+                if (error) console.dir(error);
+                else console.log("result: %s", result);
+
+                if (result.length) {
+                    console.log("user already created");
+
+                    const responseObj = {
+                        email_verified: true,
+                        email         : req.query.email,
+                        firstName     : '',
+                        lastName      : ''
+                    };
+                    return res.status(200).json(responseObj);
+                } else {
+                    console.log("creating user: " + req.query.email);
+
+                    //console.dir(tokenInfo);
+                    c.query(createUser, [
+                        req.query.email,
+                        'facebook',
+                        ''
+                    ], (error, result) => {
+                        if (error) {
+                            return res.status(500).json({ error: "Error occurred.", email_verified: false });
+                        }
+                        const responseObj = {
+                            email_verified: true,
+                            email         : req.query.email,
+                            firstName     : '',
+                            lastName      : ''
+                        };
+                        return res.status(200).json(responseObj);
+                    });
+                }
+            });
+    }
+});
+
+
+// escapes chars to prevent SQL injection
+function escapeProps(obj) {
+    for (let prop in Object.getOwnPropertyNames(obj)) {
+        obj[prop] = mysql.escape(prop);
+    }
+    return obj;
+}
 
 function validateToken(token, callback) {
     oauth2Client.verifyIdToken(token, CLIENT_ID, callback);
