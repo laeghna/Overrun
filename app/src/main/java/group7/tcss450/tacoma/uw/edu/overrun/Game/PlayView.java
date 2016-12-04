@@ -13,6 +13,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Display;
 import android.view.SurfaceHolder;
@@ -100,10 +101,16 @@ public class PlayView extends SurfaceView implements Runnable{
     /** Bitmap for the background image. */
     Bitmap bgImage;
 
+    /** Shared Preferences for this game. */
     private SharedPreferences mSharedPref;
 
-    private boolean isGameOver;
+    /** Boolean indicating game state. True if game is over, false otherwise. */
+    private volatile boolean isGameOver;
 
+    /** Handler for the game over actions. */
+    private Handler gameOverHandler;
+
+    /** The property change support for this class. */
     private PropertyChangeSupport changeSupport;
 
 
@@ -162,11 +169,6 @@ public class PlayView extends SurfaceView implements Runnable{
      */
     @Override
     public void run() {
-        if(isGameOver) {
-            OverrunDbHelper helper = new OverrunDbHelper(gameContext);
-            helper.createGame(((GameActivity) gameContext).getEmail(), gameScore, gameScore, level, gameScore);
-            changeSupport.firePropertyChange("GameActivity", false, true);
-        } else {
             // game control loop: while the user is playing continue to update the view
             while (mIsPlaying) {
                 //update and draw frame
@@ -175,7 +177,6 @@ public class PlayView extends SurfaceView implements Runnable{
                 //update the frame controls
                 framesPerSecond();
             }
-        }
     }
 
     /** Updates the frame for the PlayView. */
@@ -208,7 +209,6 @@ public class PlayView extends SurfaceView implements Runnable{
                 }
             }
             if(health.getCurrHealth() <= 0) {
-                mIsPlaying = false;
                 isGameOver = true;
             }
         }
@@ -290,7 +290,10 @@ public class PlayView extends SurfaceView implements Runnable{
 
             if(isGameOver) {
                 paint.setTextSize(150);
-                canvas.drawText("GAME OVER", mScreen.x/2 - 10, mScreen.y/2, paint);
+                canvas.drawText("GAME OVER", mScreen.x/2 - 50, mScreen.y/2, paint);
+                mIsPlaying = false;
+                changeSupport.firePropertyChange(new PropertyChangeEvent(this,
+                        "GameOver", Boolean.valueOf(false), Boolean.valueOf(true)));
             }
             mHolder.unlockCanvasAndPost(canvas); // drawing done -> unlock background
         }
@@ -409,8 +412,12 @@ public class PlayView extends SurfaceView implements Runnable{
         return false;
     }
 
-    public PropertyChangeSupport getPropertyChangeSupport() {
-        return changeSupport;
+    /**
+     * Adds a property change listener to this observer.
+     * @param listener the listener for this observer.
+     */
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+         changeSupport.addPropertyChangeListener(listener);
     }
 
     /**
@@ -420,6 +427,11 @@ public class PlayView extends SurfaceView implements Runnable{
     public int getLevel() {
         return level;
     }
+
+    /**
+     * Removes all callbacks.
+     */
+    public void endGame() {
+        removeCallbacks(this);
+    }
 }
-
-

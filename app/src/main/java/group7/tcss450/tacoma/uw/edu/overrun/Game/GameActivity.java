@@ -1,14 +1,19 @@
 package group7.tcss450.tacoma.uw.edu.overrun.Game;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Handler;
 import android.content.SharedPreferences;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,6 +25,8 @@ import java.beans.PropertyChangeListener;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Listeners.ButtonListener;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
+import group7.tcss450.tacoma.uw.edu.overrun.SignIn.SignInActivity;
+import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
 
 /**
  * This is the activity for the actual game play.
@@ -65,6 +72,12 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
     /** Shared preferences for the game. */
     private SharedPreferences mSharedPref;
 
+    /** The layout. */
+    private FrameLayout mLayout;
+
+    /** The handler for the gameover process. */
+    private Handler gameOverHandler;
+
     /**
      * To perform on creation of this Activity.
      * @param savedInstanceState the saved instance state.
@@ -73,24 +86,25 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        gameOverHandler = new Handler();
         mSharedPref = getSharedPreferences(
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
         int choose_layout = mSharedPref.getInt("saved_controls", 0);
         //Initialize the play view object
         mPlayView = new PlayView(this);
-        (mPlayView.getPropertyChangeSupport()).addPropertyChangeListener(this);
-        FrameLayout layout = getLayout_1();
+        mPlayView.addPropertyChangeListener(this);
+        mLayout = getLayout_1();
 
         if(choose_layout == 1) {
-            layout = getLayout_2();
+            mLayout = getLayout_2();
         } else if(choose_layout == 2) {
-            layout = getLayout_3();
+            mLayout = getLayout_3();
         }
 
 
         //add layout to ContentView
-        setContentView(layout);
+        setContentView(mLayout);
 
         setSpawnInterval();
         spawnHandler = new Handler();
@@ -103,6 +117,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
     protected void onDestroy() {
         super.onDestroy();
         stopSpawningTask();
+        mPlayView.endGame();
     }
 
 
@@ -469,15 +484,61 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         super.onPause();
         stopSpawningTask();
         mPlayView.pauseGame();
-        AlertDialog.Builder dialog_builder = new AlertDialog.Builder(this);
-        dialog_builder.setMessage(R.string.pause_dialog)
-                .setPositiveButton(R.string.resume_button, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface d, int id) {
+        AlertDialog.Builder db = new AlertDialog.Builder(GameActivity.this);
+        db.setMessage(R.string.pause_dialog)
+        .setPositiveButton(R.string.resume_button, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface di, int id) {
                         onResume();
                     }
                 });
-        AlertDialog dialog = dialog_builder.create();
-        dialog.show();
+        Dialog d = db.create();
+        d.show();
+    }
+
+    /**
+     * Called when the game has ended. Pops up a dialog that gives
+     * the user options to either play again or quit. Both return
+     * to main menu.
+     */
+    protected void onGameOver() {
+        stopSpawningTask();
+        mPlayView.endGame();
+        Looper.prepare();
+        gameOverHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder dialog_builder = new AlertDialog.Builder(GameActivity.this);
+                dialog_builder.setMessage(R.string.game_over_text)
+                        .setPositiveButton(R.string.play_again_text, new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface d, int id) {
+                                //do something
+                                try {
+                                    Intent i = new Intent(GameActivity.this, StartMenuActivity.class);
+                                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    mLayout.removeAllViews();
+                                    startActivity(i);
+                                    finish();
+                                } catch(Exception e) {
+
+                                }
+                            }
+                        }).setNegativeButton(R.string.exit_button, new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface d, int id) {
+                                //do something
+                                try {
+                                    mLayout.removeAllViews();
+                                    finish();
+                                } catch (Exception e) {
+
+                                }
+                            }
+                });
+                AlertDialog dialog = dialog_builder.create();
+                dialog.show();
+            }
+        });
     }
 
     /**
@@ -491,21 +552,25 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
     }
 
     /**
-     *
-     * @param evt
+     * Property change method is triggered when a property change
+     * is fired from the playview class. This will be triggered when the
+     * game is over.
+     * @param evt the event that triggered the property change.
      */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        Log.d("GameOver", "In prop change");
-        Object src = evt.getSource();
         Boolean newVal = (Boolean) evt.getNewValue();
-        Log.d("GameActivity", newVal.toString());
-        if(newVal) {
-//            onGameOver();
+        if(Boolean.TRUE.equals(newVal)) {
+            onGameOver();
         }
     }
 
+    /**
+     * Gets the user's email.
+     * @return the email.
+     */
     public String getEmail() {
         return mSharedPref.getString("user_email", "default");
     }
+
 }
