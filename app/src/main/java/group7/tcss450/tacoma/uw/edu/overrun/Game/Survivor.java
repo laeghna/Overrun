@@ -20,7 +20,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
 public class Survivor extends BitmapResizer {
 
     /** Constant for scaling survivor */
-    private static final int SCALE = 15;
+    private static final int SCALE = 10;
 
     /** Padding for the top and bottom of the game screen. */
     private static final int PADDING = 130;
@@ -51,7 +51,7 @@ public class Survivor extends BitmapResizer {
         mSpeed = 2; // test speed may need to adjust
 
         // Get the player graphic from drawable:
-        mBmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie); // a placeholder graphic
+        mBmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.survivor); // a placeholder graphic
         mBmap = getResizedBmp(mBmap, screenSize.x/SCALE, screenSize.x/SCALE);
         mX = mBmap.getWidth();
         mY = screenSize.y - (mBmap.getHeight() + PADDING);
