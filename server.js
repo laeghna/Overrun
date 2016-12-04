@@ -293,7 +293,7 @@ app.get('/api/games', (req, res) => {
         sqlQuery.replace(/;/, ' ').concat('LIMIT ', req.query.limit, ';');
     }
 
-    c.query(sqlQuery, (err, result) => {
+    c.query(sqlQuery, [req.query.email ? req.query.email : ''], (err, result) => {
         if (err) return res.status(500).json({ 'error': err.message });
         else {
             return res.status(200).json(result);
