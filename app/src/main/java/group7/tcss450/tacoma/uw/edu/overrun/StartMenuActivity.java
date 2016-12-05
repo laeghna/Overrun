@@ -1,25 +1,21 @@
 package group7.tcss450.tacoma.uw.edu.overrun;
 
-import android.app.Application;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
 
 import com.facebook.login.LoginManager;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Game.*;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.LeaderboardActivity;
-import group7.tcss450.tacoma.uw.edu.overrun.SignIn.LoginFragment;
 import group7.tcss450.tacoma.uw.edu.overrun.SignIn.SignInActivity;
-
 
 /**
  * This is the activity for the actual initial start menu.
@@ -36,7 +32,6 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
     private static MediaPlayer mMediaPlayer;
     private static SharedPreferences mSharedPref;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +39,6 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
 
         mSharedPref = getSharedPreferences(
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
-
 
         boolean loggedIn = mSharedPref.getBoolean(getString(R.string.logged_in), false);
         // Check if the user is logged in then
@@ -56,12 +50,7 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
         }
         else {
             sign_button.setText("Sign in");
-
         }
-
-
-
-
 
         // Setting onClickListeners for each button on layout.
         Button op_button = (Button) findViewById(R.id.options_button);
@@ -78,7 +67,6 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
         float current_volume = mSharedPref.getFloat(
                 getString(R.string.saved_volume_setting), 1);
 
-
         // Creating a MediaPlayer object if the member variable is
         // currently null. Set the music to the theme music, and set it to loop.
         // Starts the music when this activity is created.
@@ -88,11 +76,7 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
             mMediaPlayer.setVolume(current_volume, current_volume);
             mMediaPlayer.start();
         }
-
-
-
     }
-
 
     /**
      * The onResume callback method for this activity adjusts
@@ -102,7 +86,6 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-
 
         boolean loggedIn = mSharedPref.getBoolean(getString(R.string.logged_in), false);
         // Check if the user is logged in then
@@ -138,9 +121,7 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
                     .apply();
 
             mMediaPlayer.pause();
-
         }
-
     }
 
 
@@ -188,16 +169,14 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
                     intent = new Intent(this, SignInActivity.class);
                     startActivity(intent);
                 }
-
                 break;
+
             case R.id.leaderboard_button:
                 intent = new Intent(this, LeaderboardActivity.class);
                 startActivity(intent);
                 break;
         }
     }
-
-
 
     // TODO: logout button needs to be implemented.
     public void testLogout(View view) {

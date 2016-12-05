@@ -46,11 +46,6 @@ import timber.log.Timber;
 public class BaseActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     /**
-     * Log Tag.
-     */
-    private static final String TAG = "BaseActivity";
-
-    /**
      * Code for retrieving a token for validation from Google API Client.
      */
     private static final int RC_GET_TOKEN = 9002;
@@ -118,8 +113,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         hideProgressDialog();
     }
 
-
-
     /**
      * Checks shared preferences to determine if a user is logged in or not.
      *
@@ -142,8 +135,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
         final ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
         return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
     }
-
-
 
     /**
      * Signs the user in with a previously registered email and password.
@@ -212,7 +203,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
                                     finish();
                                 }
                             });
-
         }
 
         editor.apply();
@@ -243,10 +233,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
             mProgressDialog.dismiss();
         }
     }
-
-
-
-
 
     /**
      * Handles the sign in result by saving the user's account information.
@@ -299,7 +285,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.O
 
         finish();
     }
-
 
     /**
      * Sign in with a registered account.

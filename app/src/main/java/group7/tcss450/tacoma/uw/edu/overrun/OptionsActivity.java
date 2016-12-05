@@ -1,13 +1,11 @@
 package group7.tcss450.tacoma.uw.edu.overrun;
 
+
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
-import android.nfc.Tag;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -31,8 +29,6 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
     private Spinner mDiffSpinner;
     private Spinner mControlsSpinner;
     private static MediaPlayer mMediaPlayer;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +78,6 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
         mMediaPlayer.seekTo(music_position);
         mMediaPlayer.start();
-
     }
 
     @Override
@@ -112,9 +107,7 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
                     .apply();
 
             mMediaPlayer.pause();
-
         }
-
     }
 
     @Override
@@ -152,7 +145,6 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
                         Toast.LENGTH_SHORT) .show();
                 finish();
                 break;
-
         }
     }
 
@@ -180,7 +172,6 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         return difficulty;
-
     }
 
     private int updateControls(String theText) {
@@ -200,7 +191,6 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         return controls;
-
     }
 
     /**
@@ -214,7 +204,5 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         int currentInt = volumeBar.getProgress();
         float volume_level = (float) currentInt / 100;
         return volume_level;
-
-
     }
 }
