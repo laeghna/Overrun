@@ -8,12 +8,11 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.PlayerStats.PlayerStatsContent;
 import group7.tcss450.tacoma.uw.edu.overrun.Model.GameScoreModel;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link PlayerStatsContent} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link GameScoreModel} and makes a call to the
  * specified {@link PlayerStatsFragment.OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
@@ -37,7 +36,7 @@ public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerS
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mPlayerNumber.setText(Integer.toString(position + 1) + '.');
+        holder.mPlayerNumber.setText(String.format("%s.", Integer.toString(position + 1)));
   
         holder.mIdView.setText(mValues.get(position).getEmail());
         holder.mContentView.setText(String.valueOf(mValues.get(position).getScore()));
