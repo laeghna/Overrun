@@ -49,14 +49,12 @@ public class Bullet extends BitmapResizer {
 
     /**
      * Public constructor for the Bullet class.
-     * @param dmg - the damage the weapon does per hit.
      * @param screenSize - the size of the screen.
      * @param context - the context for the app.
      */
-    public Bullet(int dmg, Point screenSize, Context context) {
+    public Bullet(Point screenSize, Context context) {
         mContext = context;
         mScreenSize = screenSize;
-        mDamage = dmg;
 
         mBMP = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.bullet); // a placeholder graphic
         mBMP = getResizedBmp(mBMP, screenSize.x/SCALE, screenSize.x/SCALE);
