@@ -161,11 +161,19 @@ public class PlayView extends SurfaceView implements Runnable{
             // game control loop: while the user is playing continue to update the view
             while (mIsPlaying) {
 
-                //update and draw frame
-                update();
-                draw();
-                //update the frame controls
-                framesPerSecond();
+                if (isGameOver) {
+
+                    mIsPlaying = false;
+                    changeSupport.firePropertyChange("GameOver", false, true);
+
+                } else {
+
+                    //update and draw frame
+                    update();
+                    draw();
+                    //update the frame controls
+                    framesPerSecond();
+                }
             }
     }
 
@@ -247,14 +255,22 @@ public class PlayView extends SurfaceView implements Runnable{
             //Draw zombies
             for (int i = 0; i < zombies.length; i++) {
 
-                if (zombies[i] != null && zombies[i].getIsActive()) {
-                    canvas.drawBitmap(
-                            zombies[i].getBitmap(),
-                            zombies[i].getXCoord(),
-                            zombies[i].getYCoord(),
-                            paint);
+                if (zombies[i] != null) {
+
+                    if (zombies[i].getHasReachedBottom()) {
+
+                        isGameOver = true;
+
+                    } else if (zombies[i].getIsActive()) {
+                        canvas.drawBitmap(
+                                zombies[i].getBitmap(),
+                                zombies[i].getXCoord(),
+                                zombies[i].getYCoord(),
+                                paint);
+                    }
                 }
             }
+
             // draws bullets
             for(int i = 0; i < mBullets.length; i++) {
                 if (mBullets[i] != null && mBullets[i].getIsActive()) {
@@ -282,11 +298,6 @@ public class PlayView extends SurfaceView implements Runnable{
             canvas.drawText("Score: " + gameScore, mScreen.x - (health.getBitmap().getWidth() * 7),
                     60, paint);
 
-            if(isGameOver) {
-
-                mIsPlaying = false;
-                changeSupport.firePropertyChange("GameOver", false, true);
-            }
             mHolder.unlockCanvasAndPost(canvas); // drawing done -> unlock background
         }
     }

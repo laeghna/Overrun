@@ -99,7 +99,6 @@ public class ZombieColossus extends BitmapResizer implements Zombie {
 
             isActive = false;
             hasReachedBottom = true;
-            resetZombie();
         }
     }
 
