@@ -235,7 +235,10 @@ public class PlayView extends SurfaceView implements Runnable{
         // check holder
         if( mHolder.getSurface().isValid()) {
             canvas = mHolder.lockCanvas(); // lock the background for drawing
-            canvas.drawBitmap(bgImage, 0, 80, paint);
+
+            int hWidth = health.getBitmap().getWidth();
+            int hHeight = health.getBitmap().getHeight();
+            canvas.drawBitmap(bgImage, 0, hHeight, paint);
             canvas.drawBitmap(mSurvivor.getmBmap(), mSurvivor.getmX(),
                     mSurvivor.getmY(), paint);
 
@@ -262,21 +265,22 @@ public class PlayView extends SurfaceView implements Runnable{
             }
 
             paint.setColor(Color.BLACK);
-            canvas.drawRect(0, 0, mScreen.x, 80, paint);
+            canvas.drawRect(0, 0, mScreen.x, hHeight, paint);
 
 
             //Draw current health
             for(int h = 0; h < health.getCurrHealth(); h++) {
 
-                canvas.drawBitmap(health.getmBitmap(), health.getxCoord() +
-                                (health.getmBitmap().getWidth() * h),
+                canvas.drawBitmap(health.getBitmap(), health.getxCoord() +
+                                (hWidth * h),
                         health.getyCoord(), paint);
             }
 
             //Draw updated score
             paint.setTextSize(60);
             paint.setColor(Color.GREEN);
-            canvas.drawText("Score: " + gameScore, mScreen.x - 500, 60, paint);
+            canvas.drawText("Score: " + gameScore, mScreen.x - (health.getBitmap().getWidth() * 7),
+                    60, paint);
 
             if(isGameOver) {
 
