@@ -3,10 +3,8 @@ package group7.tcss450.tacoma.uw.edu.overrun.Game;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.util.Log;
 
 import java.util.Random;
 
@@ -17,19 +15,22 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  * This is the slowest and weakest enemy.
  *
  * @author Lisa Taylor
- * @version 22 Nov 2016
+ * @version 02 December 2016
  */
 
-public class ZombieCrawler implements Zombie {
+public class ZombieCrawler extends BitmapResizer implements Zombie{
 
     /** Zombie's hit points - the shots needed to destroy zombie. */
     private static final int HP = 1;
+
+    /** Zombie's point value for adding to the game score. */
+    private static final int POINTS = 10;
 
     /** Zombie crawler's speed. */
     private static final int SPEED = 1;
 
     /** Constant for scaling zombie crawler. */
-    private static final int SCALE = 15;
+    private static final int SCALE = 18;
 
     /** Zombie crawler image. */
     private Bitmap crawlerBitmap;
@@ -54,6 +55,9 @@ public class ZombieCrawler implements Zombie {
     /** Boolean to determine if crawler should be drawn or not. */
     private boolean isActive;
 
+    /** Boolean to determine if zombie reahed bottom. */
+    private boolean hasReachedBottom;
+
     /** The number of times the zombie has been hit by a bullet. */
     private int timesHit = 0;
 
@@ -67,15 +71,8 @@ public class ZombieCrawler implements Zombie {
 
         genRandom = new Random();
 
-        // Get the zombie graphic from drawable:
-        Log.d("OVERRUN: Crawler", "Screen: (" + screenSize.x + "," + screenSize.y + ")");
-
-        // a placeholder graphic
-        crawlerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
-        Log.d("OVERRUN: Crawler", "Before Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
-
-        crawlerBitmap = getResizedBmp(screenSize.x/SCALE, screenSize.x/SCALE);
-        Log.d("OVERRUN: Crawler", "After Resize: (" +  crawlerBitmap.getWidth() +","+ crawlerBitmap.getHeight() + ")");
+        crawlerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.crawler);
+        crawlerBitmap = getResizedBmp(crawlerBitmap, screenSize.x/SCALE, screenSize.x/SCALE);
 
         xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
         yCoord = yMin;
@@ -83,19 +80,7 @@ public class ZombieCrawler implements Zombie {
         detectZombie =  new Rect(xCoord, yCoord, xCoord + crawlerBitmap.getWidth(), yCoord + crawlerBitmap.getHeight());
 
         isActive = false;
-    }
-
-    @Override
-    public Bitmap getResizedBmp(float newWidth, float newHeight) {
-        int bmWidth = crawlerBitmap.getWidth();
-        int bmHeight = crawlerBitmap.getHeight();
-        float wScale = newWidth / bmWidth;
-        float hScale = newHeight / bmHeight;
-        Matrix matrix = new Matrix();
-        matrix.postScale(wScale, hScale);
-        Bitmap resizedBMP = Bitmap.createBitmap(crawlerBitmap, 0, 0, bmWidth, bmHeight, matrix, false);
-        crawlerBitmap.recycle();
-        return resizedBMP;
+        hasReachedBottom = false;
     }
 
     @Override
@@ -103,20 +88,19 @@ public class ZombieCrawler implements Zombie {
 
         if (yCoord + 1 < yMax) {
             yCoord += SPEED;
+
+            //adding top, left, bottom and right to the rect object
+            detectZombie.left = xCoord;
+            detectZombie.top = yCoord;
+            detectZombie.right = xCoord + crawlerBitmap.getWidth();
+            detectZombie.bottom = yCoord + crawlerBitmap.getHeight();
+
         } else {
-            xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
-            yCoord = yMin;
-            setIsActive(true);
+
+            isActive = false;
+            hasReachedBottom = true;
+            resetZombie();
         }
-
-        //adding top, left, bottom and right to the rect object
-        detectZombie.left = xCoord;
-        detectZombie.top = yCoord;
-        detectZombie.right = xCoord + crawlerBitmap.getWidth();
-        detectZombie.bottom = yCoord + crawlerBitmap.getHeight();
-
-        //do something if enemy reaches bottom edge
-        //such as creating new zombie and reducing survivor health
     }
 
     @Override
@@ -165,6 +149,11 @@ public class ZombieCrawler implements Zombie {
     }
 
     @Override
+    public boolean getHasReachedBottom() {
+        return hasReachedBottom;
+    }
+
+    @Override
     public int getTimesHit() {
         return timesHit;
     }
@@ -172,5 +161,23 @@ public class ZombieCrawler implements Zombie {
     @Override
     public void addHit() {
         timesHit++;
+    }
+
+    @Override
+    public int getPointValue() {
+        return POINTS;
+    }
+
+    @Override
+    public void resetZombie() {
+
+        xCoord = genRandom.nextInt(xMax - crawlerBitmap.getWidth());
+        yCoord = yMin;
+        detectZombie.left = xCoord;
+        detectZombie.top = yCoord;
+        detectZombie.right = xCoord + crawlerBitmap.getWidth();
+        detectZombie.bottom = yCoord + crawlerBitmap.getHeight();
+        isActive = false;
+        hasReachedBottom = false;
     }
 }

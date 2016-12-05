@@ -1,22 +1,26 @@
 package group7.tcss450.tacoma.uw.edu.overrun.Game;
 
+
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Handler;
 import android.content.SharedPreferences;
-import android.graphics.drawable.GradientDrawable;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Layout;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Listeners.ButtonListener;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
@@ -28,9 +32,9 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 4 Nov 2016
+ * @version 04 December 2016
  */
-public class GameActivity extends AppCompatActivity {
+public class GameActivity extends AppCompatActivity implements PropertyChangeListener{
 
     /** The game's play view where all images are drawn. */
     private PlayView mPlayView;
@@ -47,8 +51,32 @@ public class GameActivity extends AppCompatActivity {
     private Button mFireButton_L;
     private Button mFireButton_R;
 
+    /** The timer delay for level 1. */
+    private static final int SPAWN_INTERVAL_1 = 5000;  // 5 seconds
+
+    /** The timer delay for level 2. */
+    private static final int SPAWN_INTERVAL_2 = 4000;  // 4 seconds
+
+    /** The timer delay for level 3. */
+    private static final int SPAWN_INTERVAL_3 = 2000;  // 2 seconds
+
+    /** The timer delay for spawning enemies. */
+    private int spawnInterval;
+
+    /** Handler for spawn timer. */
+    private Handler spawnHandler;
+
+    /** Shared preferences for the game. */
     private SharedPreferences mSharedPref;
 
+    /** The layout. */
+    private FrameLayout mLayout;
+
+    /** The handler for the gameover process. */
+    private Handler gameOverHandler;
+
+    /** Dialog variable to be used for holding created dialogs. */
+    private Dialog dialog;
 
     /**
      * To perform on creation of this Activity.
@@ -58,28 +86,78 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        gameOverHandler = new Handler();
         mSharedPref = getSharedPreferences(
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
         int choose_layout = mSharedPref.getInt("saved_controls", 0);
 
-//        int choose_layout = 0;
         //Initialize the play view object
         mPlayView = new PlayView(this);
-        FrameLayout layout = getLayout_1();
+        mPlayView.addPropertyChangeListener(this);
+        mLayout = getLayout_1();
 
         if(choose_layout == 1) {
-            layout = getLayout_2();
+            mLayout = getLayout_2();
         } else if(choose_layout == 2) {
-            layout = getLayout_3();
+            mLayout = getLayout_3();
         }
 
 
         //add layout to ContentView
-        setContentView(layout);
+        setContentView(mLayout);
+
+        setSpawnInterval();
+        spawnHandler = new Handler();
+        startSpawningTask();
 
         // start game
         mPlayView.run();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopSpawningTask();
+        mPlayView.endGame();
+    }
+
+
+
+    protected void startSpawningTask() {
+        spawnChecker.run();
+    }
+
+    protected void stopSpawningTask() {
+        spawnHandler.removeCallbacks(spawnChecker);
+    }
+
+    private Runnable spawnChecker = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                mPlayView.spawnZombie();
+
+            } finally {
+                // 100% guarantee that this always happens, even if
+                // your update method throws an exception
+                spawnHandler.postDelayed(spawnChecker, spawnInterval);
+            }
+        }
+    };
+
+    public void setSpawnInterval() {
+
+        switch(mPlayView.getLevel()) {
+            case 1: spawnInterval = SPAWN_INTERVAL_1;
+                break;
+            case 2: spawnInterval = SPAWN_INTERVAL_2;
+                break;
+            case 3: spawnInterval = SPAWN_INTERVAL_3;
+                break;
+            default: spawnInterval = SPAWN_INTERVAL_1;
+                break;
+        }
     }
 
     /**
@@ -94,6 +172,7 @@ public class GameActivity extends AppCompatActivity {
      * @return the UI layout.
      */
     public FrameLayout getLayout_1() {
+
         //The main layout for the game
         FrameLayout layout = new FrameLayout(this);
 
@@ -105,10 +184,11 @@ public class GameActivity extends AppCompatActivity {
         mPauseButton = new Button(this);
         mPauseButton.setText(R.string.pause_button_txt);
         mPauseButton.setBackgroundResource(R.drawable.pause_button);
-        mPauseButton.setTextColor(getResources().getColor(R.color.gray));
+        mPauseButton.setTextColor(Color.GRAY);
         mPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 onPause();
             }
         });
@@ -127,8 +207,7 @@ public class GameActivity extends AppCompatActivity {
         // Create the buttons
         mLeftButton = new Button(this);
         mLeftButton.setBackgroundResource(R.drawable.move_button);
-        mLeftButton.setTextColor(getResources().getColor(R.color.gray));
-//        mLeftButton = (Button) findViewById(R.id.left_button);
+        mLeftButton.setTextColor(Color.GRAY);
         mLeftButton.setText(R.string.left_button_txt);
         mLeftButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
@@ -164,7 +243,7 @@ public class GameActivity extends AppCompatActivity {
         mRightButton = new Button(this);
         mRightButton.setText(R.string.right_button_txt);
         mRightButton.setBackgroundResource(R.drawable.move_button);
-        mRightButton.setTextColor(getResources().getColor(R.color.gray));
+        mRightButton.setTextColor(Color.GRAY);
         mRightButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
             public void onClick(View view){
@@ -224,8 +303,7 @@ public class GameActivity extends AppCompatActivity {
         mPauseButton = new Button(this);
         mPauseButton.setText(R.string.pause_button_txt);
         mPauseButton.setBackgroundResource(R.drawable.pause_button);
-        mPauseButton.setTextColor(getResources().getColor(R.color.gray));
-//        mPauseButton = (Button) findViewById(R.id.pause_button);
+        mPauseButton.setTextColor(Color.GRAY);
         mPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -248,8 +326,7 @@ public class GameActivity extends AppCompatActivity {
         // Create the buttons
         mLeftButton = new Button(this);
         mLeftButton.setBackgroundResource(R.drawable.move_button);
-        mLeftButton.setTextColor(getResources().getColor(R.color.gray));
-//        mLeftButton = (Button) findViewById(R.id.left_button);
+        mLeftButton.setTextColor(Color.GRAY);
         mLeftButton.setText(R.string.left_button_txt);
         mLeftButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
@@ -261,7 +338,7 @@ public class GameActivity extends AppCompatActivity {
         mRightButton = new Button(this);
         mRightButton.setText(R.string.right_button_txt);
         mRightButton.setBackgroundResource(R.drawable.move_button);
-        mRightButton.setTextColor(getResources().getColor(R.color.gray));
+        mRightButton.setTextColor(Color.GRAY);
         mRightButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
             public void onClick(View view){
@@ -324,8 +401,7 @@ public class GameActivity extends AppCompatActivity {
         mPauseButton = new Button(this);
         mPauseButton.setText(R.string.pause_button_txt);
         mPauseButton.setBackgroundResource(R.drawable.pause_button);
-        mPauseButton.setTextColor(getResources().getColor(R.color.gray));
-//        mPauseButton = (Button) findViewById(R.id.pause_button);
+        mPauseButton.setTextColor(Color.GRAY);
         mPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -349,7 +425,6 @@ public class GameActivity extends AppCompatActivity {
         mLeftButton = new Button(this);
         mLeftButton.setBackgroundResource(R.drawable.move_button);
         mLeftButton.setTextColor(getResources().getColor(R.color.gray));
-//        mLeftButton = (Button) findViewById(R.id.left_button);
         mLeftButton.setText(R.string.left_button_txt);
         mLeftButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
@@ -361,7 +436,7 @@ public class GameActivity extends AppCompatActivity {
         mRightButton = new Button(this);
         mRightButton.setText(R.string.right_button_txt);
         mRightButton.setBackgroundResource(R.drawable.move_button);
-        mRightButton.setTextColor(getResources().getColor(R.color.gray));
+        mRightButton.setTextColor(Color.GRAY);
         mRightButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
             @Override
             public void onClick(View view){
@@ -402,21 +477,74 @@ public class GameActivity extends AppCompatActivity {
     }
 
     /**
-     * Called when the game is paused.
+     * Pauses the game.
      */
     @Override
     protected void onPause() {
+
         super.onPause();
-        mPlayView.pauseGame();
-        AlertDialog.Builder dialog_builder = new AlertDialog.Builder(this);
-        dialog_builder.setMessage(R.string.pause_dialog)
-                .setPositiveButton(R.string.resume_button, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface d, int id) {
-                        onResume();
-                    }
+        if (!mPlayView.getIsGameOver()) {
+
+            stopSpawningTask();
+            mPlayView.pauseGame();
+            AlertDialog.Builder db = new AlertDialog.Builder(GameActivity.this);
+            db.setMessage(R.string.pause_dialog)
+                    .setPositiveButton(R.string.resume_button, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface di, int id) {
+                            onResume();
+                        }
+                    });
+            dialog = db.create();
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+        }
+    }
+
+    /**
+     * Called when the game has ended. Pops up a dialog that gives
+     * the user options to either play again or quit to the main menu.
+     */
+    protected void onGameOver() {
+        stopSpawningTask();
+        mPlayView.endGame();
+        Looper.prepare();
+        gameOverHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                AlertDialog.Builder dialog_builder = new AlertDialog.Builder(GameActivity.this);
+                dialog_builder.setMessage(R.string.game_over_text)
+                        .setPositiveButton(R.string.play_again_text, new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface d, int id) {
+                                //do something
+                                try {
+                                    Intent intent = getIntent();
+                                    finish();
+                                    startActivity(intent);
+
+                                } catch(Exception e) {
+
+                                }
+                            }
+                        }).setNegativeButton(R.string.exit_button, new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface d, int id) {
+                                //do something
+                                try {
+
+                                    mLayout.removeAllViews();
+                                    finish();
+
+                                } catch (Exception e) {
+
+                                }
+                            }
                 });
-        AlertDialog dialog = dialog_builder.create();
-        dialog.show();
+                dialog = dialog_builder.create();
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.show();
+            }
+        });
     }
 
     /**
@@ -425,6 +553,34 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        //dialog.dismiss();
+        startSpawningTask();
         mPlayView.resumeGame();
     }
+
+    /**
+     * Property change method is triggered when a property change
+     * is fired from the playview class. This will be triggered when the
+     * game is over.
+     * @param evt the event that triggered the property change.
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+
+        Boolean newVal = (Boolean) evt.getNewValue();
+        if(newVal) {
+
+            onGameOver();
+        }
+    }
+
+    /**
+     * Gets the user's email.
+     * @return the email.
+     */
+    public String getEmail() {
+        return mSharedPref.getString("user_email", "default");
+    }
+
 }

@@ -3,10 +3,8 @@ package group7.tcss450.tacoma.uw.edu.overrun.Game;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.util.Log;
 
 import java.util.Random;
 
@@ -17,13 +15,16 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  * This is the normal enemy.
  *
  * @author Lisa Taylor
- * @version 22 Nov 2016
+ * @version 02 December 2016
  */
 
-public class ZombieWalker implements Zombie {
+public class ZombieWalker extends BitmapResizer implements Zombie {
 
     /** Zombie's hit points - the shots needed to destroy zombie. */
     private static final int HP = 2;
+
+    /** Zombie's point value for adding to the game score. */
+    private static final int POINTS = 15;
 
     /** Zombie crawler's speed. */
     private static final int SPEED = 2;
@@ -54,13 +55,14 @@ public class ZombieWalker implements Zombie {
     /** Boolean to determine if crawler should be drawn or not. */
     private boolean isActive;
 
+    /** Boolean to determine if zombie reahed bottom. */
+    private boolean hasReachedBottom;
+
     /** The number of times the zombie has been hit by a bullet. */
     private int timesHit = 0;
 
     /** Constructor to initialize variables. */
     public ZombieWalker(Context context, Point screenSize) {
-
-        walkerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
 
         xMin = 0;
         xMax = screenSize.x;
@@ -69,15 +71,8 @@ public class ZombieWalker implements Zombie {
 
         genRandom = new Random();
 
-        // Get the zombie graphic from drawable:
-        Log.d("OVERRUN: Walker", "Screen: (" + screenSize.x + "," + screenSize.y + ")");
-
-        // a placeholder graphic
-        walkerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie);
-        Log.d("OVERRUN: Walker", "Before Resize: (" +  walkerBitmap.getWidth() +","+ walkerBitmap.getHeight() + ")");
-
-        walkerBitmap = getResizedBmp(screenSize.x/SCALE, screenSize.x/SCALE);
-        Log.d("OVERRUN: Walker", "After Resize: (" +  walkerBitmap.getWidth() +","+ walkerBitmap.getHeight() + ")");
+        walkerBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.walker);
+        walkerBitmap = getResizedBmp(walkerBitmap, screenSize.x/SCALE, screenSize.x/SCALE);
 
         xCoord = genRandom.nextInt(xMax - walkerBitmap.getWidth());
         yCoord = yMin;
@@ -85,19 +80,7 @@ public class ZombieWalker implements Zombie {
         detectZombie =  new Rect(xCoord, yCoord, xCoord + walkerBitmap.getWidth(), yCoord + walkerBitmap.getHeight());
 
         isActive = false;
-    }
-
-    @Override
-    public Bitmap getResizedBmp(float newWidth, float newHeight) {
-        int bmWidth = walkerBitmap.getWidth();
-        int bmHeight = walkerBitmap.getHeight();
-        float wScale = newWidth / bmWidth;
-        float hScale = newHeight / bmHeight;
-        Matrix matrix = new Matrix();
-        matrix.postScale(wScale, hScale);
-        Bitmap resizedBMP = Bitmap.createBitmap(walkerBitmap, 0, 0, bmWidth, bmHeight, matrix, false);
-        walkerBitmap.recycle();
-        return resizedBMP;
+        hasReachedBottom = false;
     }
 
     @Override
@@ -105,20 +88,19 @@ public class ZombieWalker implements Zombie {
 
         if (yCoord + 1 < yMax) {
             yCoord += SPEED;
+
+            //adding top, left, bottom and right to the rect object
+            detectZombie.left = xCoord;
+            detectZombie.top = yCoord;
+            detectZombie.right = xCoord + walkerBitmap.getWidth();
+            detectZombie.bottom = yCoord + walkerBitmap.getHeight();
+
         } else {
-            xCoord = genRandom.nextInt(xMax - walkerBitmap.getWidth());
-            yCoord = yMin;
-            setIsActive(true);
+
+            isActive = false;
+            hasReachedBottom = true;
+            resetZombie();
         }
-
-        //adding top, left, bottom and right to the rect object
-        detectZombie.left = xCoord;
-        detectZombie.top = yCoord;
-        detectZombie.right = xCoord + walkerBitmap.getWidth();
-        detectZombie.bottom = yCoord + walkerBitmap.getHeight();
-
-        //do something if enemy reaches bottom edge
-        //such as creating new zombie and reducing survivor health
     }
 
     @Override
@@ -167,6 +149,11 @@ public class ZombieWalker implements Zombie {
     }
 
     @Override
+    public boolean getHasReachedBottom() {
+        return hasReachedBottom;
+    }
+
+    @Override
     public int getTimesHit() {
         return timesHit;
     }
@@ -174,6 +161,24 @@ public class ZombieWalker implements Zombie {
     @Override
     public void addHit() {
         timesHit++;
+    }
+
+    @Override
+    public int getPointValue() {
+        return POINTS;
+    }
+
+    @Override
+    public void resetZombie() {
+
+        xCoord = genRandom.nextInt(xMax - walkerBitmap.getWidth());
+        yCoord = yMin;
+        detectZombie.left = xCoord;
+        detectZombie.top = yCoord;
+        detectZombie.right = xCoord + walkerBitmap.getWidth();
+        detectZombie.bottom = yCoord + walkerBitmap.getHeight();
+        isActive = false;
+        hasReachedBottom = false;
     }
 }
 

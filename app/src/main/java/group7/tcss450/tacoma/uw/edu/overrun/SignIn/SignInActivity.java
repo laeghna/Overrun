@@ -3,6 +3,7 @@ package group7.tcss450.tacoma.uw.edu.overrun.SignIn;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -41,7 +42,7 @@ import retrofit2.Callback;
 import timber.log.Timber;
 
 /**
- * Activity that encapsulates the loginGoogle and registration for the user.
+ * Activity that encapsulates the login and registration for the user.
  *
  * @author Ethan Rowell
  * @version 9 Nov 2016
@@ -49,6 +50,10 @@ import timber.log.Timber;
 public class SignInActivity extends BaseActivity {
 
     public CallbackManager callbackManager;
+    private MediaPlayer mMediaPlayer;
+    private SharedPreferences mSharedPref;
+
+
 
     /**
      * Code for retrieving a token for validation from Google API Client.
@@ -65,6 +70,9 @@ public class SignInActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+
+        mSharedPref = getSharedPreferences(
+                getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
 
         callbackManager = CallbackManager.Factory.create();
@@ -86,6 +94,51 @@ public class SignInActivity extends BaseActivity {
             Timber.plant(new Timber.DebugTree());
 
         mGoogleApiClient = getGoogleApiClient();
+
+        float current_volume = mSharedPref.getFloat(
+                getString(R.string.saved_volume_setting), 1);
+
+        mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
+        mMediaPlayer.setLooping(true);
+        mMediaPlayer.setVolume(current_volume, current_volume);
+        int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
+        mMediaPlayer.seekTo(music_position);
+        mMediaPlayer.start();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+            int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
+            float current_volume = mSharedPref.getFloat(
+                    getString(R.string.saved_volume_setting), 1);
+
+            mMediaPlayer.setVolume(current_volume,current_volume);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.start();
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (mMediaPlayer.isPlaying()) {
+            mSharedPref.edit()
+                    .putInt(getString(R.string.music_position), mMediaPlayer.getCurrentPosition())
+                    .apply();
+
+            mMediaPlayer.pause();
+
+        }
+
+        if (mMediaPlayer != null) {
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
+
+
     }
 
     @Optional
@@ -367,7 +420,7 @@ public class SignInActivity extends BaseActivity {
     }
 
     /**
-     * Checks the loginGoogle status of the user. If logged in already, it will route the user
+     * Checks the login status of the user. If logged in already, it will route the user
      * to the startMenu
      */
     private void checkLoginStatus() {

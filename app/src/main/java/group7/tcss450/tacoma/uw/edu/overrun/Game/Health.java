@@ -14,7 +14,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  * @version 22 November 2016
  */
 
-public class Health extends GameCharacter {
+public class Health extends BitmapResizer {
 
     /** Constant for scaling health */
     private static final int SCALE = 25;

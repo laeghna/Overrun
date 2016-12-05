@@ -73,10 +73,19 @@
 
     <string name="pause_dialog">GAME PAUSED</string>
     <string name="resume_button">Resume</string>
+    <string name="game_over_text">GAME OVER!</string>
+    <string name="exit_button">Exit to Main Menu</string>
+    <string name="play_again_text">Play Again</string>
 
     <!--Facebook Strings-->
 
     <string name="facebook_app_id">1325773164160592</string>
+
+
+
+    <!--MediaPlayer Strings-->
+    <string name="music_position">position_music</string>
+    <string name="music_volume">volume_music</string>
 
 
 
@@ -89,6 +98,5 @@
     <string name="DROP_PLAYER_SQL">
     DROP TABLE IF EXISTS Player
     </string>
-
 
 </resources>

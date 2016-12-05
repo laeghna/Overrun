@@ -1,13 +1,11 @@
 package group7.tcss450.tacoma.uw.edu.overrun;
 
+
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
-import android.nfc.Tag;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -30,7 +28,7 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
     private SharedPreferences mSharedPref;
     private Spinner mDiffSpinner;
     private Spinner mControlsSpinner;
-
+    private MediaPlayer mMediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +37,9 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
 
         mSharedPref = getSharedPreferences(
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
+
+
+
 
         mDiffSpinner = (Spinner) findViewById(R.id.diff_spinner);
         mControlsSpinner = (Spinner) findViewById(R.id.control_spinner);
@@ -56,7 +57,7 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
 
         int current_controls = mSharedPref.getInt("saved_controls", 1);
 
-        double current_volume = mSharedPref.getFloat(
+        float current_volume = mSharedPref.getFloat(
                 getString(R.string.saved_volume_setting), 1);
 
         // Set volume to an integer to properly display on Slider.
@@ -69,6 +70,65 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         volumeBar.setProgress(volume_int);
         mydiffSpinner.setSelection(current_difficulty - 1);
         myControlsSpinner.setSelection(current_controls);
+
+
+
+        if (mMediaPlayer == null) {
+            mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
+            mMediaPlayer.setLooping(true);
+            mMediaPlayer.setVolume(current_volume, current_volume);
+            int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.start();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
+        float current_volume = mSharedPref.getFloat(
+                getString(R.string.saved_volume_setting), 1);
+
+        if (mMediaPlayer == null) {
+            mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
+
+            mMediaPlayer.setVolume(current_volume,current_volume);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.start();
+        }
+
+        else if (!mMediaPlayer.isPlaying()) {
+
+            mMediaPlayer.setVolume(current_volume,current_volume);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.start();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (mMediaPlayer.isPlaying()) {
+            mSharedPref.edit()
+                    .putInt(getString(R.string.music_position), mMediaPlayer.getCurrentPosition())
+                    .apply();
+
+            mMediaPlayer.pause();
+            mMediaPlayer.release();
+
+        }
+
+
+
+
+        if (mMediaPlayer != null) {
+            mMediaPlayer = null;
+        }
+
+        this.finish();
 
 
     }
@@ -106,9 +166,10 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
                         , "Difficulty set to: " + diffText + "\nVolume set to: " +
                                 (int)(volume_level * 100) + "%",
                         Toast.LENGTH_SHORT) .show();
+
+
                 finish();
                 break;
-
         }
     }
 
@@ -136,7 +197,6 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         return difficulty;
-
     }
 
     private int updateControls(String theText) {
@@ -156,7 +216,6 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         return controls;
-
     }
 
     /**
@@ -170,7 +229,5 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         int currentInt = volumeBar.getProgress();
         float volume_level = (float) currentInt / 100;
         return volume_level;
-
-
     }
 }
