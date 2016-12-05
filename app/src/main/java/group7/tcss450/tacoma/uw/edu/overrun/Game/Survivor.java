@@ -15,7 +15,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 02 December 2016
+ * @version 04 December 2016
  */
 public class Survivor extends BitmapResizer {
 
