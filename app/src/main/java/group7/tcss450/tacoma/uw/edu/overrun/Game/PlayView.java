@@ -358,7 +358,8 @@ public class PlayView extends SurfaceView implements Runnable{
 
             if(!mBullets[i].getIsActive()) {
 
-                mBullets[i].shootWeapon(mSurvivor.getmX(), mSurvivor.getmY());
+                mBullets[i].shootWeapon(mSurvivor.getmX() + (mSurvivor.getmBmap().getWidth()),
+                        mSurvivor.getmY());
                 return true;
             }
         }
