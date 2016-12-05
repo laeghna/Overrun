@@ -20,7 +20,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
 public class Survivor extends BitmapResizer {
 
     /** Constant for scaling survivor */
-    private static final int SCALE = 10;
+    private static final int SCALE = 12;
 
     /** Padding for the top and bottom of the game screen. */
     private static final int PADDING = 130;
