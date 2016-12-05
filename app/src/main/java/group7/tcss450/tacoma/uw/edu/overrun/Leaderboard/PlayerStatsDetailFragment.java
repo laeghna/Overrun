@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.PlayerStats.PlayerStatsContent;
+import group7.tcss450.tacoma.uw.edu.overrun.Model.GameScoreModel;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 public class PlayerStatsDetailFragment extends Fragment {
@@ -33,10 +33,10 @@ public class PlayerStatsDetailFragment extends Fragment {
         return view;
     }
 
-    public void updateView(PlayerStatsContent player) {
-        if (player != null) {
-            mPlayerIdView.setText(player.getPlayerId());
-            mPlayerScoreView.setText(player.getPlayerScore());
+    public void updateView(GameScoreModel gameScore) {
+        if (gameScore != null) {
+            mPlayerIdView.setText(String.valueOf(gameScore.getEmail()));
+            mPlayerScoreView.setText(String.valueOf(gameScore.getScore()));
         }
     }
 
@@ -51,7 +51,7 @@ public class PlayerStatsDetailFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             // Set article based on argument passed in
-            updateView((PlayerStatsContent) args.getSerializable(PLAYER_ITEM_SELECTED));
+            updateView((GameScoreModel) args.getSerializable(PLAYER_ITEM_SELECTED));
         }
     }
 }

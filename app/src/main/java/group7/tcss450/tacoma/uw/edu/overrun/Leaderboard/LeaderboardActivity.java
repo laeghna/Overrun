@@ -32,7 +32,6 @@ public class LeaderboardActivity extends BaseActivity implements PlayerStatsFrag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard);
 
-
         mSharedPref = getSharedPreferences(
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
@@ -65,7 +64,7 @@ public class LeaderboardActivity extends BaseActivity implements PlayerStatsFrag
 
             PlayerStatsDetailFragment playerDetailFragment = new PlayerStatsDetailFragment();
             Bundle args = new Bundle();
-            args.putSerializable(playerDetailFragment.PLAYER_ITEM_SELECTED, gameStats);
+            args.putSerializable(PlayerStatsDetailFragment.PLAYER_ITEM_SELECTED, gameStats);
             playerDetailFragment.setArguments(args);
             FragmentTransaction transaction = getSupportFragmentManager()
                     .beginTransaction()
@@ -74,9 +73,6 @@ public class LeaderboardActivity extends BaseActivity implements PlayerStatsFrag
 
             // Commit the transaction
             transaction.commit();
-
-
-
     }
 
 

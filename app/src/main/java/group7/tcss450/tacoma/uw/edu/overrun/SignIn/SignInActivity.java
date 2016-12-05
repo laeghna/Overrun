@@ -113,7 +113,7 @@ public class SignInActivity extends BaseActivity {
             int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
             float current_volume = mSharedPref.getFloat(
                     getString(R.string.saved_volume_setting), 1);
-
+            if (mMediaPlayer == null) mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
             mMediaPlayer.setVolume(current_volume,current_volume);
             mMediaPlayer.seekTo(music_position);
             mMediaPlayer.start();
