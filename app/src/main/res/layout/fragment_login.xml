@@ -106,8 +106,7 @@
         android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Test Sync"
+        android:text="Test"
         android:id="@+id/test_sync_button"/>
-
 
 </LinearLayout>

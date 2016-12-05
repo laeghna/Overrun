@@ -1,18 +1,21 @@
 package group7.tcss450.tacoma.uw.edu.overrun.Leaderboard;
 
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.PlayerStats.PlayerStatsContent;
+import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
+import group7.tcss450.tacoma.uw.edu.overrun.Model.GameScoreModel;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
+import timber.log.Timber;
 
-public class LeaderboardActivity extends AppCompatActivity implements PlayerStatsFragment.OnListFragmentInteractionListener {
+public class LeaderboardActivity extends BaseActivity implements PlayerStatsFragment.OnListFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard);
+
+        Timber.plant(new Timber.DebugTree());
 
         if (findViewById(R.id.fragment_container) != null) {
             getSupportFragmentManager().beginTransaction()
@@ -22,7 +25,7 @@ public class LeaderboardActivity extends AppCompatActivity implements PlayerStat
     }
 
     @Override
-    public void onListFragmentInteraction(PlayerStatsContent thePlayer) {
+    public void onListFragmentInteraction(GameScoreModel gameStats) {
 
             // If the frag is not available, we're in the one-pane layout and must swap frags...
 
@@ -32,7 +35,7 @@ public class LeaderboardActivity extends AppCompatActivity implements PlayerStat
 
             PlayerStatsDetailFragment playerDetailFragment = new PlayerStatsDetailFragment();
             Bundle args = new Bundle();
-            args.putSerializable(playerDetailFragment.PLAYER_ITEM_SELECTED, thePlayer);
+            args.putSerializable(playerDetailFragment.PLAYER_ITEM_SELECTED, gameStats);
             playerDetailFragment.setArguments(args);
             FragmentTransaction transaction = getSupportFragmentManager()
                     .beginTransaction()
@@ -41,8 +44,5 @@ public class LeaderboardActivity extends AppCompatActivity implements PlayerStat
 
             // Commit the transaction
             transaction.commit();
-
-
-
     }
 }

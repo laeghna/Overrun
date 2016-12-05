@@ -5,12 +5,12 @@ import android.support.annotation.Nullable;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * User model for API client to serialize json objects into a User object.
+ * UserModel model for API client to serialize json objects into a UserModel object.
  *
  * @author Ethan Rowell
  * @version 2 NDec 2016
  */
-public class User {
+public class UserModel {
 
     /**
      * The user's email.
@@ -49,16 +49,16 @@ public class User {
     private String lastName;
 
     /**
-     * Public constructer for the User object.
+     * Public constructor for the UserModel object.
      *
      * @param email the email for the User.
      * @param hash  the hash for the User.
      * @param salt  the salt for the User.
      * @throws IllegalArgumentException if any of the String parameters are null.
      */
-    public User(String email, String salt, String hash) {
+    public UserModel(String email, String salt, String hash) {
         if (email == null || salt == null || hash == null) {
-            throw new IllegalArgumentException("Null values not allowed for User.");
+            throw new IllegalArgumentException("Null values not allowed for UserModel.");
         }
         this.email = email;
         this.salt = salt;
@@ -82,15 +82,15 @@ public class User {
      */
     public void setHash(String hash) {
         if (hash == null) {
-            throw new IllegalArgumentException("User hash cannot be null.");
+            throw new IllegalArgumentException("UserModel hash cannot be null.");
         }
         this.hash = hash;
     }
 
     /**
-     * Gets the salt for this User object.
+     * Gets the salt for this UserModel object.
      *
-     * @return the salt for this User.
+     * @return the salt for this UserModel.
      */
     public String getSalt() {
         return salt;
@@ -104,7 +104,7 @@ public class User {
      */
     public void setSalt(String salt) {
         if (salt == null) {
-            throw new IllegalArgumentException("User salt cannot be null.");
+            throw new IllegalArgumentException("UserModel salt cannot be null.");
         }
         this.salt = salt;
     }
@@ -119,14 +119,14 @@ public class User {
     }
 
     /**
-     * Sets the email for the User.
+     * Sets the email for the UserModel.
      *
      * @param email the new email for the user.
      * @throws IllegalArgumentException if the email is null
      */
     public void setEmail(String email) {
         if (email == null) {
-            throw new IllegalArgumentException("User email cannot be null.");
+            throw new IllegalArgumentException("UserModel email cannot be null.");
         }
         this.email = email;
     }

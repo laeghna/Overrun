@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -30,7 +29,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Optional;
 import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
-import group7.tcss450.tacoma.uw.edu.overrun.Model.User;
+import group7.tcss450.tacoma.uw.edu.overrun.Model.UserModel;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.Utils.ApiClient;
@@ -229,15 +228,15 @@ public class SignInActivity extends BaseActivity {
     private void signInAsync(String email, String password) {
         showProgressDialog("Logging in...");
         ApiInterface api = ApiClient.getClient();
-        Call<User> call = api.login(email, password);
-        call.enqueue(new Callback<User>() {
+        Call<UserModel> call = api.login(email, password);
+        call.enqueue(new Callback<UserModel>() {
             @Override
-            public void onResponse(Call<User> call, retrofit2.Response<User> response) {
+            public void onResponse(Call<UserModel> call, retrofit2.Response<UserModel> response) {
                 handleSignInResponse(response);
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(Call<UserModel> call, Throwable t) {
                 handleSignInError(call, t);
             }
         });
@@ -251,15 +250,15 @@ public class SignInActivity extends BaseActivity {
      */
     private void googleSignInAsync(String token) {
         ApiInterface api = ApiClient.getClient();
-        Call<User> call = api.loginGoogle(token);
-        call.enqueue(new Callback<User>() {
+        Call<UserModel> call = api.loginGoogle(token);
+        call.enqueue(new Callback<UserModel>() {
             @Override
-            public void onResponse(Call<User> call, retrofit2.Response<User> response) {
+            public void onResponse(Call<UserModel> call, retrofit2.Response<UserModel> response) {
                 handleSignInResponse(response);
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(Call<UserModel> call, Throwable t) {
                 handleSignInError(call, t);
             }
         });
@@ -267,15 +266,15 @@ public class SignInActivity extends BaseActivity {
 
     private void facebookSignInAsync(String email) {
         ApiInterface api = ApiClient.getClient();
-        Call<User> call = api.loginFacebook(email);
-        call.enqueue(new Callback<User>() {
+        Call<UserModel> call = api.loginFacebook(email);
+        call.enqueue(new Callback<UserModel>() {
             @Override
-            public void onResponse(Call<User> call, retrofit2.Response<User> response) {
+            public void onResponse(Call<UserModel> call, retrofit2.Response<UserModel> response) {
                 handleSignInResponse(response);
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(Call<UserModel> call, Throwable t) {
                 handleSignInError(call, t);
             }
         });
@@ -287,7 +286,7 @@ public class SignInActivity extends BaseActivity {
      *
      * @param response API client response.
      */
-    private void handleSignInResponse(retrofit2.Response<User> response) {
+    private void handleSignInResponse(retrofit2.Response<UserModel> response) {
         if (response.isSuccessful()) {
             String email = response.body().getEmail();
             String firstName = response.body().getFirstName();
@@ -326,7 +325,7 @@ public class SignInActivity extends BaseActivity {
      * @param call calling request
      * @param t    throwable exception.
      */
-    private void handleSignInError(Call<User> call, Throwable t) {
+    private void handleSignInError(Call<UserModel> call, Throwable t) {
         Timber.d("Error: %s", t.toString());
         Toast.makeText(getApplicationContext(), getString(R.string.our_server_messed_up), Toast.LENGTH_LONG).show();
         hideProgressDialog();

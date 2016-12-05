@@ -6,11 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.PlayerStats.PlayerStatsContent;
+import group7.tcss450.tacoma.uw.edu.overrun.Model.GameScoreModel;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 /**
@@ -20,10 +19,10 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  */
 public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerStatsRecyclerViewAdapter.ViewHolder> {
 
-    private final List<PlayerStatsContent> mValues;
+    private final List<GameScoreModel> mValues;
     private final PlayerStatsFragment.OnListFragmentInteractionListener mListener;
 
-    public PlayerStatsRecyclerViewAdapter(List<PlayerStatsContent> items, PlayerStatsFragment.OnListFragmentInteractionListener listener) {
+    public PlayerStatsRecyclerViewAdapter(List<GameScoreModel> items, PlayerStatsFragment.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -40,8 +39,8 @@ public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerS
         holder.mItem = mValues.get(position);
         holder.mPlayerNumber.setText(Integer.toString(position + 1) + '.');
   
-        holder.mIdView.setText(mValues.get(position).getPlayerId());
-        holder.mContentView.setText(mValues.get(position).getPlayerScore());
+        holder.mIdView.setText(mValues.get(position).getEmail());
+        holder.mContentView.setText(String.valueOf(mValues.get(position).getScore()));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,7 +65,7 @@ public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerS
         public final TextView mIdView;
         public final TextView mContentView;
 
-        public PlayerStatsContent mItem;
+        public GameScoreModel mItem;
 
         public ViewHolder(View view) {
             super(view);

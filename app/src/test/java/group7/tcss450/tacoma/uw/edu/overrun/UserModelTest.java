@@ -3,17 +3,17 @@ package group7.tcss450.tacoma.uw.edu.overrun;
 import org.junit.Before;
 import org.junit.Test;
 
-import group7.tcss450.tacoma.uw.edu.overrun.Model.User;
+import group7.tcss450.tacoma.uw.edu.overrun.Model.UserModel;
 
 import static junit.framework.Assert.fail;
 
 /**
- * A Test Class for the Model.User class.
+ * A Test Class for the Model.UserModel class.
  * @author Leslie Pedro
  */
-public class UserTest {
+public class UserModelTest {
 
-    User testUser;
+    UserModel testUser;
 
     /**
      * Sets up a test user with valid parameters for use while
@@ -21,43 +21,43 @@ public class UserTest {
      */
     @Before
     public void setup() {
-        testUser = new User("email", "salt", "hash");
+        testUser = new UserModel("email", "salt", "hash");
     }
 
-    /** Testing the User constructor with a null email address. */
+    /** Testing the UserModel constructor with a null email address. */
     @Test
     public void userConstructorBadEmailTest() {
         try {
-            new User(null, "salt", "hash");
-            fail("Null email given, User still created.");
+            new UserModel(null, "salt", "hash");
+            fail("Null email given, UserModel still created.");
         } catch (IllegalArgumentException e) {
             // Test passed.
         }
     }
 
-    /** Testing the User constructor with a null hash value. */
+    /** Testing the UserModel constructor with a null hash value. */
     @Test
     public void userConstructorBadHashTest() {
         try {
-            new User("email", "salt", null);
-            fail("Null hash given, User still created.");
+            new UserModel("email", "salt", null);
+            fail("Null hash given, UserModel still created.");
         } catch (IllegalArgumentException e) {
             // Test passed.
         }
     }
 
-    /** Testing the User constructor with a null salt value. */
+    /** Testing the UserModel constructor with a null salt value. */
     @Test
     public void userConstructorBadSaltTest() {
         try {
-            new User("email", null, "hash");
-            fail("Null email given, User still created.");
+            new UserModel("email", null, "hash");
+            fail("Null email given, UserModel still created.");
         } catch (IllegalArgumentException e) {
             // Test passed.
         }
     }
 
-    /** Tests the User function setEmail with a null email. */
+    /** Tests the UserModel function setEmail with a null email. */
     @Test
     public void userEmailSetterNullEmailTest() {
         try {

@@ -21,6 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbHelper;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailTextWatcher;
 import timber.log.Timber;
@@ -50,7 +51,9 @@ public class LoginFragment extends Fragment {
      */
     private Unbinder unbinder;
 
-
+    /**
+     * Facebook callback manager.
+     */
     private CallbackManager callbackManager;
 
     public LoginFragment() {
@@ -97,8 +100,6 @@ public class LoginFragment extends Fragment {
         //End Facebook
 
         if (((SignInActivity) getActivity()).isLoggedIn()) {
-            //Intent intent = new Intent(getActivity().getApplicationContext(), StartMenuActivity.class);
-            //startActivity(intent);
             getActivity().finish();
         }
 
@@ -112,17 +113,32 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Test OnClickListener for debugging.
+     */
+    @OnClick(R.id.test_sync_button)
+    void testGames() {
+        OverrunDbHelper dbHelper = new OverrunDbHelper(getActivity());
+        dbHelper.submitScore("blah@blahblah.com", 1000, 23, 1, 30);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
+    /**
+     * googleSignIn OnClickListener.
+     */
     @OnClick(R.id.google_sign_in_button)
     void googleSignIn() {
         ((SignInActivity) getActivity()).googleSignIn();
     }
 
+    /**
+     * Login OnClickListener
+     */
     @OnClick(R.id.login_button)
     void signIn() {
         Timber.d(getString(R.string.signing_in));
@@ -130,6 +146,9 @@ public class LoginFragment extends Fragment {
                 passwordText.getText().toString());
     }
 
+    /**
+     * Register OnClickListener
+     */
     @OnClick(R.id.register_button)
     void register() {
         getActivity().getSupportFragmentManager().beginTransaction()

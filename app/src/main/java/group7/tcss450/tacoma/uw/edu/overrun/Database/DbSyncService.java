@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import group7.tcss450.tacoma.uw.edu.overrun.Model.Game;
+import group7.tcss450.tacoma.uw.edu.overrun.Model.GameScoreModel;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import timber.log.Timber;
 
@@ -71,7 +71,7 @@ public class DbSyncService extends BroadcastReceiver {
      */
     private class UploadAsync extends AsyncTask<Void, Void, Void> {
         private OverrunDbHelper db;
-        private List<Game> games;
+        private List<GameScoreModel> games;
         private SharedPreferences prefs;
         private SharedPreferences.Editor editor;
 
@@ -92,7 +92,7 @@ public class DbSyncService extends BroadcastReceiver {
 
             games = db.getGames();
             for (int i = 0; i < games.size(); i++) {
-                Game game = games.get(i);
+                GameScoreModel game = games.get(i);
                 db.uploadGame(game.getGameId(), game.getEmail(), game.getScore(),
                         game.getZombiesKilled(), game.getLevel(), game.getShotsFired());
             }

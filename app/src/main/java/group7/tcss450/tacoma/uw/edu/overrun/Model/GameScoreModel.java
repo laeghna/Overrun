@@ -2,13 +2,17 @@ package group7.tcss450.tacoma.uw.edu.overrun.Model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Game model for API client to serialize json objects into a Game object.
+ * GameScoreModel model for API client to serialize json objects into a GameScoreModel object.
  *
  * @author Ethan Rowell
  * @version 2 NDec 2016
  */
-public class Game {
+public class GameScoreModel implements Serializable {
 
     @SerializedName("gameId")
     private int gameId;
@@ -28,13 +32,26 @@ public class Game {
     @SerializedName("shotsFired")
     private int shotsFired;
 
-    public Game(int gameId, String email, int score, int zombiesKilled, int level, int shotsFired) {
+    @SerializedName("games")
+    private List<GameScoreModel> games = new ArrayList<>();
+
+    public GameScoreModel(int gameId, String email, int score, int zombiesKilled, int level, int shotsFired,
+                          List<GameScoreModel> games) {
         this.gameId = gameId;
         this.email = email;
         this.score = score;
         this.zombiesKilled = zombiesKilled;
         this.level = level;
         this.shotsFired = shotsFired;
+        this.games = games;
+    }
+
+    public List<GameScoreModel> getGames() {
+        return games;
+    }
+
+    public void setGames(List<GameScoreModel> games) {
+        this.games = games;
     }
 
     public int getGameId() {

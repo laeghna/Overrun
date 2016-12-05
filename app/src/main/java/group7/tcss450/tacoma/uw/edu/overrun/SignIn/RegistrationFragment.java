@@ -20,7 +20,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbHelper;
-import group7.tcss450.tacoma.uw.edu.overrun.Model.User;
+import group7.tcss450.tacoma.uw.edu.overrun.Model.UserModel;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.Utils.ApiClient;
 import group7.tcss450.tacoma.uw.edu.overrun.Utils.ApiInterface;
@@ -31,8 +31,6 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import timber.log.Timber;
-
-import com.facebook.FacebookSdk;
 
 
 /**
@@ -168,10 +166,10 @@ public class RegistrationFragment extends Fragment {
         ((BaseActivity) getActivity()).showProgressDialog(getString(R.string.loading));
 
         ApiInterface apiService = ApiClient.getClient();
-        Call<User> call = apiService.registerUser(email, pass);
-        call.enqueue(new Callback<User>() {
+        Call<UserModel> call = apiService.registerUser(email, pass);
+        call.enqueue(new Callback<UserModel>() {
             @Override
-            public void onResponse(Call<User> call, retrofit2.Response<User> response) {
+            public void onResponse(Call<UserModel> call, retrofit2.Response<UserModel> response) {
                 if (response.isSuccessful()) {
                     getActivity().getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, new LoginFragment())
@@ -195,7 +193,7 @@ public class RegistrationFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(Call<UserModel> call, Throwable t) {
                 Timber.d("Error: %s", t.toString());
                 Toast.makeText(getActivity().getApplicationContext(), R.string.our_server_messed_up,
                         Toast.LENGTH_LONG).show();

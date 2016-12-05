@@ -20,6 +20,7 @@ import java.util.List;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbContract.Game;
 import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbContract.User;
+import group7.tcss450.tacoma.uw.edu.overrun.Model.GameScoreModel;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.Utils.ApiClient;
 import group7.tcss450.tacoma.uw.edu.overrun.Utils.ApiInterface;
@@ -117,9 +118,11 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
      *
      * @return A list of Games stored in the local database.
      */
-    List<group7.tcss450.tacoma.uw.edu.overrun.Model.Game> getGames() {
-        ArrayList<group7.tcss450.tacoma.uw.edu.overrun.Model.Game> games = new ArrayList<>();
+    public List<GameScoreModel> getGames() {
+        List<GameScoreModel> games = new ArrayList<>();
+
         Cursor c = null;
+
         try {
             mDb = getReadableDatabase();
 
@@ -144,8 +147,8 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
                 level = c.getInt(c.getColumnIndex(Game.COLUMN_NAME_LEVEL));
                 shotsFired = c.getInt(c.getColumnIndex(Game.COLUMN_NAME_SHOTS_FIRED));
 
-                games.add(new group7.tcss450.tacoma.uw.edu.overrun.Model.Game(gameId, email,
-                        score, zombiesKilled, level, shotsFired));
+                games.add(new GameScoreModel(gameId, email,
+                        score, zombiesKilled, level, shotsFired, null));
                 c.moveToNext();
             }
             return games;
@@ -159,7 +162,7 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Creats a user in the local database.
+     * Creates a user in the local database.
      *
      * @param email    The user's email.
      * @param password The user's password.
@@ -290,15 +293,9 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
     public boolean submitScore(String email, int score, int zombiesKilled, int level, int shotsFired) {
         Timber.d("Creating game for %s", email);
 
-        ConnectivityManager cm =
-                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-
-        if (isConnected) {
+        if (isConnected()) {
             uploadGame(-1, email, score, zombiesKilled, level, shotsFired);
-            Timber.d("Game upload started...");
+            Timber.d("GameScoreModel upload started...");
         } else {
             try {
                 mDb = getWritableDatabase();
@@ -326,7 +323,7 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
 
                     Toast.makeText(mContext, "No internet connection, game will be uploaded when" +
                             " network is available.", Toast.LENGTH_LONG).show();
-                    Timber.d("Game stored locally...");
+                    Timber.d("GameScoreModel stored locally...");
                 }
 
             } catch (SQLiteException e) {
@@ -353,21 +350,21 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
                     int level, int shotsFired) {
 
         ApiInterface api = ApiClient.getClient();
-        Call<group7.tcss450.tacoma.uw.edu.overrun.Model.Game> call = api.uploadGameScore(email,
+        Call<GameScoreModel> call = api.uploadGameScore(email,
                 score, zombiesKilled, level, shotsFired);
 
-        call.enqueue(new Callback<group7.tcss450.tacoma.uw.edu.overrun.Model.Game>() {
+        call.enqueue(new Callback<GameScoreModel>() {
             @Override
-            public void onResponse(Call<group7.tcss450.tacoma.uw.edu.overrun.Model.Game> call,
-                                   retrofit2.Response<group7.tcss450.tacoma.uw.edu.overrun.Model.Game>
+            public void onResponse(Call<GameScoreModel> call,
+                                   retrofit2.Response<GameScoreModel>
                                            response) {
                 if (gameId > 0) deleteGame(gameId);
                 if (response.code() == HttpURLConnection.HTTP_CREATED)
-                    Timber.d("Game uploaded successfully.");
+                    Timber.d("GameScoreModel uploaded successfully.");
             }
 
             @Override
-            public void onFailure(Call<group7.tcss450.tacoma.uw.edu.overrun.Model.Game> call,
+            public void onFailure(Call<GameScoreModel> call,
                                   Throwable t) {
                 Timber.d("Could not remove game: %d", gameId);
             }
@@ -415,5 +412,18 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
         submitScore("blah@blah.com", 500, 80, 10, 250);
 
         Timber.d("Num Games inserted: %d", getNumberOfGames());
+    }
+
+    /**
+     * Tests internet connectivity.
+     *
+     * @return whether internet connection is detected or not.
+     */
+    private boolean isConnected() {
+        ConnectivityManager cm =
+                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 }
