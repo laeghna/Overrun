@@ -495,6 +495,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
                         }
                     });
             dialog = db.create();
+            dialog.setCanceledOnTouchOutside(false);
             dialog.show();
         }
     }
@@ -539,7 +540,8 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
                                 }
                             }
                 });
-                AlertDialog dialog = dialog_builder.create();
+                dialog = dialog_builder.create();
+                dialog.setCanceledOnTouchOutside(false);
                 dialog.show();
             }
         });
