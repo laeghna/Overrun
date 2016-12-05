@@ -509,7 +509,20 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
                             hasPauseDialog = false;
                             onResume();
                         }
-                    });
+                    }).setNegativeButton(R.string.exit_button, new DialogInterface.OnClickListener() {
+
+                public void onClick(DialogInterface d, int id) {
+                    //do something
+                    try {
+
+                        mLayout.removeAllViews();
+                        finish();
+
+                    } catch (Exception e) {
+
+                    }
+                }
+            });
             dialog = db.create();
             dialog.setCanceledOnTouchOutside(false);
             dialog.show();
