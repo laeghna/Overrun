@@ -31,7 +31,7 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 public class SignInActivity extends BaseActivity {
 
     public CallbackManager callbackManager;
-    private static MediaPlayer mMediaPlayer;
+    private MediaPlayer mMediaPlayer;
     private SharedPreferences mSharedPref;
 
 
@@ -60,15 +60,12 @@ public class SignInActivity extends BaseActivity {
             showLoginFragment();
         }
 
-        double current_volume = mSharedPref.getFloat(
+        float current_volume = mSharedPref.getFloat(
                 getString(R.string.saved_volume_setting), 1);
-
-        // Set volume to an integer to properly display on Slider.
-        int volume_int = (int) (current_volume * 100);
 
         mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
         mMediaPlayer.setLooping(true);
-        mMediaPlayer.setVolume(volume_int, volume_int);
+        mMediaPlayer.setVolume(current_volume, current_volume);
         int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
         mMediaPlayer.seekTo(music_position);
         mMediaPlayer.start();
@@ -79,12 +76,10 @@ public class SignInActivity extends BaseActivity {
         super.onResume();
 
             int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
-            double current_volume = mSharedPref.getFloat(
+            float current_volume = mSharedPref.getFloat(
                     getString(R.string.saved_volume_setting), 1);
 
-            // Set volume to an integer to properly display on Slider.
-            int volume_int = (int) (current_volume * 100);
-            mMediaPlayer.setVolume(volume_int,volume_int);
+            mMediaPlayer.setVolume(current_volume,current_volume);
             mMediaPlayer.seekTo(music_position);
             mMediaPlayer.start();
 
@@ -102,6 +97,12 @@ public class SignInActivity extends BaseActivity {
             mMediaPlayer.pause();
 
         }
+
+        if (mMediaPlayer != null) {
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
+
 
     }
 

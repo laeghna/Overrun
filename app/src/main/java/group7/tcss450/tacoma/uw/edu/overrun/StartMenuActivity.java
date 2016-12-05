@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,7 +13,12 @@ import android.widget.Button;
 import android.widget.Toast;
 
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareButton;
+import com.facebook.share.widget.ShareDialog;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Game.*;
 
@@ -33,14 +39,46 @@ import group7.tcss450.tacoma.uw.edu.overrun.SignIn.SignInActivity;
  */
 public class StartMenuActivity extends BaseActivity implements View.OnClickListener {
 
-    private static MediaPlayer mMediaPlayer;
-    private static SharedPreferences mSharedPref;
+    private MediaPlayer mMediaPlayer;
+    private SharedPreferences mSharedPref;
+    private ShareDialog shareDialog;
+    private Button fbShareButton;
+    private CallbackManager callbackManager;
+
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+
         setContentView(R.layout.activity_start_menu);
+
+
+        shareDialog = new ShareDialog(this);
+        callbackManager = CallbackManager.Factory.create();
+
+
+        fbShareButton = (Button) findViewById(R.id.share_btn);
+
+        fbShareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (ShareDialog.canShow(ShareLinkContent.class)) {
+                    ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                            .setContentTitle("Overrun Highscore!")
+                            .setContentDescription(
+                                    "Overrun App share test")
+                            .setContentUrl(Uri.parse("https://developers.facebook.com"))
+                            .build();
+
+                    shareDialog.show(linkContent);
+                }
+            }
+        });
 
         mSharedPref = getSharedPreferences(
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
@@ -93,6 +131,12 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
 
     }
 
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
 
     /**
      * The onResume callback method for this activity adjusts
@@ -118,12 +162,21 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
 
         float current_volume = mSharedPref.getFloat(
                 getString(R.string.saved_volume_setting), 1);
-        mMediaPlayer.setVolume(current_volume, current_volume);
 
-        if (!mMediaPlayer.isPlaying()) {
+
+        if (mMediaPlayer == null) {
+            mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
             int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
-            mMediaPlayer.seekTo(music_position);
+
             mMediaPlayer.setVolume(current_volume, current_volume);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.start();
+        }
+
+        else if (!mMediaPlayer.isPlaying()) {
+            int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
+
+            mMediaPlayer.setVolume(current_volume, current_volume);            mMediaPlayer.seekTo(music_position);
             mMediaPlayer.start();
         }
     }
@@ -137,8 +190,15 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
                     .putInt(getString(R.string.music_position), mMediaPlayer.getCurrentPosition())
                     .apply();
 
-            mMediaPlayer.pause();
+            mMediaPlayer.stop();
+            mMediaPlayer.release();
 
+
+
+        }
+
+        if (mMediaPlayer != null) {
+            mMediaPlayer = null;
         }
 
     }

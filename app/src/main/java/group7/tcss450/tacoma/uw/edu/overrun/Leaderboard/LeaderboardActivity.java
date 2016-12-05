@@ -1,38 +1,45 @@
 package group7.tcss450.tacoma.uw.edu.overrun.Leaderboard;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+
+import com.facebook.CallbackManager;
+import com.facebook.FacebookSdk;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareButton;
+import com.facebook.share.widget.ShareDialog;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.PlayerStats.PlayerStatsContent;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 public class LeaderboardActivity extends AppCompatActivity implements PlayerStatsFragment.OnListFragmentInteractionListener {
-    private static MediaPlayer mMediaPlayer;
+    private MediaPlayer mMediaPlayer;
     private SharedPreferences mSharedPref;
 
-
-    @Override
+  @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard);
 
+
         mSharedPref = getSharedPreferences(
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
-        double current_volume = mSharedPref.getFloat(
+        float current_volume = mSharedPref.getFloat(
                 getString(R.string.saved_volume_setting), 1);
-
-        // Set volume to an integer to properly display on Slider.
-        int volume_int = (int) (current_volume * 100);
-
 
         mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
         mMediaPlayer.setLooping(true);
-        mMediaPlayer.setVolume(volume_int, volume_int);
+        mMediaPlayer.setVolume(current_volume, current_volume);
         int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
         mMediaPlayer.seekTo(music_position);
         mMediaPlayer.start();
@@ -70,6 +77,8 @@ public class LeaderboardActivity extends AppCompatActivity implements PlayerStat
 
     }
 
+
+
     @Override
     public void onResume() {
         super.onResume();
@@ -95,9 +104,15 @@ public class LeaderboardActivity extends AppCompatActivity implements PlayerStat
                     .putInt(getString(R.string.music_position), mMediaPlayer.getCurrentPosition())
                     .apply();
 
-            mMediaPlayer.pause();
+            mMediaPlayer.stop();
 
         }
+
+        if (mMediaPlayer != null) {
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
+        finish();
 
     }
 }

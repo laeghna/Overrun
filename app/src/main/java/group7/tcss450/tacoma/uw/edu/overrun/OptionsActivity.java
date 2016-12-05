@@ -30,7 +30,7 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
     private SharedPreferences mSharedPref;
     private Spinner mDiffSpinner;
     private Spinner mControlsSpinner;
-    private static MediaPlayer mMediaPlayer;
+    private MediaPlayer mMediaPlayer;
 
 
 
@@ -61,7 +61,7 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
 
         int current_controls = mSharedPref.getInt("saved_controls", 1);
 
-        double current_volume = mSharedPref.getFloat(
+        float current_volume = mSharedPref.getFloat(
                 getString(R.string.saved_volume_setting), 1);
 
         // Set volume to an integer to properly display on Slider.
@@ -76,12 +76,14 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         myControlsSpinner.setSelection(current_controls);
 
 
-        mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
-        mMediaPlayer.setLooping(true);
-        mMediaPlayer.setVolume(volume_int, volume_int);
-        int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
-        mMediaPlayer.seekTo(music_position);
-        mMediaPlayer.start();
+        if (mMediaPlayer == null) {
+            mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
+            mMediaPlayer.setLooping(true);
+            mMediaPlayer.setVolume(current_volume, current_volume);
+            int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.start();
+        }
 
     }
 
@@ -89,14 +91,21 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
     public void onResume() {
         super.onResume();
 
-        if (!mMediaPlayer.isPlaying()) {
-            int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
-            double current_volume = mSharedPref.getFloat(
-                    getString(R.string.saved_volume_setting), 1);
+        int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
+        float current_volume = mSharedPref.getFloat(
+                getString(R.string.saved_volume_setting), 1);
 
-            // Set volume to an integer to properly display on Slider.
-            int volume_int = (int) (current_volume * 100);
-            mMediaPlayer.setVolume(volume_int,volume_int);
+        if (mMediaPlayer == null) {
+            mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
+
+            mMediaPlayer.setVolume(current_volume,current_volume);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.start();
+        }
+
+        else if (!mMediaPlayer.isPlaying()) {
+
+            mMediaPlayer.setVolume(current_volume,current_volume);
             mMediaPlayer.seekTo(music_position);
             mMediaPlayer.start();
         }
@@ -112,8 +121,17 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
                     .apply();
 
             mMediaPlayer.pause();
+            mMediaPlayer.release();
+
 
         }
+
+        if (mMediaPlayer != null) {
+            mMediaPlayer = null;
+        }
+
+        this.finish();
+
 
     }
 
@@ -150,6 +168,8 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
                         , "Difficulty set to: " + diffText + "\nVolume set to: " +
                                 (int)(volume_level * 100) + "%",
                         Toast.LENGTH_SHORT) .show();
+
+
                 finish();
                 break;
 
