@@ -51,7 +51,7 @@ public class Survivor extends BitmapResizer {
         mSpeed = 2; // test speed may need to adjust
 
         // Get the player graphic from drawable:
-        mBmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.zombie); // a placeholder graphic
+        mBmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.survivor);
         mBmap = getResizedBmp(mBmap, screenSize.x/SCALE, screenSize.x/SCALE);
         mX = mBmap.getWidth();
         mY = screenSize.y - (mBmap.getHeight() + PADDING);
