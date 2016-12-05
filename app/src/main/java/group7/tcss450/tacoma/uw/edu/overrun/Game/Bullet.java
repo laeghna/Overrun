@@ -21,7 +21,7 @@ public class Bullet extends BitmapResizer {
     public static final int AMMO_CAPACITY = 25;
 
     /** Bullet's speed. */
-    private static final int SPEED = 15;
+    private static final int SPEED = 25;
 
     /** Constant for scaling bullet. */
     private static final int SCALE = 55;
