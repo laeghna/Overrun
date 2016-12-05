@@ -5,7 +5,7 @@ const config = JSON.parse(fs.readFileSync("overrun.json"));
 
 const express = require('express');
 const app = express();
-
+//require('./routes')(app);
 
 const google = require('google-auth-library');
 const OAuth2 = new google().OAuth2;
@@ -121,7 +121,7 @@ app.post('/api/user', (req, res) => {
         return res.status(400).json({ error: 'Invalid email format.' });
     }
 
-    const salt = bcrypt.genSalt(10, (err, salt) => {
+    bcrypt.genSalt(10, (err, salt) => {
 
         if (err) return res.status(500).json({ error: 'Internal server error.' });
 
@@ -290,7 +290,8 @@ app.get('/api/games', (req, res) => {
 
     // add limit if provided and check if it is a number
     if (req.query.limit && !isNaN(req.query.limit)) {
-        sqlQuery.replace(/;/, ' ').concat('LIMIT ', req.query.limit, ';');
+        sqlQuery = sqlQuery.replace(/;/, ' ').concat('LIMIT ', req.query.limit, ';');
+        console.log(sqlQuery);
     }
 
     c.query(sqlQuery, [req.query.email ? req.query.email : ''], (err, result) => {
