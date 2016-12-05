@@ -26,9 +26,6 @@ public class Bullet extends BitmapResizer {
     /** Constant for scaling bullet. */
     private static final int SCALE = 55;
 
-    /** The amt of damage the weapon does with each hit. */
-    private int mDamage;
-
     /** The context for the bullet. */
     private Context mContext;
 

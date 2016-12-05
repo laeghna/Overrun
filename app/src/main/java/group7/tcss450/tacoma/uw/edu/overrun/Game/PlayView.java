@@ -136,7 +136,7 @@ public class PlayView extends SurfaceView implements Runnable{
         mBullets = new Bullet[Bullet.AMMO_CAPACITY];
         for(int i = 0; i < mBullets.length; i++) {
 
-            mBullets[i] = new Bullet(1, mScreen, context);
+            mBullets[i] = new Bullet(mScreen, context);
         }
 
         level = mSharedPref.getInt("saved_difficulty", 1);
