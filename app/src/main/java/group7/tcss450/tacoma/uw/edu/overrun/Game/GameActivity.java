@@ -79,6 +79,16 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
     private Dialog dialog;
 
     /**
+     *     Boolean for controlling onResume method. It is needed to
+     *     prevent the game from running in the background if the pause
+     *     dialog is still up when returning to app from an external activity.
+     */
+    private boolean isResumimg;
+
+    /** Boolean to prevent multiple dialogs being created by multiple calls to onPause. */
+    private boolean hasPauseDialog;
+
+    /**
      * To perform on creation of this Activity.
      * @param savedInstanceState the saved instance state.
      */
@@ -110,6 +120,8 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         setSpawnInterval();
         spawnHandler = new Handler();
         startSpawningTask();
+        isResumimg = true;
+        hasPauseDialog = false;
 
         // start game
         mPlayView.run();
@@ -483,14 +495,18 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
     protected void onPause() {
 
         super.onPause();
-        if (!mPlayView.getIsGameOver()) {
+        if (!hasPauseDialog && !mPlayView.getIsGameOver()) {
 
             stopSpawningTask();
+            isResumimg = false;
+            hasPauseDialog = true;
             mPlayView.pauseGame();
             AlertDialog.Builder db = new AlertDialog.Builder(GameActivity.this);
             db.setMessage(R.string.pause_dialog)
                     .setPositiveButton(R.string.resume_button, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface di, int id) {
+                            isResumimg = true;
+                            hasPauseDialog = false;
                             onResume();
                         }
                     });
@@ -554,9 +570,15 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
     protected void onResume() {
         super.onResume();
 
-        //dialog.dismiss();
-        startSpawningTask();
-        mPlayView.resumeGame();
+        if (!isResumimg) {
+
+            //mPlayView.pauseGame();
+
+        } else {
+
+            startSpawningTask();
+            mPlayView.resumeGame();
+        }
     }
 
     /**
