@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.util.Log;
 
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
@@ -14,7 +13,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 02 December 2016
+ * @version 04 December 2016
  */
 
 public class Bullet extends BitmapResizer {
@@ -25,7 +24,7 @@ public class Bullet extends BitmapResizer {
     private static final int SPEED = 15;
 
     /** Constant for scaling bullet. */
-    private static final int SCALE = 25;
+    private static final int SCALE = 55;
 
     /** The amt of damage the weapon does with each hit. */
     private int mDamage;
@@ -86,27 +85,11 @@ public class Bullet extends BitmapResizer {
     }
 
     /**
-     * Sets the x-coordinate position of the bullet to the desired location.
-     * @param mX - the new x-coordinate of the bullet.
-     */
-    public void setX(int mX) {
-        this.mX = mX;
-    }
-
-    /**
      * Gets the y-coordinate position of the bullet.
      * @return - the y-coord position of the bullet.
      */
     public int getY() {
         return mY;
-    }
-
-    /**
-     * Sets the y-coordinate of the position of the bullet to the desired location.
-     * @param mY - the new y-coord position of the bullet.
-     */
-    public void setY(int mY) {
-        this.mY = mY;
     }
 
     /**
@@ -147,9 +130,9 @@ public class Bullet extends BitmapResizer {
      * @param startY - the y coordinate of the bullet fired.
      */
     public void shootWeapon(int theX, int startY) {
-        Log.d("shooting:", theX + " " + startY);
+
         if (!mIsActive) {
-            mX = theX;
+            mX = theX - mBMP.getWidth();
             mY = startY - mBMP.getHeight();
             mDetectBullet.left = mX;
             mDetectBullet.top = mY;
