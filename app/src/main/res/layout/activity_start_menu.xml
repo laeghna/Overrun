@@ -69,26 +69,18 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"/>
 
+    <Button
+        android:id="@+id/share_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Facebook Share"
+
+        android:textColor="@color/com_facebook_blue"
+        android:background="@color/transparent"
+        android:drawableLeft="@drawable/com_facebook_button_icon"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/start_button"
+        android:layout_toEndOf="@+id/start_button" />
 
 
-
-    <!--        <ImageButton
-                android:id="@+id/start_button"
-                android:contentDescription="@string/start_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/start_temp_image"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true"
-                android:onClick="startGameClicked"
-                android:background="@android:color/transparent" />
-
-            <ImageButton
-                android:id="@+id/imageButton"
-                android:contentDescription="@string/options_description"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/options_temp"
-                android:layout_below="@+id/start_button"
-                android:layout_centerHorizontal="true" />-->
 </RelativeLayout>
