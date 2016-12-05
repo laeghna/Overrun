@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -136,7 +135,7 @@ public class PlayView extends SurfaceView implements Runnable{
         mBullets = new Bullet[Bullet.AMMO_CAPACITY];
         for(int i = 0; i < mBullets.length; i++) {
 
-            mBullets[i] = new Bullet(1, mScreen, context);
+            mBullets[i] = new Bullet(mScreen, context);
         }
 
         level = mSharedPref.getInt("saved_difficulty", 1);
@@ -161,69 +160,89 @@ public class PlayView extends SurfaceView implements Runnable{
             // game control loop: while the user is playing continue to update the view
             while (mIsPlaying) {
 
-                //update and draw frame
-                update();
-                draw();
-                //update the frame controls
-                framesPerSecond();
+                if (isGameOver) {
+
+                    mIsPlaying = false;
+                    changeSupport.firePropertyChange("GameOver", false, true);
+
+                } else {
+
+                    //update and draw frame
+                    update();
+                    draw();
+                    //update the frame controls
+                    framesPerSecond();
+                }
             }
     }
 
     /** Updates the frame for the PlayView. */
     private void update() {
 
-        // update zombie positions.
-        for (int i = 0; i < zombies.length; i++) {
+        // Iterate through zombies
+        for (int z = 0; z < zombies.length; z++) {
 
+            for (int b = 0; b < mBullets.length; b++) {
 
-            if (zombies[i] != null) {
+                if (mBullets[b] == null || zombies[z] == null) {
 
-                if (mBarrier.detectCollisions(zombies[i])) {   //check if zombie is at barrier or survivor
-                    // do not update position
-                } else if (Rect.intersects(zombies[i].getDetectZombie(),  //collision between survivor and zombie
-                        mSurvivor.getmDetectSurvivor())) {
+                    //Do nothing
 
-                    if (hitDelayCounter == 0) {
+                    //Check if zombie collides with bullet
+                } else if (Rect.intersects(mBullets[b].getDetectBullet(),
+                        zombies[z].getDetectZombie())) {
 
-                        health.setCurrHealth(health.getCurrHealth() - 1);
-                        Log.d("PlayView", "Survivor is hit!");
+                    //Increase zombie's hit count and reset bullet
+                    zombies[z].addHit();
+                    mBullets[b] = null;
 
-                    } else if (hitDelayCounter == HIT_DELAY)
-                        hitDelayCounter = -1;
+                    //If hit count is equal to zombie's health, reset zombie and increase score
+                    if (zombies[z].getTimesHit() == zombies[z].getHP()) {
 
-                    hitDelayCounter++;
-
-                } else if (zombies[i].getIsActive()) {
-
-                    zombies[i].updateMovement();
-                }
-            }
-            if(health.getCurrHealth() <= 0) {
-                isGameOver = true;
-            }
-        }
-
-        //update bullet positions
-        //check for collisions between bullets and zombies.
-        for (int i = 0; i < mBullets.length; i++) {
-            if (mBullets[i] != null && mBullets[i].getIsActive()) {
-
-                mBullets[i].updateBulletPosition();
-
-                for (int z = 0; z < zombieCount; z++) {
-                    //if collision occurs with bullet
-                    if (zombies[z] != null && Rect.intersects(mBullets[i].getDetectBullet(),
-                            zombies[z].getDetectZombie())) {
-                        //Increase zombie's hit count and reset bullet
-                        zombies[z].addHit();
-                        mBullets[i].resetBullet();
-                        //If hit count is equal to zombie's health, reset zombie and increase score
-                        if (zombies[z].getTimesHit() == zombies[z].getHP()) {
-                            zombies[z].resetZombie();
-                            gameScore = gameScore + zombies[z].getPointValue();
-                        }
+                        zombies[z].resetZombie();
+                        gameScore = gameScore + zombies[z].getPointValue();
                     }
+
+                    //Update bullet position
+                } else if ((z % zombies.length == 0) && mBullets[b].getIsActive()) {
+
+                    mBullets[b].updateBulletPosition();
                 }
+            }
+
+            if (zombies[z] == null) {
+
+                //do nothing
+
+              //Check if zombie at barrier
+            } else if (mBarrier.detectCollisions(zombies[z])) {
+
+                // do not update position
+
+              //Check if zombie collides with survivor
+            } else if (Rect.intersects(zombies[z].getDetectZombie(), mSurvivor.getmDetectSurvivor())) {
+
+                if (hitDelayCounter == 0) {
+
+                    health.setCurrHealth(health.getCurrHealth() - 1);
+
+                } else if (hitDelayCounter == HIT_DELAY) {
+
+                    hitDelayCounter = -1;
+                }
+
+                hitDelayCounter++;
+
+              //Update zombie movement if active
+            } else if (zombies[z].getIsActive()) {
+
+                zombies[z].updateMovement();
+
+            }
+
+            if (health.getCurrHealth() <= 0) {
+
+                isGameOver = true;
             }
         }
     }
@@ -235,54 +254,66 @@ public class PlayView extends SurfaceView implements Runnable{
         // check holder
         if( mHolder.getSurface().isValid()) {
             canvas = mHolder.lockCanvas(); // lock the background for drawing
-            canvas.drawBitmap(bgImage, 0, 80, paint);
+
+            int hWidth = health.getBitmap().getWidth();
+            int hHeight = health.getBitmap().getHeight();
+            canvas.drawBitmap(bgImage, 0, hHeight, paint);
             canvas.drawBitmap(mSurvivor.getmBmap(), mSurvivor.getmX(),
                     mSurvivor.getmY(), paint);
 
             mBarrier.drawBarrier(paint, canvas);
 
             //Draw zombies
-            for (int i = 0; i < zombies.length; i++) {
+            for (Zombie z : zombies) {
 
-                if (zombies[i] != null && zombies[i].getIsActive()) {
-                    canvas.drawBitmap(
-                            zombies[i].getBitmap(),
-                            zombies[i].getXCoord(),
-                            zombies[i].getYCoord(),
-                            paint);
+                if (z != null) {
+
+                    if (z.getHasReachedBottom()) {
+
+                        isGameOver = true;
+
+                    } else if (z.getIsActive()) {
+                        canvas.drawBitmap(
+                                z.getBitmap(),
+                                z.getXCoord(),
+                                z.getYCoord(),
+                                paint);
+                    }
                 }
             }
-            // draws bullets
-            for(int i = 0; i < mBullets.length; i++) {
-                if (mBullets[i] != null && mBullets[i].getIsActive()) {
 
-                    canvas.drawBitmap(mBullets[i].getBMP(), mBullets[i].getX(),
-                            mBullets[i].getY(), paint);
+            // draws bullets
+            for (Bullet b : mBullets) {
+
+                if (b == null) {
+
+                    //Do nothing
+
+                } else if (b.getIsActive()) {
+
+                    canvas.drawBitmap(b.getBMP(), b.getX(),
+                            b.getY(), paint);
                 }
             }
 
             paint.setColor(Color.BLACK);
-            canvas.drawRect(0, 0, mScreen.x, 80, paint);
+            canvas.drawRect(0, 0, mScreen.x, hHeight, paint);
 
 
             //Draw current health
             for(int h = 0; h < health.getCurrHealth(); h++) {
 
-                canvas.drawBitmap(health.getmBitmap(), health.getxCoord() +
-                                (health.getmBitmap().getWidth() * h),
+                canvas.drawBitmap(health.getBitmap(), health.getxCoord() +
+                                (hWidth * h),
                         health.getyCoord(), paint);
             }
 
             //Draw updated score
             paint.setTextSize(60);
             paint.setColor(Color.GREEN);
-            canvas.drawText("Score: " + gameScore, mScreen.x - 500, 60, paint);
+            canvas.drawText("Score: " + gameScore, mScreen.x - (health.getBitmap().getWidth() * 7),
+                    60, paint);
 
-            if(isGameOver) {
-
-                mIsPlaying = false;
-                changeSupport.firePropertyChange("GameOver", false, true);
-            }
             mHolder.unlockCanvasAndPost(canvas); // drawing done -> unlock background
         }
     }
@@ -310,6 +341,7 @@ public class PlayView extends SurfaceView implements Runnable{
 
         } catch (InterruptedException e) {
 
+            e.getMessage();
         }
     }
 
@@ -348,20 +380,25 @@ public class PlayView extends SurfaceView implements Runnable{
 
     /**
      * Fires the survivor's weapon.
-     * @return true if the bullet was fired (added to the bullet array), false otherwise.
      */
-    public boolean fire() {
+    public void fire() {
 
-        for(int i = 0; i < Bullet.AMMO_CAPACITY; i++) {
+        int b = 0;
+        while (b < mBullets.length && mBullets[b] != null && mBullets[b].getIsActive()) {
 
-            if(!mBullets[i].getIsActive()) {
-
-                mBullets[i].shootWeapon(mSurvivor.getmX() + (mSurvivor.getmBmap().getWidth()),
-                        mSurvivor.getmY());
-                return true;
-            }
+            b++;
         }
-        return false;
+
+        if (b < mBullets.length) {
+
+            if (mBullets[b] == null) {
+
+                mBullets[b] = new Bullet(mScreen, getContext());
+            }
+
+            mBullets[b].shootWeapon(mSurvivor.getmX() + (mSurvivor.getmBmap().getWidth()),
+                    mSurvivor.getmY());
+        }
     }
 
     /**
@@ -384,33 +421,37 @@ public class PlayView extends SurfaceView implements Runnable{
     /**
      * Method for zombie spawning.
      */
-    public boolean spawnZombie() {
+    public void spawnZombie() {
 
         Random random = new Random();
         int zombie;
+        int z = 0;
 
-        for(int i = 0; i < zombies.length; i++) {
+        while (z < zombies.length && zombies[z] != null && zombies[z].getIsActive()) {
 
-            if(zombies[i] == null || !zombies[i].getIsActive()) {
+            z++;
+        }
+
+        if (z < zombies.length) {
+
+            if(zombies[z] == null || !zombies[z].getIsActive()) {
 
                 zombie = random.nextInt(3);
                 switch(zombie) {
 
-                    case 0: zombies[i] = new ZombieCrawler(gameContext, mScreen);
+                    case 0: zombies[z] = new ZombieCrawler(gameContext, mScreen);
                         break;
-                    case 1: zombies[i] = new ZombieWalker(gameContext, mScreen);
+                    case 1: zombies[z] = new ZombieWalker(gameContext, mScreen);
                         break;
-                    case 2: zombies[i] = new ZombieColossus(gameContext,mScreen);
+                    case 2: zombies[z] = new ZombieColossus(gameContext,mScreen);
                         break;
-                    default: zombies[i] = new ZombieCrawler(gameContext, mScreen);
+                    default: zombies[z] = new ZombieCrawler(gameContext, mScreen);
                         break;
                 }
 
-                zombies[i].setIsActive(true);
-                return true;
+                zombies[z].setIsActive(true);
             }
         }
-        return false;
     }
 
     /**

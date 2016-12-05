@@ -11,7 +11,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  * Class for survivor's health.
  *
  * @author Lisa Taylor
- * @version 22 November 2016
+ * @version 04 December 2016
  */
 
 public class Health extends BitmapResizer {
@@ -63,7 +63,7 @@ public class Health extends BitmapResizer {
         return yCoord;
     }
 
-    public Bitmap getmBitmap() {
+    public Bitmap getBitmap() {
         return healthBitmap;
     }
 }

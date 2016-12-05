@@ -21,13 +21,10 @@ public class Bullet extends BitmapResizer {
     public static final int AMMO_CAPACITY = 25;
 
     /** Bullet's speed. */
-    private static final int SPEED = 15;
+    private static final int SPEED = 25;
 
     /** Constant for scaling bullet. */
     private static final int SCALE = 55;
-
-    /** The amt of damage the weapon does with each hit. */
-    private int mDamage;
 
     /** The context for the bullet. */
     private Context mContext;
@@ -52,14 +49,12 @@ public class Bullet extends BitmapResizer {
 
     /**
      * Public constructor for the Bullet class.
-     * @param dmg - the damage the weapon does per hit.
      * @param screenSize - the size of the screen.
      * @param context - the context for the app.
      */
-    public Bullet(int dmg, Point screenSize, Context context) {
+    public Bullet(Point screenSize, Context context) {
         mContext = context;
         mScreenSize = screenSize;
-        mDamage = dmg;
 
         mBMP = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.bullet); // a placeholder graphic
         mBMP = getResizedBmp(mBMP, screenSize.x/SCALE, screenSize.x/SCALE);

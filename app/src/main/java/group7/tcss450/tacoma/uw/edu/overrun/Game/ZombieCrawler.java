@@ -99,7 +99,6 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
 
             isActive = false;
             hasReachedBottom = true;
-            resetZombie();
         }
     }
 
