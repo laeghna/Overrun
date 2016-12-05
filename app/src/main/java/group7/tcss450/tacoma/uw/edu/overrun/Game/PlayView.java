@@ -221,7 +221,6 @@ public class PlayView extends SurfaceView implements Runnable{
                         if (zombies[z].getTimesHit() == zombies[z].getHP()) {
                             zombies[z].resetZombie();
                             gameScore = gameScore + zombies[z].getPointValue();
-                            Log.d("SCORE", "" + gameScore);
                         }
                     }
                 }
@@ -280,8 +279,7 @@ public class PlayView extends SurfaceView implements Runnable{
             canvas.drawText("Score: " + gameScore, mScreen.x - 500, 60, paint);
 
             if(isGameOver) {
-                paint.setTextSize(150);
-                canvas.drawText("GAME OVER", mScreen.x/2 - 50, mScreen.y/2, paint);
+
                 mIsPlaying = false;
                 changeSupport.firePropertyChange("GameOver", false, true);
             }
