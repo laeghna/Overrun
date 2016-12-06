@@ -32,7 +32,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
  *
  * @author Leslie Pedro
  * @author Lisa Taylor
- * @version 04 December 2016
+ * @version 05 December 2016
  */
 public class GameActivity extends AppCompatActivity implements PropertyChangeListener{
 
@@ -193,17 +193,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         actionBarCenter.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
         actionBarCenter.setVerticalGravity(Gravity.TOP);
 
-        mPauseButton = new Button(this);
-        mPauseButton.setText(R.string.pause_button_txt);
-        mPauseButton.setBackgroundResource(R.drawable.pause_button);
-        mPauseButton.setTextColor(Color.GRAY);
-        mPauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                onPause();
-            }
-        });
+        mPauseButton = createPauseButton();
 
         actionBarCenter.addView(mPauseButton);
 
@@ -217,27 +207,9 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         buttonsLeft.setOrientation(LinearLayout.VERTICAL);
 
         // Create the buttons
-        mLeftButton = new Button(this);
-        mLeftButton.setBackgroundResource(R.drawable.move_button);
-        mLeftButton.setTextColor(Color.GRAY);
-        mLeftButton.setText(R.string.left_button_txt);
-        mLeftButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
-            @Override
-            public void onClick(View view){
-                mPlayView.moveLeft();
-            }
-        }));
+        mLeftButton = createMoveLeftButton();
 
-        mFireButton_L = new Button(this);
-        mFireButton_L.setText(R.string.fire_button_txt);
-        mFireButton_L.setBackgroundResource(R.drawable.fire_button);
-        mFireButton_L.setOnTouchListener(new ButtonListener(0, 0, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPlayView.fire();
-            }
-        }));
-
+        mFireButton_L = createFireButton();
 
         //add the buttons to the proper layout
         buttonsLeft.addView(mFireButton_L);
@@ -252,27 +224,9 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         LinearLayout buttonsRight = new LinearLayout(this);
         buttonsRight.setOrientation(LinearLayout.VERTICAL);
 
-        mRightButton = new Button(this);
-        mRightButton.setText(R.string.right_button_txt);
-        mRightButton.setBackgroundResource(R.drawable.move_button);
-        mRightButton.setTextColor(Color.GRAY);
-        mRightButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
-            @Override
-            public void onClick(View view){
-                mPlayView.moveRight();
-            }
-        }));
+        mRightButton = createMoveRightButton();
 
-        mFireButton_R = new Button(this);
-        mFireButton_R.setText(R.string.fire_button_txt);
-        mFireButton_R.setBackgroundResource(R.drawable.fire_button);
-
-        mFireButton_R.setOnTouchListener(new ButtonListener(0, 0, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPlayView.fire();
-            }
-        }));
+        mFireButton_R = createFireButton();
 
         buttonsRight.addView(mFireButton_R);
         buttonsRight.addView(mRightButton);
@@ -312,16 +266,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         actionBarCenter.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
         actionBarCenter.setVerticalGravity(Gravity.TOP);
 
-        mPauseButton = new Button(this);
-        mPauseButton.setText(R.string.pause_button_txt);
-        mPauseButton.setBackgroundResource(R.drawable.pause_button);
-        mPauseButton.setTextColor(Color.GRAY);
-        mPauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onPause();
-            }
-        });
+        mPauseButton = createPauseButton();
 
         actionBarCenter.addView(mPauseButton);
 
@@ -336,27 +281,10 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         move_buttons_low.setHorizontalGravity(Gravity.RIGHT);
 
         // Create the buttons
-        mLeftButton = new Button(this);
-        mLeftButton.setBackgroundResource(R.drawable.move_button);
-        mLeftButton.setTextColor(Color.GRAY);
-        mLeftButton.setText(R.string.left_button_txt);
-        mLeftButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
-            @Override
-            public void onClick(View view){
-                mPlayView.moveLeft();
-            }
-        }));
+        mLeftButton = createMoveLeftButton();
 
-        mRightButton = new Button(this);
-        mRightButton.setText(R.string.right_button_txt);
-        mRightButton.setBackgroundResource(R.drawable.move_button);
-        mRightButton.setTextColor(Color.GRAY);
-        mRightButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
-            @Override
-            public void onClick(View view){
-                mPlayView.moveRight();
-            }
-        }));
+        mRightButton = createMoveRightButton();
+
         move_buttons_low.addView(mLeftButton);
         move_buttons_low.addView(mRightButton);
 
@@ -364,15 +292,8 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         fire.setOrientation(LinearLayout.HORIZONTAL);
         fire.setHorizontalGravity(Gravity.RIGHT);
         fire.setVerticalGravity(Gravity.BOTTOM);
-        mFireButton_R = new Button(this);
-        mFireButton_R.setText(R.string.fire_button_txt);
-        mFireButton_R.setBackgroundResource(R.drawable.fire_button);
-        mFireButton_R.setOnTouchListener(new ButtonListener(0, 0, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPlayView.fire();
-            }
-        }));
+
+        mFireButton_R = createFireButton();
         mFireButton_R.setWidth(mLeftButton.getWidth() + mRightButton.getWidth());
         fire.addView(mFireButton_R);
 
@@ -410,16 +331,7 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         actionBarCenter.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
         actionBarCenter.setVerticalGravity(Gravity.TOP);
 
-        mPauseButton = new Button(this);
-        mPauseButton.setText(R.string.pause_button_txt);
-        mPauseButton.setBackgroundResource(R.drawable.pause_button);
-        mPauseButton.setTextColor(Color.GRAY);
-        mPauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onPause();
-            }
-        });
+        mPauseButton = createPauseButton();
 
         actionBarCenter.addView(mPauseButton);
 
@@ -434,27 +346,10 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         move_buttons_low.setHorizontalGravity(Gravity.LEFT);
 
         // Create the buttons
-        mLeftButton = new Button(this);
-        mLeftButton.setBackgroundResource(R.drawable.move_button);
-        mLeftButton.setTextColor(getResources().getColor(R.color.gray));
-        mLeftButton.setText(R.string.left_button_txt);
-        mLeftButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
-            @Override
-            public void onClick(View view){
-                mPlayView.moveLeft();
-            }
-        }));
+        mLeftButton = createMoveLeftButton();
 
-        mRightButton = new Button(this);
-        mRightButton.setText(R.string.right_button_txt);
-        mRightButton.setBackgroundResource(R.drawable.move_button);
-        mRightButton.setTextColor(Color.GRAY);
-        mRightButton.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
-            @Override
-            public void onClick(View view){
-                mPlayView.moveRight();
-            }
-        }));
+        mRightButton = createMoveRightButton();
+
         move_buttons_low.addView(mLeftButton);
         move_buttons_low.addView(mRightButton);
 
@@ -462,17 +357,10 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         fire.setOrientation(LinearLayout.HORIZONTAL);
         fire.setHorizontalGravity(Gravity.LEFT);
         fire.setVerticalGravity(Gravity.BOTTOM);
-        mFireButton_R = new Button(this);
-        mFireButton_R.setText(R.string.fire_button_txt);
-        mFireButton_R.setBackgroundResource(R.drawable.fire_button);
-        mFireButton_R.setOnTouchListener(new ButtonListener(0, 0, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPlayView.fire();
-            }
-        }));
-        mFireButton_R.setWidth(mLeftButton.getWidth() + mRightButton.getWidth());
-        fire.addView(mFireButton_R);
+
+        mFireButton_L = createFireButton();
+        mFireButton_L.setWidth(mLeftButton.getWidth() + mRightButton.getWidth());
+        fire.addView(mFireButton_L);
 
         actionBarLow.addView(fire);
         actionBarLow.addView(move_buttons_low);
@@ -486,6 +374,102 @@ public class GameActivity extends AppCompatActivity implements PropertyChangeLis
         layout.addView(actionBarLow);
 
         return layout;
+    }
+
+    /**
+     * Creates a pause button to be used in a layout.
+     *
+     * @return pauseBttn the pause button
+     */
+    private Button createPauseButton() {
+
+        Button pauseBttn = new Button(this);
+
+        pauseBttn.setText(R.string.pause_button_txt);
+        pauseBttn.setBackgroundResource(R.drawable.pause_button);
+        pauseBttn.setTextColor(Color.GRAY);
+        pauseBttn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                onPause();
+            }
+        });
+
+        return pauseBttn;
+    }
+
+    /**
+     * Creates a fire button to be used in a layout. Fires the survivor's weapon.
+     *
+     * @return fireBttn the fire button
+     */
+    private Button createFireButton() {
+
+        Button fireBttn = new Button(this);
+
+        fireBttn.setText(R.string.fire_button_txt);
+        fireBttn.setBackgroundResource(R.drawable.fire_button);
+        fireBttn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                mPlayView.fire();
+            }
+        });
+
+        return fireBttn;
+    }
+
+    /**
+     * Creates a button to be used in a layout. Moves Survivor left. Uses onTouchListener.
+     *
+     * @return leftBttn the move left button
+     */
+    private Button createMoveLeftButton() {
+
+        Button leftBttn = new Button(this);
+
+        leftBttn.setBackgroundResource(R.drawable.move_button);
+        leftBttn.setTextColor(Color.GRAY);
+        leftBttn.setText(R.string.left_button_txt);
+        leftBttn.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view){
+
+                mPlayView.moveLeft();
+
+            }
+        }));
+
+        return leftBttn;
+    }
+
+    /**
+     * Creates a button to be used in a layout. Moves Survivor right. Uses onTouchListener.
+     *
+     * @return rightBttn the move right button
+     */
+    private Button createMoveRightButton() {
+
+        Button rightBttn = new Button(this);
+
+        rightBttn.setText(R.string.right_button_txt);
+        rightBttn.setBackgroundResource(R.drawable.move_button);
+        rightBttn.setTextColor(Color.GRAY);
+        rightBttn.setOnTouchListener(new ButtonListener(10, 5, new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view){
+
+                mPlayView.moveRight();
+            }
+        }));
+
+        return rightBttn;
     }
 
     /**
