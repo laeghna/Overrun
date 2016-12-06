@@ -1,7 +1,6 @@
 package group7.tcss450.tacoma.uw.edu.overrun.SignIn;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -16,13 +15,14 @@ import butterknife.OnClick;
 import butterknife.Optional;
 import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
-import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
 
 /**
  * Activity that encapsulates the login and registration for the user.
  *
  * @author Ethan Rowell
- * @version 9 Nov 2016
+ * @author Lisa Taylor
+ * @author Andrew Merz
+ * @version 06 December 2016
  */
 public class SignInActivity extends BaseActivity {
 
@@ -75,6 +75,7 @@ public class SignInActivity extends BaseActivity {
 
         if (mMediaPlayer == null) {
             mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.setVolume(current_volume, current_volume);
             mMediaPlayer.seekTo(music_position);
             mMediaPlayer.start();
@@ -82,6 +83,7 @@ public class SignInActivity extends BaseActivity {
 
         else if (!mMediaPlayer.isPlaying()) {
 
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.setVolume(current_volume, current_volume);
             mMediaPlayer.seekTo(music_position);
             mMediaPlayer.start();
@@ -99,7 +101,6 @@ public class SignInActivity extends BaseActivity {
                     .apply();
 
             mMediaPlayer.pause();
-
         }
 
         if (mMediaPlayer != null) {
@@ -148,9 +149,6 @@ public class SignInActivity extends BaseActivity {
 
         Toast.makeText(getApplicationContext(), "Signed in as: " + userEmail,
                 Toast.LENGTH_LONG).show();
-
-        Intent intent = new Intent(this, StartMenuActivity.class);
-        startActivity(intent);
         finish();
     }
 
