@@ -19,6 +19,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Random;
 
+import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbHelper;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 /** This class is intended for use in the game Overrun. A fun and fast-paced survival
@@ -165,6 +166,10 @@ public class PlayView extends SurfaceView implements Runnable{
                             .putString(getContext().getString(R.string.recient_high_score), String.valueOf(gameScore))
                             .apply();
                     mIsPlaying = false;
+                    String email = mSharedPref.getString("USER_EMAIL", "");
+
+                    OverrunDbHelper dbHelper = new OverrunDbHelper(getContext());
+                    dbHelper.submitScore(email, gameScore, 0, 0, 0);
                     changeSupport.firePropertyChange("GameOver", false, true);
 
                 } else {

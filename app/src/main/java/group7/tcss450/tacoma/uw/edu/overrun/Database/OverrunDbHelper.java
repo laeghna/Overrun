@@ -291,7 +291,8 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
      * @param shotsFired    The number of shots fired.
      */
     public boolean submitScore(String email, int score, int zombiesKilled, int level, int shotsFired) {
-        Timber.d("Creating game for %s", email);
+        Timber.d("Creating game for %s with score: %d, zombiesKilled: %d, level: %d and shotsFired: %d",
+                email, score, zombiesKilled, level, shotsFired);
 
         if (isConnected()) {
             uploadGame(-1, email, score, zombiesKilled, level, shotsFired);
@@ -358,9 +359,10 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
             public void onResponse(Call<GameScoreModel> call,
                                    retrofit2.Response<GameScoreModel>
                                            response) {
+                Timber.d("Status code: %d", response.code());
                 if (gameId > 0) deleteGame(gameId);
                 if (response.code() == HttpURLConnection.HTTP_CREATED)
-                    Timber.d("GameScoreModel uploaded successfully.");
+                    Timber.d("GameScoreModel uploaded successfully");
             }
 
             @Override
