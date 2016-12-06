@@ -145,7 +145,7 @@ public class PlayView extends SurfaceView implements Runnable{
         zombies = new Zombie[zombieCount];
         spawnZombie();
 
-        mBarrier = new Barrier(mScreen, mSurvivor);
+        mBarrier = new Barrier(mScreen, mSurvivor, level);
 
         gameScore = 0;
     }
@@ -161,7 +161,9 @@ public class PlayView extends SurfaceView implements Runnable{
             while (mIsPlaying) {
 
                 if (isGameOver) {
-
+                    mSharedPref.edit()
+                            .putString(getContext().getString(R.string.recient_high_score), String.valueOf(gameScore))
+                            .apply();
                     mIsPlaying = false;
                     changeSupport.firePropertyChange("GameOver", false, true);
 
