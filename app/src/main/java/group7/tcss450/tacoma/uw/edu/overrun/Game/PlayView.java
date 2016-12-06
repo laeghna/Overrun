@@ -145,7 +145,7 @@ public class PlayView extends SurfaceView implements Runnable{
         zombies = new Zombie[zombieCount];
         spawnZombie();
 
-        mBarrier = new Barrier(mScreen, mSurvivor);
+        mBarrier = new Barrier(mScreen, mSurvivor, level);
 
         gameScore = 0;
     }

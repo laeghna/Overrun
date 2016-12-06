@@ -34,15 +34,19 @@ public class Barrier {
     /** The starting y position for the barrier. */
     private float mStartY;
 
+    /** The game's difficulty level. */
+    private int levelDiff;
+
     /**
      * Creates a barrier between the survivor and the attacking zombies.
      * @param screenSize the size of the device's screen.
      * @param s the survivor.
      */
-    public Barrier(Point screenSize, Survivor s) {
+    public Barrier(Point screenSize, Survivor s, int lvlDifficulty) {
         mScreen = screenSize;
         mSurvivor = s;
         mBarrier = assembleBarrier();
+        levelDiff = lvlDifficulty;
     }
 
     /**
@@ -103,7 +107,8 @@ public class Barrier {
         for(int i = 0; i < BARRIER_ROWS; i++) {
             currentX = startPosX;
             for(int j = 0; j < BARRIER_COLS; j++) {
-                barrier[i][j] = new BarrierBlock(currentX, currentY, rect_width + currentX, currentY + rect_height);
+                barrier[i][j] = new BarrierBlock(currentX, currentY, rect_width + currentX,
+                        currentY + rect_height, levelDiff);
                 currentX = currentX + rect_width;
             }
             currentY = currentY + rect_height;
@@ -146,7 +151,11 @@ public class Barrier {
         private RectF mBlock;
 
         /** Max health for all blocks. */
-        public static final int MAX_HEALTH = 500;
+        public static final int MAX_HEALTH_1 = 500;
+
+        public static final int MAX_HEALTH_2 = 400;
+
+        public static final int MAX_HEALTH_3 = 300;
 
         /** The current health of the block. */
         private int mHealth;
@@ -164,8 +173,18 @@ public class Barrier {
          * @param right the right coordinate of the block.
          * @param bottom the bottom coordinate of the block.
          */
-        private BarrierBlock(float left, float top, float right, float bottom) {
-            mHealth = MAX_HEALTH;
+        private BarrierBlock(float left, float top, float right, float bottom, int lvlDifficulty) {
+            switch(lvlDifficulty) {
+                case 1: mHealth = MAX_HEALTH_1;
+                    break;
+                case 2: mHealth = MAX_HEALTH_2;
+                    break;
+                case 3: mHealth = MAX_HEALTH_3;
+                    break;
+                default: mHealth = MAX_HEALTH_1;
+                    break;
+            }
+
             mIsDestroyed = false;
             mBlock = new RectF(left, top, right, bottom);
             Random r = new Random();
