@@ -65,8 +65,8 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
                 if (ShareDialog.canShow(ShareLinkContent.class)) {
                     ShareLinkContent linkContent = new ShareLinkContent.Builder()
                             .setContentTitle("Overrun Highscore!")
-                            .setContentDescription(
-                                    "Overrun App share test")
+                            .setContentDescription("Score: " +
+                                    mSharedPref.getString(getString(R.string.recient_high_score), "0"))
                             .setContentUrl(Uri.parse("https://developers.facebook.com"))
                             .build();
 
@@ -225,6 +225,10 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
                             .apply();
                     mSharedPref.edit()
                             .putString(getString(R.string.user_email), "")
+                            .apply();
+
+                    mSharedPref.edit()
+                            .putString(getString(R.string.recient_high_score), "0")
                             .apply();
 
                     LoginManager.getInstance().logOut();
