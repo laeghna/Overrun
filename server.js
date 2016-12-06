@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 
 const express = require('express');
 const app = express();
-//require('./routes')(app);
+const routes = require('./routes');
 
 
 // express config
@@ -17,6 +17,8 @@ app.set("title", "Overrun");
 const bp = require('body-parser');
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
+
+app.use(routes);
 
 
 

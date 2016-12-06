@@ -1,6 +1,6 @@
 const fs = require('fs');
 const bcrypt = require('bcrypt');
-const config = JSON.parse(fs.readFileSync("../overrun.json"));
+const config = JSON.parse(fs.readFileSync("overrun.json"));
 
 // MySQL config
 const mysql = require('mysql');

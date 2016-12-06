@@ -1,5 +1,5 @@
 const fs = require('fs');
-const config = JSON.parse(fs.readFileSync("../overrun.json"));
+const config = JSON.parse(fs.readFileSync("overrun.json"));
 
 // MySQL config
 const mysql = require('mysql');
@@ -22,7 +22,7 @@ const getStats = 'SELECT email, ' +
     'MAX(zombiesKilled) AS mostZombiesKilled, ' +
     'MAX(level) AS highestLevel, ' +
     'MAX(shotsFired) AS mostShotsFired ' +
-    'FROM Game';
+    'FROM Game GROUP BY email;';
 const getGameScores = 'SELECT * FROM Game ORDER BY score DESC;';
 const getUsersGameScores = 'SELECT * FROM Game WHERE email = ? ORDER BY score DESC;';
 
@@ -110,7 +110,6 @@ module.exports = {
         // add limit if provided and check if it is a number
         if (req.query.limit && !isNaN(req.query.limit)) {
             sqlQuery = sqlQuery.replace(/;/, ' ').concat('LIMIT ', req.query.limit, ';');
-            console.log(sqlQuery);
         }
 
         c.query(sqlQuery, [req.query.email ? req.query.email : ''], (err, result) => {
@@ -188,6 +187,4 @@ module.exports = {
             return res.status(200).json(result);
         });
     }
-
-
 };
