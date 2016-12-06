@@ -83,6 +83,7 @@ public class LeaderboardActivity extends AppCompatActivity implements PlayerStat
 
             mMediaPlayer.setVolume(current_volume, current_volume);
             mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.start();
         }
 
@@ -90,6 +91,7 @@ public class LeaderboardActivity extends AppCompatActivity implements PlayerStat
 
             mMediaPlayer.setVolume(current_volume, current_volume);
             mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.start();
         }
 

@@ -77,6 +77,7 @@ public class SignInActivity extends BaseActivity {
             mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
             mMediaPlayer.setVolume(current_volume, current_volume);
             mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.start();
         }
 
@@ -84,6 +85,7 @@ public class SignInActivity extends BaseActivity {
 
             mMediaPlayer.setVolume(current_volume, current_volume);
             mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.start();
         }
 
@@ -149,8 +151,6 @@ public class SignInActivity extends BaseActivity {
         Toast.makeText(getApplicationContext(), "Signed in as: " + userEmail,
                 Toast.LENGTH_LONG).show();
 
-        Intent intent = new Intent(this, StartMenuActivity.class);
-        startActivity(intent);
         finish();
     }
 

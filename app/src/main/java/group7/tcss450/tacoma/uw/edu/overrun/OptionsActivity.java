@@ -107,7 +107,7 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
 
         if (mMediaPlayer == null) {
             mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
-
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.setVolume(current_volume,current_volume);
             mMediaPlayer.seekTo(music_position);
             mMediaPlayer.start();
@@ -117,6 +117,7 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
 
             mMediaPlayer.setVolume(current_volume,current_volume);
             mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.start();
         }
     }
