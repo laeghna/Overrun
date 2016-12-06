@@ -140,7 +140,7 @@ public class PlayerStatsFragment extends Fragment {
      */
     public void getGameScores() {
         ApiInterface api = ApiClient.getClient();
-        Call<List<GameScoreModel>> call = api.getGames();
+        Call<List<GameScoreModel>> call = api.getGames(10);
 
         call.enqueue(new Callback<List<GameScoreModel>>() {
             @Override

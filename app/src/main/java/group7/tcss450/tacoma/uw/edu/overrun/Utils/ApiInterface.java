@@ -76,4 +76,12 @@ public interface ApiInterface {
      */
     @GET("api/games")
     Call<List<GameScoreModel>> getGames();
+
+    /**
+     * Gets a list of games in order of descending score limited to 'limit'.
+     * @return Array of Games
+     */
+    @GET("api/games")
+    Call<List<GameScoreModel>> getGames(@Query("limit") int limit);
 }
+
