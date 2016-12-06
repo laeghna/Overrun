@@ -207,6 +207,13 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         return difficulty;
     }
 
+    /**
+     * Updates the current button layout based off
+     * selected layout of control Spinner.
+     *
+     * @param theText String of selected layout
+     * @return int value based off selected layout {0, 1, 2}
+     */
     private int updateControls(String theText) {
 
         int controls = 0;
