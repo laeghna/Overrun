@@ -30,7 +30,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 /**
  * A fragment representing a list of Items.
- * <p/>
+ *
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */

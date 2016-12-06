@@ -21,6 +21,14 @@ import com.facebook.share.widget.ShareDialog;
 import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.PlayerStats.PlayerStatsContent;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
+/**
+ * Activity to display the global Scoreboard.
+ *
+ * @author Ethan Rowell
+ * @author Andrew Merz
+ * @version 04 December 2016
+ */
+
 public class LeaderboardActivity extends AppCompatActivity implements PlayerStatsFragment.OnListFragmentInteractionListener {
     private MediaPlayer mMediaPlayer;
     private SharedPreferences mSharedPref;
