@@ -23,7 +23,7 @@ import android.widget.Toast;
  *
  * @author Andrew Merz
  * @author Lisa Taylor
- * @version 05 December 2016
+ * @version 06 December 2016
  */
 public class OptionsActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -31,18 +31,15 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
     private Spinner mDiffSpinner;
     private Spinner mControlsSpinner;
     private MediaPlayer mMediaPlayer;
-    private AudioManager mAudioManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_options);
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         mSharedPref = getSharedPreferences(
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
-        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mDiffSpinner = (Spinner) findViewById(R.id.diff_spinner);
         mControlsSpinner = (Spinner) findViewById(R.id.control_spinner);
 
@@ -85,7 +82,6 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
             public void onProgressChanged(SeekBar arg0, int progress, boolean arg2)
             {
                 mMediaPlayer.setVolume(updateVolume(),updateVolume());
-                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
             }
         });
         mydiffSpinner.setSelection(current_difficulty - 1);
