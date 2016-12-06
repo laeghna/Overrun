@@ -78,9 +78,20 @@ public class LeaderboardActivity extends AppCompatActivity implements PlayerStat
         float current_volume = mSharedPref.getFloat(
                 getString(R.string.saved_volume_setting), 1);
 
-        mMediaPlayer.setVolume(current_volume,current_volume);
-        mMediaPlayer.seekTo(music_position);
-        mMediaPlayer.start();
+        if (mMediaPlayer == null) {
+            mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
+
+            mMediaPlayer.setVolume(current_volume, current_volume);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.start();
+        }
+
+        else if (!mMediaPlayer.isPlaying()) {
+
+            mMediaPlayer.setVolume(current_volume, current_volume);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.start();
+        }
 
     }
 
