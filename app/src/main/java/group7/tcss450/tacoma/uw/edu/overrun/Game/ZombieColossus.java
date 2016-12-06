@@ -21,7 +21,7 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
 public class ZombieColossus extends BitmapResizer implements Zombie {
 
     /** Zombie's hit points - the shots needed to destroy zombie. */
-    private static final int HP = 2;
+    private static final int HP = 3;
 
     /** Zombie's point value for adding to the game score. */
     private static final int POINTS = 50;
