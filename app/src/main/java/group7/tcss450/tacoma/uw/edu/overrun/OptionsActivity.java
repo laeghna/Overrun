@@ -52,7 +52,7 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         int current_difficulty = mSharedPref.getInt(
                 getString(R.string.saved_difficulty_setting), 1);
 
-        int current_controls = mSharedPref.getInt("saved_controls", 1);
+        int current_controls = mSharedPref.getInt("saved_controls", 0);
 
         float current_volume = mSharedPref.getFloat(
                 getString(R.string.saved_volume_setting), 1);
