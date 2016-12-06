@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.facebook.CallbackManager;
@@ -20,8 +18,6 @@ import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
 
-import static com.facebook.FacebookSdk.getApplicationContext;
-
 /**
  * Activity that encapsulates the login and registration for the user.
  *
@@ -33,8 +29,6 @@ public class SignInActivity extends BaseActivity {
     public CallbackManager callbackManager;
     private MediaPlayer mMediaPlayer;
     private SharedPreferences mSharedPref;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,8 +96,6 @@ public class SignInActivity extends BaseActivity {
             mMediaPlayer.release();
             mMediaPlayer = null;
         }
-
-
     }
 
     @Optional @OnClick(R.id.register_button)
@@ -116,7 +108,6 @@ public class SignInActivity extends BaseActivity {
         super.onStart();
         checkLoginStatus();
     }
-
 
     /**
      * Shows the login fragment.

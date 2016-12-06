@@ -30,9 +30,6 @@ import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailValidator;
 import group7.tcss450.tacoma.uw.edu.overrun.Validation.PasswordValidator;
 import timber.log.Timber;
 
-import com.facebook.FacebookSdk;
-
-
 /**
  * Fragment that is responsible for registering accounts.
  *
@@ -66,7 +63,6 @@ public class RegistrationFragment extends Fragment {
     public RegistrationFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

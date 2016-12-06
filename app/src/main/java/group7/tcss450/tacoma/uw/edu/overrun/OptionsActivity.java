@@ -3,7 +3,6 @@ package group7.tcss450.tacoma.uw.edu.overrun;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -84,6 +83,7 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
                 mMediaPlayer.setVolume(updateVolume(),updateVolume());
             }
         });
+
         mydiffSpinner.setSelection(current_difficulty - 1);
         myControlsSpinner.setSelection(current_controls);
 
@@ -140,8 +140,6 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         this.finish();
-
-
     }
 
     @Override

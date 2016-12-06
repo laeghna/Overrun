@@ -16,8 +16,6 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
-import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
@@ -28,11 +26,8 @@ import butterknife.Unbinder;
 import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.BuildConfig;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
-import group7.tcss450.tacoma.uw.edu.overrun.StartMenuActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailValidator;
 import timber.log.Timber;
-
-import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
  * Fragment that encapsulates logging in and registering accounts.
