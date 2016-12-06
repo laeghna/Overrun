@@ -3,6 +3,7 @@ package group7.tcss450.tacoma.uw.edu.overrun;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,7 +22,8 @@ import android.widget.Toast;
  * the music and sound effects.
  *
  * @author Andrew Merz
- * @version 8 Nov 2016
+ * @author Lisa Taylor
+ * @version 05 December 2016
  */
 public class OptionsActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -29,18 +31,18 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
     private Spinner mDiffSpinner;
     private Spinner mControlsSpinner;
     private MediaPlayer mMediaPlayer;
+    private AudioManager mAudioManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_options);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         mSharedPref = getSharedPreferences(
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
-
-
-
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mDiffSpinner = (Spinner) findViewById(R.id.diff_spinner);
         mControlsSpinner = (Spinner) findViewById(R.id.control_spinner);
 
@@ -49,7 +51,6 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
 
         cancel_button.setOnClickListener(this);
         ok_button.setOnClickListener(this);
-
 
         // Set the settings to the saved settings in Preferences.
         int current_difficulty = mSharedPref.getInt(
@@ -65,13 +66,30 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
 
         Spinner mydiffSpinner = (Spinner) findViewById(R.id.diff_spinner);
         Spinner myControlsSpinner = (Spinner) findViewById(R.id.control_spinner);
-        SeekBar volumeBar = (SeekBar) findViewById(R.id.volume_bar);
 
+        SeekBar volumeBar = (SeekBar) findViewById(R.id.volume_bar);
         volumeBar.setProgress(volume_int);
+        volumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+        {
+            @Override
+            public void onStopTrackingTouch(SeekBar arg0)
+            {
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar arg0)
+            {
+            }
+
+            @Override
+            public void onProgressChanged(SeekBar arg0, int progress, boolean arg2)
+            {
+                mMediaPlayer.setVolume(updateVolume(),updateVolume());
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+            }
+        });
         mydiffSpinner.setSelection(current_difficulty - 1);
         myControlsSpinner.setSelection(current_controls);
-
-
 
         if (mMediaPlayer == null) {
             mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
@@ -118,13 +136,10 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
 
             mMediaPlayer.pause();
             mMediaPlayer.release();
-
         }
 
-
-
-
         if (mMediaPlayer != null) {
+
             mMediaPlayer = null;
         }
 
@@ -166,7 +181,6 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
                         , "Difficulty set to: " + diffText + "\nVolume set to: " +
                                 (int)(volume_level * 100) + "%",
                         Toast.LENGTH_SHORT) .show();
-
 
                 finish();
                 break;
