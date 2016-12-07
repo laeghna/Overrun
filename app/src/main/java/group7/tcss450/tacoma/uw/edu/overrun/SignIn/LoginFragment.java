@@ -113,15 +113,6 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
-    /**
-     * Test OnClickListener for debugging.
-     */
-    @OnClick(R.id.test_sync_button)
-    void testGames() {
-        OverrunDbHelper dbHelper = new OverrunDbHelper(getActivity());
-        dbHelper.submitScore("blah@blahblah.com", 1000, 23, 1, 30);
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
