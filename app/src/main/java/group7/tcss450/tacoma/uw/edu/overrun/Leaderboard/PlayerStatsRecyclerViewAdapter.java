@@ -12,9 +12,10 @@ import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.PlayerStats.PlayerStatsC
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link PlayerStatsContent} and makes a call to the
- * specified {@link PlayerStatsFragment.OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
+ * Recycler View Adapter to help display the Player Stats.
+ *
+ * @author Andrew Merz
+ * @version 04 December 2016
  */
 public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerStatsRecyclerViewAdapter.ViewHolder> {
 

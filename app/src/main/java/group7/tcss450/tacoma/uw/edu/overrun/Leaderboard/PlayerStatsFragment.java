@@ -29,10 +29,10 @@ import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.PlayerStats.PlayerStatsC
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 /**
- * A fragment representing a list of Items.
+ * A fragment representing a list of PlayerStats.
+ * @author Andrew Merz
+ * @version 04 December 2016
  *
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
  */
 public class PlayerStatsFragment extends Fragment {
 
@@ -40,9 +40,7 @@ public class PlayerStatsFragment extends Fragment {
     private static final String SCORES_URL
             = "http://cssgate.insttech.washington.edu/~dionmerz/overrun_scores.php?cmd=scores";
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private RecyclerView mRecyclerView;
@@ -52,13 +50,12 @@ public class PlayerStatsFragment extends Fragment {
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
+     * fragment.
      */
     public PlayerStatsFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
+
     public static PlayerStatsFragment newInstance(int columnCount) {
         PlayerStatsFragment fragment = new PlayerStatsFragment();
         Bundle args = new Bundle();
@@ -140,17 +137,19 @@ public class PlayerStatsFragment extends Fragment {
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
+
      */
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(PlayerStatsContent thePlayer);
     }
 
 
-
+    /**
+     * An Async task to download all scores from the Database.
+     * @author Andrew Merz
+     * @version 04 December 2016
+     *
+     */
     private class DownloadScoresTask extends AsyncTask<String, Void, String> {
         @Override
         protected void onPreExecute() {

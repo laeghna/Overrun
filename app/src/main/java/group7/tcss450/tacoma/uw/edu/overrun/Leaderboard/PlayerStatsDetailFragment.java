@@ -10,6 +10,13 @@ import android.widget.TextView;
 import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.PlayerStats.PlayerStatsContent;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
+/**
+ * The fragment to display the each Players Stats.
+ *
+ * @author Ethan Rowell
+ * @author Andrew Merz
+ * @version 04 December 2016
+ */
 public class PlayerStatsDetailFragment extends Fragment {
 
     public final static String PLAYER_ITEM_SELECTED = "player_selected";
@@ -37,6 +44,11 @@ public class PlayerStatsDetailFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Updates the View and sets the appropriate text.
+     *
+     * @param player the current player being displayed.
+     */
     public void updateView(PlayerStatsContent player) {
         if (player != null) {
             mPlayerIdView.setText(player.getPlayerId());

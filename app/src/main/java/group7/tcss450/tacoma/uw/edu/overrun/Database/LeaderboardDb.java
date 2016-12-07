@@ -13,7 +13,10 @@ import group7.tcss450.tacoma.uw.edu.overrun.Leaderboard.PlayerStats.PlayerStatsC
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 /**
- * Created by Andrew on 11/29/16.
+ * A Database class to store Player stats locally using SQLite.
+ *
+ * @author Andrew Merz
+ * @version 04 December 2016
  */
 
 public class LeaderboardDb {
@@ -37,9 +40,9 @@ public class LeaderboardDb {
 
 
     /**
-     * Inserts the course into the local sqlite table. Returns true if successful, false otherwise.
-     * @param id
-     * @param theScore
+     * Inserts the player into the local sqlite table. Returns true if successful, false otherwise.
+     * @param id the Id of the player (email)
+     * @param theScore The score of their game.
 
      * @return true or false
      */
@@ -56,7 +59,7 @@ public class LeaderboardDb {
 
 
     /**
-     * Returns the list of courses from the local Course table.
+     * Returns the list of players from the local Leaderboard table.
      * @return list
      */
     public List<PlayerStatsContent> getPlayers() {
@@ -66,13 +69,13 @@ public class LeaderboardDb {
         };
 
         Cursor c = mSQLiteDatabase.query(
-                LEADERBOARD_TABLE,  // The table to query
-                columns,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
+                LEADERBOARD_TABLE,
+                columns,
+                null,
+                null,
+                null,
+                null,
+                null
         );
         c.moveToFirst();
         List<PlayerStatsContent> list = new ArrayList<PlayerStatsContent>();
@@ -88,28 +91,38 @@ public class LeaderboardDb {
     }
 
     /**
-     * Delete all the data from the COURSE_TABLE
+     * Delete all the data from the LEADERBOARD_TABLE
      */
     public void deletePlayer() {
         mSQLiteDatabase.delete(LEADERBOARD_TABLE, null, null);
     }
 
 
-
-
+    /**
+     * Closes the DB connection.
+     */
     public void closeDB() {
         mSQLiteDatabase.close();
     }
 
 
-
-
+    /**
+     * Helper class for the LeaderboardDB class. Helps create the local DB.
+     */
     class LeaderboardDBHelper extends SQLiteOpenHelper {
 
         private final String CREATE_PLAYER_SQL;
 
         private final String DROP_PLAYER_SQL;
 
+        /**
+         * Constructs the query for the DB creation.
+         *
+         * @param context the context
+         * @param name
+         * @param factory
+         * @param version
+         */
         public LeaderboardDBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
             super(context, name, factory, version);
             CREATE_PLAYER_SQL = context.getString(R.string.CREATE_PLAYER_SQL);
