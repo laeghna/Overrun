@@ -12,11 +12,10 @@ import group7.tcss450.tacoma.uw.edu.overrun.Model.GameScoreModel;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link GameScoreModel} and makes a call to the
- * specified {@link PlayerStatsFragment.OnListFragmentInteractionListener}.
+ * Recycler View Adapter to help display the Player Stats.
  *
- * @author Ethan Roewll
  * @author Andrew Merz
+ * @author Ethan Roewll
  * @version Dec 6, 2016
  */
 class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerStatsRecyclerViewAdapter.ViewHolder> {

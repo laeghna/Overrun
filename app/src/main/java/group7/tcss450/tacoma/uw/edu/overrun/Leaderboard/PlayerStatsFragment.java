@@ -26,10 +26,7 @@ import retrofit2.Callback;
 import timber.log.Timber;
 
 /**
- * A fragment representing a list of Items.
- * <p>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
+ * A fragment representing a list of game scores.
  *
  * @author Ethan Rowell
  * @author AndrewM Merz
@@ -69,12 +66,13 @@ public class PlayerStatsFragment extends Fragment {
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
+     * fragment.
      */
     public PlayerStatsFragment() {
     }
 
     @SuppressWarnings("unused")
+
     public static PlayerStatsFragment newInstance(int columnCount) {
         PlayerStatsFragment fragment = new PlayerStatsFragment();
         Bundle args = new Bundle();
@@ -155,10 +153,6 @@ public class PlayerStatsFragment extends Fragment {
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(GameScoreModel gameStats);
