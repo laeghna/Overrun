@@ -154,13 +154,16 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
 
             mMediaPlayer.setVolume(current_volume, current_volume);
             mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.start();
         }
 
         else if (!mMediaPlayer.isPlaying()) {
             int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
 
-            mMediaPlayer.setVolume(current_volume, current_volume);            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.setVolume(current_volume, current_volume);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.start();
         }
     }

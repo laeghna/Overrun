@@ -12,6 +12,8 @@ import java.util.Random;
 /**
  * This class represents the barrier between the Survivor and the zombies.
  * @author Leslie Pedro
+ * @author Lisa
+ * @version 05 December 2016
  */
 
 public class Barrier {

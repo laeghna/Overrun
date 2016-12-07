@@ -45,7 +45,9 @@ import timber.log.Timber;
  * Activity that encapsulates the login and registration for the user.
  *
  * @author Ethan Rowell
- * @version 9 Nov 2016
+ * @author Lisa Taylor
+ * @author Andrew Merz
+ * @version 06 December 2016
  */
 public class SignInActivity extends BaseActivity {
 
@@ -113,10 +115,22 @@ public class SignInActivity extends BaseActivity {
             int music_position = mSharedPref.getInt(getString(R.string.music_position), 0);
             float current_volume = mSharedPref.getFloat(
                     getString(R.string.saved_volume_setting), 1);
-            if (mMediaPlayer == null) mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
-            mMediaPlayer.setVolume(current_volume,current_volume);
+
+        if (mMediaPlayer == null) {
+            mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
+            mMediaPlayer.setLooping(true);
+            mMediaPlayer.setVolume(current_volume, current_volume);
             mMediaPlayer.seekTo(music_position);
             mMediaPlayer.start();
+        }
+
+        else if (!mMediaPlayer.isPlaying()) {
+
+            mMediaPlayer.setLooping(true);
+            mMediaPlayer.setVolume(current_volume, current_volume);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.start();
+        }
 
     }
 
@@ -130,15 +144,12 @@ public class SignInActivity extends BaseActivity {
                     .apply();
 
             mMediaPlayer.pause();
-
         }
 
         if (mMediaPlayer != null) {
             mMediaPlayer.release();
             mMediaPlayer = null;
         }
-
-
     }
 
     @Optional
@@ -413,9 +424,6 @@ public class SignInActivity extends BaseActivity {
 
         Toast.makeText(getApplicationContext(), "Signed in as: " + userEmail,
                 Toast.LENGTH_LONG).show();
-
-        Intent intent = new Intent(this, StartMenuActivity.class);
-        startActivity(intent);
         finish();
     }
 
