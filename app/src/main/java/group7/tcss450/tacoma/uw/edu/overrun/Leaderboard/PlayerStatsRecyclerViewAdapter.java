@@ -14,14 +14,29 @@ import group7.tcss450.tacoma.uw.edu.overrun.R;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link GameScoreModel} and makes a call to the
  * specified {@link PlayerStatsFragment.OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
+ *
+ * @author Ethan Roewll
+ * @author Andrew Merz
+ * @version Dec 6, 2016
  */
-public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerStatsRecyclerViewAdapter.ViewHolder> {
+class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerStatsRecyclerViewAdapter.ViewHolder> {
 
+    /**
+     * List of games scores being displayed.
+     */
     private final List<GameScoreModel> mValues;
+
+    /**
+     * The listener for each of the game scores.
+     */
     private final PlayerStatsFragment.OnListFragmentInteractionListener mListener;
 
-    public PlayerStatsRecyclerViewAdapter(List<GameScoreModel> items, PlayerStatsFragment.OnListFragmentInteractionListener listener) {
+    /**
+     * Constructor for the recycler adapter.
+     * @param items items to be shown
+     * @param listener listener for when items are clicked on.
+     */
+    PlayerStatsRecyclerViewAdapter(List<GameScoreModel> items, PlayerStatsFragment.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -37,7 +52,7 @@ public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerS
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mPlayerNumber.setText(String.format("%s.", Integer.toString(position + 1)));
-  
+
         holder.mIdView.setText(mValues.get(position).getEmail());
         holder.mContentView.setText(String.valueOf(mValues.get(position).getScore()));
 
@@ -58,15 +73,41 @@ public class PlayerStatsRecyclerViewAdapter extends RecyclerView.Adapter<PlayerS
         return mValues.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public TextView mPlayerNumber;
-        public final TextView mIdView;
-        public final TextView mContentView;
+    /**
+     * Holds the values for each of the game scores being displayed.
+     */
+    class ViewHolder extends RecyclerView.ViewHolder {
 
-        public GameScoreModel mItem;
+        /**
+         * View item displaying the values.
+         */
+        final View mView;
 
-        public ViewHolder(View view) {
+        /**
+         * Ranking of the player on the leaderboard.
+         */
+        TextView mPlayerNumber;
+
+        /**
+         * The TextView displaying the player ranking.
+         */
+        final TextView mIdView;
+
+        /**
+         * The TextView displaying the score content.
+         */
+        final TextView mContentView;
+
+        /**
+         * GameScore object being displayed.
+         */
+        GameScoreModel mItem;
+
+        /**
+         * ViewHodler constructor
+         * @param view the view to find the TextViews in
+         */
+        ViewHolder(View view) {
             super(view);
             mView = view;
             mPlayerNumber = (TextView) view.findViewById(R.id.player_number);

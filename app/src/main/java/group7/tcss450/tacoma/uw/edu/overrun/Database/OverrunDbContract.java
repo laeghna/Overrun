@@ -10,53 +10,138 @@ import android.provider.BaseColumns;
  */
 final class OverrunDbContract {
 
+    /**
+     * Comma Separator
+     */
+    private static final String COMMA_SEP = ", ";
 
-    public static final String COMMA_SEP = ", ";
-    public static final String NVARCHAR_TYPE = "NVARCHAR(255)";
-    public static final String INT_TYPE = "INTEGER";
+    /**
+     * NVARCHAR type
+     */
+    private static final String NVARCHAR_TYPE = "NVARCHAR(255)";
+
+    /**
+     * Integer type.
+     */
+    private static final String INT_TYPE = "INTEGER";
 
 
-    public static final class User implements BaseColumns {
+    /**
+     * Contract for the User table in the local database.
+     *
+     * @author Ethan Rowell
+     * @version Dec 6, 2016
+     */
+    static final class User implements BaseColumns {
         private User() {
         }
 
-        public static final String TABLE_NAME = "User";
-        public static final String COLUMN_NAME_EMAIL = "email";
-        public static final String COLUMN_NAME_SALT = "salt";
-        public static final String COLUMN_NAME_HASH = "hash";
+        /**
+         * Table name.
+         */
+        static final String TABLE_NAME = "User";
 
-        public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" +
+        /**
+         * Email column name.
+         */
+        static final String COLUMN_NAME_EMAIL = "email";
+
+        /**
+         * Salt column name.
+         */
+        static final String COLUMN_NAME_SALT = "salt";
+
+        /**
+         * Hash column name.
+         */
+        static final String COLUMN_NAME_HASH = "hash";
+
+        /**
+         * Create table SQL statement.
+         */
+        static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" +
                 COLUMN_NAME_EMAIL + " " + NVARCHAR_TYPE + "PRIMARY KEY " + COMMA_SEP +
                 COLUMN_NAME_SALT + " " + NVARCHAR_TYPE + COMMA_SEP +
                 COLUMN_NAME_HASH + " " + NVARCHAR_TYPE +
                 ");";
 
-        public static final String DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME + ";";
+        /**
+         * Drop table SQL statement.
+         */
+        static final String DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME + ";";
 
+        /**
+         * Insert user SQL statement.
+         *
+         * @param email User's email.
+         * @param pass  User's password.
+         * @return the SQL statement string.
+         */
         public static String INSERT_USER(String email, String pass) {
             return "INSERT INTO User VALUES (" + COLUMN_NAME_EMAIL + COMMA_SEP +
                     COLUMN_NAME_SALT + COMMA_SEP + COLUMN_NAME_HASH + ")" + "VALUES (" + email + COMMA_SEP + pass + ");";
         }
 
+        /**
+         * Delete user SQL statement.
+         *
+         * @param email User's email.
+         * @return the SQL statement string.
+         */
         public static String DELETE_USER(String email) {
             return "DELETE FROM User WHERE email = " + email + ";";
         }
     }
 
+    /**
+     * Contract for the Game table in the local database.
+     *
+     * @author Ethan Rowell
+     * @version Dec 6, 2016
+     */
     public static final class Game {
         private Game() {
         }
 
-        public static final String TABLE_NAME = "Game";
-        public static final String COLUMN_NAME_GAMEID = "gameId";
-        public static final String COLUMN_NAME_EMAIL = "email";
-        public static final String COLUMN_NAME_SCORE = "score";
-        public static final String COLUMN_NAME_ZOMBIES_KILLED = "zombiesKilled";
-        public static final String COLUMN_NAME_LEVEL = "level";
-        public static final String COLUMN_NAME_SHOTS_FIRED = "shotsFired";
+        /**
+         * Game table name.
+         */
+        static final String TABLE_NAME = "Game";
 
+        /**
+         * GameId column name.
+         */
+        static final String COLUMN_NAME_GAMEID = "gameId";
 
-        public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" +
+        /**
+         * Email column name.
+         */
+        static final String COLUMN_NAME_EMAIL = "email";
+
+        /**
+         * Score column name.
+         */
+        static final String COLUMN_NAME_SCORE = "score";
+
+        /**
+         * ZombiesKilled column name.
+         */
+        static final String COLUMN_NAME_ZOMBIES_KILLED = "zombiesKilled";
+
+        /**
+         * Level column name.
+         */
+        static final String COLUMN_NAME_LEVEL = "level";
+
+        /**
+         * ShotsFired column name.
+         */
+        static final String COLUMN_NAME_SHOTS_FIRED = "shotsFired";
+
+        /**
+         * Create table SQL statement.
+         */
+        static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" +
                 COLUMN_NAME_GAMEID + " " + INT_TYPE + " PRIMARY KEY AUTOINCREMENT" + COMMA_SEP +
                 COLUMN_NAME_EMAIL + " " + NVARCHAR_TYPE + COMMA_SEP +
                 COLUMN_NAME_SCORE + " " + INT_TYPE + COMMA_SEP +
@@ -65,7 +150,65 @@ final class OverrunDbContract {
                 COLUMN_NAME_SHOTS_FIRED + " " + INT_TYPE +
                 ");";
 
-        public static final String DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME + ";";
+        /**
+         * Drop table SQL statement.
+         */
+        static final String DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME + ";";
+
+    }
+
+    public static final class Leaderboard {
+        /**
+         * Game table name.
+         */
+        static final String TABLE_NAME = "Leaderboard";
+
+        /**
+         * GameId column name.
+         */
+        static final String COLUMN_NAME_GAMEID = "gameId";
+
+        /**
+         * Email column name.
+         */
+        static final String COLUMN_NAME_EMAIL = "email";
+
+        /**
+         * Score column name.
+         */
+        static final String COLUMN_NAME_SCORE = "score";
+
+        /**
+         * ZombiesKilled column name.
+         */
+        static final String COLUMN_NAME_ZOMBIES_KILLED = "zombiesKilled";
+
+        /**
+         * Level column name.
+         */
+        static final String COLUMN_NAME_LEVEL = "level";
+
+        /**
+         * ShotsFired column name.
+         */
+        static final String COLUMN_NAME_SHOTS_FIRED = "shotsFired";
+
+        /**
+         * Create table SQL statement.
+         */
+        static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "(" +
+                COLUMN_NAME_GAMEID + " " + INT_TYPE + " PRIMARY KEY AUTOINCREMENT" + COMMA_SEP +
+                COLUMN_NAME_EMAIL + " " + NVARCHAR_TYPE + COMMA_SEP +
+                COLUMN_NAME_SCORE + " " + INT_TYPE + COMMA_SEP +
+                COLUMN_NAME_ZOMBIES_KILLED + " " + INT_TYPE + COMMA_SEP +
+                COLUMN_NAME_LEVEL + " " + INT_TYPE + COMMA_SEP +
+                COLUMN_NAME_SHOTS_FIRED + " " + INT_TYPE + ");";
+
+        /**
+         * Drop table SQL statement.
+         */
+        static final String DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME + ";";
+
 
     }
 

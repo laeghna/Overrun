@@ -10,13 +10,34 @@ import android.widget.TextView;
 import group7.tcss450.tacoma.uw.edu.overrun.Model.GameScoreModel;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 
+/**
+ * Displays the detail for the player's game score after selecting
+ * in the leaderboard.
+ *
+ * @author Ethan Rowell
+ * @author Andrew Merz
+ * @version Dec 6, 2016
+ */
 public class PlayerStatsDetailFragment extends Fragment {
 
+    /**
+     * Bundle argument string.
+     */
     public final static String PLAYER_ITEM_SELECTED = "player_selected";
 
+    /**
+     * Id for the game score.
+     */
     private TextView mPlayerIdView;
+
+    /**
+     * TextView that displays the score.
+     */
     private TextView mPlayerScoreView;
 
+    /**
+     * Required empty public constructor
+     */
     public PlayerStatsDetailFragment() {
         // Required empty public constructor
     }
@@ -25,7 +46,7 @@ public class PlayerStatsDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_player_stats_detail, container, false);
+        View view = inflater.inflate(R.layout.fragment_player_stats_detail, container, false);
         mPlayerIdView = (TextView) view.findViewById(R.id.player_stats_item_id);
         mPlayerScoreView = (TextView) view.findViewById(R.id.player_stats_item_score);
 
@@ -33,6 +54,11 @@ public class PlayerStatsDetailFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Updates the view with the new values.
+     *
+     * @param gameScore GameScore to be updated with.
+     */
     public void updateView(GameScoreModel gameScore) {
         if (gameScore != null) {
             mPlayerIdView.setText(String.valueOf(gameScore.getEmail()));

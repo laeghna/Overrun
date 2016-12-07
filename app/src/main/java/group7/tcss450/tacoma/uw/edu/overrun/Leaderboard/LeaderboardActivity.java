@@ -3,13 +3,12 @@ package group7.tcss450.tacoma.uw.edu.overrun.Leaderboard;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
-import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 
-import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.Model.GameScoreModel;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
-import timber.log.Timber;
 
 /**
  * Activity to display the global Scoreboard.
@@ -18,12 +17,20 @@ import timber.log.Timber;
  * @author Andrew Merz
  * @version 04 December 2016
  */
-public class LeaderboardActivity extends BaseActivity implements PlayerStatsFragment.OnListFragmentInteractionListener {
+public class LeaderboardActivity extends AppCompatActivity implements PlayerStatsFragment.OnListFragmentInteractionListener {
+
+    /**
+     * Media player instance for the background music.
+     */
     private MediaPlayer mMediaPlayer;
+
+    /**
+     * Shared Preferences instance.
+     */
     private SharedPreferences mSharedPref;
 
 
-  @Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard);
@@ -52,23 +59,23 @@ public class LeaderboardActivity extends BaseActivity implements PlayerStatsFrag
     @Override
     public void onListFragmentInteraction(GameScoreModel gameStats) {
 
-            // If the frag is not available, we're in the one-pane layout and must swap frags...
+        // If the frag is not available, we're in the one-pane layout and must swap frags...
 
-            // Create fragment and give it an argument for the selected student
-            // Replace whatever is in the fragment_container view with this fragment,
-            // and add the transaction to the back stack so the user can navigate back
+        // Create fragment and give it an argument for the selected student
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack so the user can navigate back
 
-            PlayerStatsDetailFragment playerDetailFragment = new PlayerStatsDetailFragment();
-            Bundle args = new Bundle();
-            args.putSerializable(PlayerStatsDetailFragment.PLAYER_ITEM_SELECTED, gameStats);
-            playerDetailFragment.setArguments(args);
-            FragmentTransaction transaction = getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, playerDetailFragment)
-                    .addToBackStack(null);
+        PlayerStatsDetailFragment playerDetailFragment = new PlayerStatsDetailFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(PlayerStatsDetailFragment.PLAYER_ITEM_SELECTED, gameStats);
+        playerDetailFragment.setArguments(args);
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, playerDetailFragment)
+                .addToBackStack(null);
 
-            // Commit the transaction
-            transaction.commit();
+        // Commit the transaction
+        transaction.commit();
     }
 
     @Override
@@ -86,9 +93,7 @@ public class LeaderboardActivity extends BaseActivity implements PlayerStatsFrag
             mMediaPlayer.seekTo(music_position);
             mMediaPlayer.setLooping(true);
             mMediaPlayer.start();
-        }
-
-        else if (!mMediaPlayer.isPlaying()) {
+        } else if (!mMediaPlayer.isPlaying()) {
 
             mMediaPlayer.setVolume(current_volume, current_volume);
             mMediaPlayer.seekTo(music_position);
@@ -115,6 +120,5 @@ public class LeaderboardActivity extends BaseActivity implements PlayerStatsFrag
             mMediaPlayer = null;
         }
         finish();
-
     }
 }

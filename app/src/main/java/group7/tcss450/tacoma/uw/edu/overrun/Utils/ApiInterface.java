@@ -10,8 +10,8 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 /**
- * Interface used to interface with the Retrofit API Client.
- *
+ * Interface used to make calls with the Retrofit API Client.
+ * <p>
  * Author: Ethan Rowell
  * December 2, 2016
  */
@@ -21,7 +21,7 @@ public interface ApiInterface {
      * Registers a new user with a custom account.
      *
      * @param email User's email.
-     * @param pass User's password.
+     * @param pass  User's password.
      * @return Serialized UserModel object.
      */
     @POST("api/user")
@@ -49,7 +49,7 @@ public interface ApiInterface {
      * Logs the user in through custom registration.
      *
      * @param email User's email address.
-     * @param pass User's password.
+     * @param pass  User's password.
      * @return Serialized UserModel object.
      */
     @POST("api/login")
@@ -58,11 +58,11 @@ public interface ApiInterface {
     /**
      * Uploads a game to the server database.
      *
-     * @param email User's email
-     * @param score Score of the game
+     * @param email         User's email
+     * @param score         Score of the game
      * @param zombiesKilled Number of zombies killed
-     * @param level Level of difficulty played
-     * @param shotsFired Number of shots fired
+     * @param level         Level of difficulty played
+     * @param shotsFired    Number of shots fired
      * @return Serialized GameScoreModel object.
      */
     @POST("api/game")
@@ -72,6 +72,7 @@ public interface ApiInterface {
 
     /**
      * Gets a list of games in order of descending score.
+     *
      * @return Array of Games
      */
     @GET("api/games")
@@ -79,6 +80,7 @@ public interface ApiInterface {
 
     /**
      * Gets a list of games in order of descending score limited to 'limit'.
+     *
      * @return Array of Games
      */
     @GET("api/games")

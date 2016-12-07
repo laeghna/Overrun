@@ -8,13 +8,32 @@ import android.view.WindowManager;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
-public class ToastMatcher extends TypeSafeMatcher<Root> {
+/**
+ * Checks that the toast exists.
+ *
+ * @author Ethan Rowell
+ * @version Dec 6, 2016
+ */
+class ToastMatcher extends TypeSafeMatcher<Root> {
 
-    @Override    public void describeTo(Description description) {
+    /**
+     * Describes the toast.
+     *
+     * @param description the toast description
+     */
+    @Override
+    public void describeTo(Description description) {
         description.appendText("is toast");
     }
 
-    @Override    public boolean matchesSafely(Root root) {
+    /**
+     * Makes a safe match.
+     *
+     * @param root view root
+     * @return returns whether it matches or not.
+     */
+    @Override
+    public boolean matchesSafely(Root root) {
         int type = root.getWindowLayoutParams().get().type;
         if ((type == WindowManager.LayoutParams.TYPE_TOAST)) {
             IBinder windowToken = root.getDecorView().getWindowToken();

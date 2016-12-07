@@ -40,25 +40,41 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Tests the login fragment.
+ *
+ * @author Ethan Rowell
+ * @version Dec 6, 2016
+ */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class LoginAndroidTest {
 
-    private boolean firstRun = true;
-
-    // this must be a registered user in order for these test to pass.
+    /**
+     * Test email.
+     * This must be a registered user in order for these test to pass.
+     */
     private String email = "blah@blah.com";
+
+    /**
+     * Test password.
+     */
     private String password = "blahblah1@";
 
+
+    /**
+     * Rule for creating an activity.
+     */
     @Rule
     public ActivityTestRule<SignInActivity> mActivityRule = new ActivityTestRule<>(
             SignInActivity.class);
 
-//    @Rule
-//    public IntentsTestRule<StartMenuActivity> mIntentRule = new IntentsTestRule<>(
-//            StartMenuActivity.class);
-
+    /**
+     * Set up method before each test.
+     *
+     * @throws InterruptedException Exception for the Thread sleep.
+     */
     @Before
     public void setUp() throws InterruptedException {
         Intents.init();
@@ -69,11 +85,18 @@ public class LoginAndroidTest {
         Thread.sleep(4000);
     }
 
+    /**
+     * Handles tear down after tests.
+     */
     @After
-    public void tearDown() {
+    public void tearDown() throws InterruptedException {
+        Thread.sleep(5000);
         Intents.release();
     }
 
+    /**
+     * Tests the activity change after sign in.
+     */
     @Ignore
     //@Test
     public void testLogin_RouteToStartMenu() {
@@ -82,20 +105,36 @@ public class LoginAndroidTest {
 
         onView(withId(R.id.login_button)).perform(click());
 
-
         assertCurrentActivityIsInstanceOf(StartMenuActivity.class);
-        //intended(hasComponent(new ComponentName(getTargetContext(), StartMenuActivity.class.getName())));
     }
 
-    //@Ignore
+    /**
+     * Tests a failed login attempt.
+     */
     @Test
-    public void testLogin_FailedLogin() throws InterruptedException {
+    public void testLogin_FailedLogin() {
         onView(withId(R.id.email_login)).perform(typeText(email));
         onView(withId(R.id.password_login)).perform(typeText(password + "1"));
 
         onView(withId(R.id.login_button)).perform(click());
 
         onView(withText("Email or password was incorrect."))
+                .inRoot(new ToastMatcher())
+                .check(matches(isDisplayed()));
+    }
+
+
+    /**
+     * Tests a successful login.
+     */
+    @Test
+    public void testLogin_ValidLogin() {
+        onView(withId(R.id.email_login)).perform(typeText(email));
+        onView(withId(R.id.password_login)).perform(typeText(password));
+
+        onView(withId(R.id.login_button)).perform(click());
+
+        onView(withText("Signed in as: " + email))
                 .inRoot(new ToastMatcher())
                 .check(matches(isDisplayed()));
     }
@@ -122,19 +161,11 @@ public class LoginAndroidTest {
         setWifiEnabled(getContext(), true);
     }
 
-    //@Ignore
-    @Test
-    public void testLogin_ToastMessage() {
-        onView(withId(R.id.email_login)).perform(typeText(email));
-        onView(withId(R.id.password_login)).perform(typeText(password));
-
-        onView(withId(R.id.login_button)).perform(click());
-
-        onView(withText("Signed in as: " + email))
-                .inRoot(new ToastMatcher())
-                .check(matches(isDisplayed()));
-    }
-
+    /**
+     * Asserts instance of activity.
+     *
+     * @param activityClass The activity class to assert.
+     */
     public void assertCurrentActivityIsInstanceOf(Class<? extends Activity> activityClass) {
         Context currentActivity = getContext();// getActivityInstance();
         checkNotNull(currentActivity);
@@ -162,6 +193,13 @@ public class LoginAndroidTest {
         }
     }
 
+    /**
+     * Sets the WiFi to enabled.
+     * Not currently working...
+     *
+     * @param context Current context
+     * @param enabled enabled or not
+     */
     private void setWifiEnabled(Context context, boolean enabled) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         wifiManager.setWifiEnabled(enabled);

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbHelper;
@@ -26,18 +27,44 @@ import timber.log.Timber;
 
 /**
  * A fragment representing a list of Items.
- *
+ * <p>
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
+ *
+ * @author Ethan Rowell
+ * @author AndrewM Merz
+ * @version Dec 6, 2016
  */
 public class PlayerStatsFragment extends Fragment {
 
-
+    /**
+     * Bundle argument string.
+     */
     private static final String ARG_COLUMN_COUNT = "column-count";
+
+    /**
+     * Number of columns to display for the recycler view.
+     */
     private int mColumnCount = 1;
+
+    /**
+     * Handles the interaction of the list items.
+     */
     private OnListFragmentInteractionListener mListener;
+
+    /**
+     * The recycler view for the score items.
+     */
     private RecyclerView mRecyclerView;
+
+    /**
+     * The first game score to be populated.
+     */
     private GameScoreModel mFirstGameScore;
+
+    /**
+     * List of game score being populated.
+     */
     private List<GameScoreModel> mStatsList;
 
     /**
@@ -87,15 +114,17 @@ public class PlayerStatsFragment extends Fragment {
         if (networkInfo != null && networkInfo.isConnected()) {
             Timber.d("Getting leaderboard game scores...");
             getGameScores();
-        }
-        else {
+        } else {
             Toast.makeText(view.getContext(),
                     "No network connection available. Displaying most recent leaderboard.",
-                    Toast.LENGTH_LONG) .show();
+                    Toast.LENGTH_LONG).show();
 
             if (mStatsList == null) {
                 OverrunDbHelper dbHelper = new OverrunDbHelper(getActivity());
-                mStatsList = dbHelper.getGames();
+                mStatsList = dbHelper.getLeaderboardGames();
+
+                // no entries cached in leaderboard table
+                if (mStatsList == null) mStatsList = new ArrayList<>();
             }
 
             mRecyclerView.setAdapter(new PlayerStatsRecyclerViewAdapter(mStatsList, mListener));
@@ -149,6 +178,13 @@ public class PlayerStatsFragment extends Fragment {
                                            response) {
                 mStatsList = response.body();
                 mFirstGameScore = mStatsList.get(0);
+
+                OverrunDbHelper dbHelper = new OverrunDbHelper(getActivity());
+
+                for (GameScoreModel game: mStatsList) {
+                    dbHelper.insertLeaderboardEntry(game.getEmail(), game.getScore(),
+                            game.getZombiesKilled(), game.getLevel(), game.getShotsFired());
+                }
                 mRecyclerView.setAdapter(new PlayerStatsRecyclerViewAdapter(mStatsList, mListener));
             }
 

@@ -133,6 +133,7 @@ public class UserModel {
 
     /**
      * Gets the user's first name. May be null.
+     *
      * @return user's first name.
      */
     @Nullable
@@ -142,6 +143,7 @@ public class UserModel {
 
     /**
      * Sets the user's first name.
+     *
      * @param firstName User's first name.
      */
     public void setFirstName(String firstName) {
@@ -150,7 +152,8 @@ public class UserModel {
 
     /**
      * Gets the user's last name. May be null.
-     * @return
+     *
+     * @return gets the user's last name
      */
     @Nullable
     public String getLastName() {
@@ -159,6 +162,7 @@ public class UserModel {
 
     /**
      * Sets the user's last name.
+     *
      * @param lastName user's last name
      */
     public void setLastName(String lastName) {

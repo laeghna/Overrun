@@ -20,6 +20,7 @@ import java.util.List;
 
 import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbContract.Game;
 import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbContract.User;
+import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbContract.Leaderboard;
 import group7.tcss450.tacoma.uw.edu.overrun.Model.GameScoreModel;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import group7.tcss450.tacoma.uw.edu.overrun.Utils.ApiClient;
@@ -35,14 +36,33 @@ import timber.log.Timber;
  * @version 9 Nov 2016
  */
 public class OverrunDbHelper extends SQLiteOpenHelper {
+
+    /**
+     * SQLite database instance.
+     */
     private SQLiteDatabase mDb;
 
-    // If you change the database schema, you must increment the database version.
+    /**
+     * Current database version.
+     * If you change the database schema, you must increment the database version.
+     */
     private static final int DATABASE_VERSION = 3;
+
+    /**
+     * Database name.
+     */
     private static final String DATABASE_NAME = "Overrun.db";
 
+    /**
+     * Current context.
+     */
     private Context mContext;
 
+    /**
+     * DbHelper constructor
+     *
+     * @param context the current context
+     */
     public OverrunDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         mContext = context;
@@ -57,6 +77,7 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
         Timber.i("Creating database [ %s v. %d ]...", DATABASE_NAME, DATABASE_VERSION);
         db.execSQL(User.CREATE_TABLE);
         db.execSQL(Game.CREATE_TABLE);
+        db.execSQL(Leaderboard.CREATE_TABLE);
     }
 
     /**
@@ -73,6 +94,7 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
         // to simply to discard the data and start over
         db.execSQL(User.DROP_TABLE);
         db.execSQL(Game.DROP_TABLE);
+        db.execSQL(Leaderboard.DROP_TABLE);
         onCreate(db);
     }
 
@@ -85,6 +107,70 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
      */
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    /**
+     * Inserts a game into the local database.
+     *
+     * @param email         user's email
+     * @param score         user's game score
+     * @param zombiesKilled number of zombies killed
+     * @param level         level of difficulty
+     * @param shotsFired    number of shots fired
+     * @return whether the game was inserted or not
+     */
+    public boolean insertGame(String email, int score, int zombiesKilled,
+                              int level, int shotsFired) {
+        try {
+            mDb = getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put(Game.COLUMN_NAME_EMAIL, email);
+            values.put(Game.COLUMN_NAME_SCORE, score);
+            values.put(Game.COLUMN_NAME_ZOMBIES_KILLED, zombiesKilled);
+            values.put(Game.COLUMN_NAME_LEVEL, level);
+            values.put(Game.COLUMN_NAME_SHOTS_FIRED, shotsFired);
+
+            long result = mDb.insertOrThrow(Game.TABLE_NAME, null, values);
+
+            return result >= 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Inserts a game into the local database.
+     *
+     * @param email         user's email
+     * @param score         user's game score
+     * @param zombiesKilled number of zombies killed
+     * @param level         level of difficulty
+     * @param shotsFired    number of shots fired
+     * @return whether the game was inserted or not
+     */
+    public boolean insertLeaderboardEntry(String email, int score, int zombiesKilled,
+                              int level, int shotsFired) {
+        try {
+            mDb = getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put(Leaderboard.COLUMN_NAME_EMAIL, email);
+            values.put(Leaderboard.COLUMN_NAME_SCORE, score);
+            values.put(Leaderboard.COLUMN_NAME_ZOMBIES_KILLED, zombiesKilled);
+            values.put(Leaderboard.COLUMN_NAME_LEVEL, level);
+            values.put(Leaderboard.COLUMN_NAME_SHOTS_FIRED, shotsFired);
+
+            long result = mDb.insertOrThrow(Leaderboard.TABLE_NAME, null, values);
+
+            return result >= 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 
@@ -130,6 +216,54 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
                     Game.COLUMN_NAME_SCORE, Game.COLUMN_NAME_ZOMBIES_KILLED,
                     Game.COLUMN_NAME_LEVEL, Game.COLUMN_NAME_SHOTS_FIRED };
             c = mDb.query(Game.TABLE_NAME, projection, null, null, null, null, null);
+
+            String email;
+            int gameId,
+                    score,
+                    zombiesKilled,
+                    level,
+                    shotsFired;
+
+            c.moveToFirst();
+            for (int i = 0; i < c.getCount(); i++) {
+                email = c.getString(c.getColumnIndex(Game.COLUMN_NAME_EMAIL));
+                gameId = c.getInt(c.getColumnIndex(Game.COLUMN_NAME_GAMEID));
+                score = c.getInt(c.getColumnIndex(Game.COLUMN_NAME_SCORE));
+                zombiesKilled = c.getInt(c.getColumnIndex(Game.COLUMN_NAME_ZOMBIES_KILLED));
+                level = c.getInt(c.getColumnIndex(Game.COLUMN_NAME_LEVEL));
+                shotsFired = c.getInt(c.getColumnIndex(Game.COLUMN_NAME_SHOTS_FIRED));
+
+                games.add(new GameScoreModel(gameId, email,
+                        score, zombiesKilled, level, shotsFired, null));
+                c.moveToNext();
+            }
+            return games;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            mDb.close();
+            if (c != null) c.close();
+        }
+        return null;
+    }
+
+    /**
+     * Gets all the games stored in the local database.
+     *
+     * @return A list of Games stored in the local database.
+     */
+    public List<GameScoreModel> getLeaderboardGames() {
+        List<GameScoreModel> games = new ArrayList<>();
+
+        Cursor c = null;
+
+        try {
+            mDb = getReadableDatabase();
+
+            String[] projection = { Game.COLUMN_NAME_EMAIL, Game.COLUMN_NAME_GAMEID,
+                    Game.COLUMN_NAME_SCORE, Game.COLUMN_NAME_ZOMBIES_KILLED,
+                    Game.COLUMN_NAME_LEVEL, Game.COLUMN_NAME_SHOTS_FIRED };
+            c = mDb.query(Leaderboard.TABLE_NAME, projection, null, null, null, null, null);
 
             String email;
             int gameId,
@@ -401,7 +535,7 @@ public class OverrunDbHelper extends SQLiteOpenHelper {
     /**
      * Seeds the local database with test data.
      */
-    public void seedDb() {
+    private void seedDb() {
         mDb = getWritableDatabase();
         String selection = Game.COLUMN_NAME_EMAIL + " = ?";
         String[] selectionArgs = { "blah@blah.com" };

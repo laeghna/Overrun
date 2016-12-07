@@ -21,7 +21,7 @@ import timber.log.Timber;
  * initiates the sync if there are any games stored locally.
  *
  * @author Ethan Rowell
- * @version 2 NDec 2016
+ * @version 2 Dec 2016
  */
 public class DbSyncService extends BroadcastReceiver {
 
@@ -68,6 +68,9 @@ public class DbSyncService extends BroadcastReceiver {
     /**
      * Class that uploads all game records in the local database, uploads them to
      * the server's database and then removes them once they are successfully uploaded.
+     *
+     * @author Ethan Rowell
+     * @version Dec 6, 2016
      */
     private class UploadAsync extends AsyncTask<Void, Void, Void> {
         private OverrunDbHelper db;
