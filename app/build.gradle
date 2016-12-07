@@ -6,13 +6,13 @@ android {
         release {
             keyAlias 'release-key'
             keyPassword '450team7'
-            storeFile file('/home/ethan/.android/release.keystore')
+            storeFile file('../app/release.keystore')
             storePassword '450team7'
         }
         debug {
             keyAlias 'debug-key'
             keyPassword '450team7'
-            storeFile file('/home/ethan/.android/debug.keystore')
+            storeFile file('../app/debug.keystore')
             storePassword '450team7'
         }
     }
