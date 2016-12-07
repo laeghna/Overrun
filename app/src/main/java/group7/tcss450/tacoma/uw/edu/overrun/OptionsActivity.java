@@ -3,7 +3,6 @@ package group7.tcss450.tacoma.uw.edu.overrun;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,7 +22,7 @@ import android.widget.Toast;
  *
  * @author Andrew Merz
  * @author Lisa Taylor
- * @version 05 December 2016
+ * @version 06 December 2016
  */
 public class OptionsActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -31,18 +30,15 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
     private Spinner mDiffSpinner;
     private Spinner mControlsSpinner;
     private MediaPlayer mMediaPlayer;
-    private AudioManager mAudioManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_options);
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         mSharedPref = getSharedPreferences(
                 getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
-        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mDiffSpinner = (Spinner) findViewById(R.id.diff_spinner);
         mControlsSpinner = (Spinner) findViewById(R.id.control_spinner);
 
@@ -56,7 +52,7 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         int current_difficulty = mSharedPref.getInt(
                 getString(R.string.saved_difficulty_setting), 1);
 
-        int current_controls = mSharedPref.getInt("saved_controls", 1);
+        int current_controls = mSharedPref.getInt("saved_controls", 0);
 
         float current_volume = mSharedPref.getFloat(
                 getString(R.string.saved_volume_setting), 1);
@@ -85,9 +81,9 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
             public void onProgressChanged(SeekBar arg0, int progress, boolean arg2)
             {
                 mMediaPlayer.setVolume(updateVolume(),updateVolume());
-                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
             }
         });
+
         mydiffSpinner.setSelection(current_difficulty - 1);
         myControlsSpinner.setSelection(current_controls);
 
@@ -111,7 +107,7 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
 
         if (mMediaPlayer == null) {
             mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
-
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.setVolume(current_volume,current_volume);
             mMediaPlayer.seekTo(music_position);
             mMediaPlayer.start();
@@ -121,6 +117,7 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
 
             mMediaPlayer.setVolume(current_volume,current_volume);
             mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.setLooping(true);
             mMediaPlayer.start();
         }
     }
@@ -144,8 +141,6 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         this.finish();
-
-
     }
 
     @Override
@@ -213,6 +208,13 @@ public class OptionsActivity extends AppCompatActivity implements View.OnClickLi
         return difficulty;
     }
 
+    /**
+     * Updates the current button layout based off
+     * selected layout of control Spinner.
+     *
+     * @param theText String of selected layout
+     * @return int value based off selected layout {0, 1, 2}
+     */
     private int updateControls(String theText) {
 
         int controls = 0;

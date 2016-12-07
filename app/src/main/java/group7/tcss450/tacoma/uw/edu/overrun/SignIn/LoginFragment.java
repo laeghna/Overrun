@@ -23,6 +23,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import group7.tcss450.tacoma.uw.edu.overrun.Database.OverrunDbHelper;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
+import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailValidator;
 import group7.tcss450.tacoma.uw.edu.overrun.Validation.EmailTextWatcher;
 import timber.log.Timber;
 

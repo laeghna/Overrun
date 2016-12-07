@@ -1,27 +1,23 @@
 package group7.tcss450.tacoma.uw.edu.overrun.Leaderboard;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-
-import com.facebook.CallbackManager;
-import com.facebook.FacebookSdk;
-import com.facebook.share.model.ShareLinkContent;
-import com.facebook.share.widget.ShareButton;
-import com.facebook.share.widget.ShareDialog;
 
 import group7.tcss450.tacoma.uw.edu.overrun.BaseActivity;
 import group7.tcss450.tacoma.uw.edu.overrun.Model.GameScoreModel;
 import group7.tcss450.tacoma.uw.edu.overrun.R;
 import timber.log.Timber;
 
+/**
+ * Activity to display the global Scoreboard.
+ *
+ * @author Ethan Rowell
+ * @author Andrew Merz
+ * @version 04 December 2016
+ */
 public class LeaderboardActivity extends BaseActivity implements PlayerStatsFragment.OnListFragmentInteractionListener {
     private MediaPlayer mMediaPlayer;
     private SharedPreferences mSharedPref;
@@ -75,8 +71,6 @@ public class LeaderboardActivity extends BaseActivity implements PlayerStatsFrag
             transaction.commit();
     }
 
-
-
     @Override
     public void onResume() {
         super.onResume();
@@ -85,10 +79,22 @@ public class LeaderboardActivity extends BaseActivity implements PlayerStatsFrag
         float current_volume = mSharedPref.getFloat(
                 getString(R.string.saved_volume_setting), 1);
 
+        if (mMediaPlayer == null) {
+            mMediaPlayer = MediaPlayer.create(this, R.raw.dark_theme);
 
-        mMediaPlayer.setVolume(current_volume,current_volume);
-        mMediaPlayer.seekTo(music_position);
-        mMediaPlayer.start();
+            mMediaPlayer.setVolume(current_volume, current_volume);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.setLooping(true);
+            mMediaPlayer.start();
+        }
+
+        else if (!mMediaPlayer.isPlaying()) {
+
+            mMediaPlayer.setVolume(current_volume, current_volume);
+            mMediaPlayer.seekTo(music_position);
+            mMediaPlayer.setLooping(true);
+            mMediaPlayer.start();
+        }
 
     }
 
@@ -102,7 +108,6 @@ public class LeaderboardActivity extends BaseActivity implements PlayerStatsFrag
                     .apply();
 
             mMediaPlayer.stop();
-
         }
 
         if (mMediaPlayer != null) {
