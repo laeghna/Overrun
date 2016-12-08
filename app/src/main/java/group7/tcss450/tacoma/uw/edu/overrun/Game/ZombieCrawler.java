@@ -33,7 +33,7 @@ public class ZombieCrawler extends BitmapResizer implements Zombie{
     private static final int SCALE = 18;
 
     /** Padding for the left side of the screen. */
-    private static final int PADDING = 50;
+    private static final int PADDING = 100;
 
     /** Zombie crawler image. */
     private Bitmap crawlerBitmap;
