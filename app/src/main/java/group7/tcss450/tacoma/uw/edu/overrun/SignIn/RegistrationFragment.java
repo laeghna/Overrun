@@ -175,7 +175,7 @@ public class RegistrationFragment extends Fragment {
                             .commit();
                     Toast.makeText(getActivity().getApplicationContext(),
                             "Successful account creation for: " + email,
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_SHORT).show();
 
                 } else {
                     ResponseBody errorBody = response.errorBody();

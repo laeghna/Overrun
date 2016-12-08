@@ -367,7 +367,7 @@ public class SignInActivity extends BaseActivity {
 
             finish();
             Timber.d("Signed in as: %s", email);
-            Toast.makeText(getApplicationContext(), "Signed in as: " + email, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Signed in as: " + email, Toast.LENGTH_SHORT).show();
         } else {
             ResponseBody errorBody = response.errorBody();
             try {
@@ -423,7 +423,7 @@ public class SignInActivity extends BaseActivity {
                 .getString(getString(R.string.user_email), "");
 
         Toast.makeText(getApplicationContext(), "Signed in as: " + userEmail,
-                Toast.LENGTH_LONG).show();
+                Toast.LENGTH_SHORT).show();
         finish();
     }
 
