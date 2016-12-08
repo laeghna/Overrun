@@ -66,6 +66,28 @@ public class UserModel {
     }
 
     /**
+     * Gets the email for this user object.
+     *
+     * @return the email for this user.
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * Sets the email for the UserModel.
+     *
+     * @param email the new email for the user.
+     * @throws IllegalArgumentException if the email is null
+     */
+    public void setEmail(String email) {
+        if (email == null) {
+            throw new IllegalArgumentException("UserModel email cannot be null.");
+        }
+        this.email = email;
+    }
+
+    /**
      * Gets the hash for this user object.
      *
      * @return the hash for this user.
@@ -114,21 +136,21 @@ public class UserModel {
      *
      * @return the email for this user.
      */
-    public String getEmail() {
-        return email;
+    public String getEmailVerified() {
+        return emailVerified;
     }
 
     /**
      * Sets the email for the UserModel.
      *
-     * @param email the new email for the user.
+     * @param emailVerified the new emailVerified status for the user.
      * @throws IllegalArgumentException if the email is null
      */
-    public void setEmail(String email) {
+    public void setEmailVerified(String emailVerified) {
         if (email == null) {
-            throw new IllegalArgumentException("UserModel email cannot be null.");
+            throw new IllegalArgumentException("UserModel emailVerified cannot be null.");
         }
-        this.email = email;
+        this.email = emailVerified;
     }
 
     /**
