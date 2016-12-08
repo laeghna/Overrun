@@ -248,7 +248,6 @@ public class StartMenuActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
-    // TODO: logout button needs to be implemented.
     public void testLogout(View view) {
         signOut();
     }
