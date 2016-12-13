@@ -25,7 +25,7 @@ const createUser = 'INSERT INTO User (email, salt, hash) ' +
     'VALUES ( ?, ?, ? );';
 
 
-module.exports = {
+module.exports = (db) => {
 
 
     /**
@@ -55,7 +55,7 @@ module.exports = {
      *
      * @apiVersion 0.1.0
      */
-    loginGoogle: (req, res) => {
+    const loginGoogle = (req, res) => {
 
         // sign in with google account by verifying id_token
         console.log("in validate token");
@@ -69,7 +69,7 @@ module.exports = {
             } else {
                 const tokenInfo = response.getPayload();
 
-                c.query(getUser, [tokenInfo.email],
+                db.query(getUser, [tokenInfo.email],
                     (error, result) => {
                         if (error) console.dir(error);
                         else console.log("result: %s", result);
@@ -90,7 +90,7 @@ module.exports = {
                             console.log("creating user: " + tokenInfo.email);
 
                             //console.dir(tokenInfo);
-                            c.query(createUser, [
+                            db.query(createUser, [
                                 tokenInfo.email,
                                 'google',
                                 ''
@@ -110,7 +110,7 @@ module.exports = {
                     });
             }
         });
-    },
+    };
 
 
     /**
@@ -139,12 +139,12 @@ module.exports = {
      *
      * @apiVersion 0.1.0
      */
-    loginCustom: (req, res) => {
+    const loginCustom = (req, res) => {
         if (!req.query.email || !req.query.pass) {
             return res.status(400).json({ 'error': 'Some parameters were missing.' });
         }
         console.log("email: " + req.query.email + " pass: " + req.query.pass);
-        c.query(getUser, [req.query.email], (err, rows) => {
+        db.query(getUser, [req.query.email], (err, rows) => {
 
             if (!rows.length) return res.status(400).json({ 'error': 'No user matching that email.' });
 
@@ -153,7 +153,7 @@ module.exports = {
             bcrypt.hash(req.query.pass, salt, (err, hash) => {
                 if (err) return res.status(500).json({ 'error': 'Internal server error.' });
 
-                c.query(login, [
+                db.query(login, [
                     req.query.email,
                     hash
                 ], (error, result) => {
@@ -173,7 +173,7 @@ module.exports = {
                 });
             });
         });
-    },
+    };
 
 
     /**
@@ -200,12 +200,12 @@ module.exports = {
      *
      * @apiVersion 0.1.0
      */
-    loginFacebook: (req, res) => {
+    const loginFacebook = (req, res) => {
 
         if (!req.query.email) {
             return res.status(400).json({ 'error': 'Some parameters were missing.' });
         } else {
-            c.query(getUser, [req.query.email],
+            db.query(getUser, [req.query.email],
                 (error, result) => {
                     if (error) console.dir(error);
                     else console.log("result: %s", result);
@@ -243,6 +243,12 @@ module.exports = {
                     }
                 });
         }
+    };
+
+    return {
+        loginCustom: loginCustom,
+        loginFacebook: loginFacebook,
+        loginGoogle: loginGoogle
     }
 };
 

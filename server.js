@@ -4,12 +4,16 @@ const bcrypt = require('bcrypt');
 
 const express = require('express');
 const app = express();
-const routes = require('./routes');
+
+const config = require("./overrun");
+
+// MySQL config
+const mysql = require('mysql');
+const db = new mysql.createConnection(config.mysqlConfig);
 
 
 // express config
 const PORT = process.env.PORT || 8081;
-//const apiurl = 'http://cssgate.insttech.washington.edu:8081/';
 app.set("title", "Overrun");
 
 
@@ -18,17 +22,18 @@ const bp = require('body-parser');
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 
+const routes = require('./routes')(db);
 app.use(routes);
-
 
 
 app.use(escapeCharMiddleware);
 
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log("Server listening on : http://localhost:%s", PORT);
 });
 
+module.exports = server;
 
 // prevents SQL injection
 function escapeCharMiddleware(req, res, next) {

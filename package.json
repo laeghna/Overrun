@@ -4,10 +4,11 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --debug server.js --ignore node_modules/",
+    "test": "mocha --timeout 10000",
+    "start": "NODE_ENV=dev && nodemon --debug server.js --ignore node_modules/",
     "apidoc": "apidoc -f server.js -o doc/"
   },
+  "test-unit": "NODE_ENV=test mocha '/**/*.spec.js'",
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -15,9 +16,15 @@
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "google-auth-library": "^0.9.9",
-    "node-mysql": "^0.4.2"
+    "node-mysql": "^0.4.2",
+    "query-string": "^4.2.3"
   },
   "devDependencies": {
-    "nodemon": "^1.11.0"
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "mocha": "^3.2.0",
+    "nodemon": "^1.11.0",
+    "sinon": "^1.17.6",
+    "supertest": "^2.0.1"
   }
 }

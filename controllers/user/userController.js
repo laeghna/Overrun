@@ -1,10 +1,4 @@
-const fs = require('fs');
 const bcrypt = require('bcrypt');
-const config = JSON.parse(fs.readFileSync("overrun.json"));
-
-// MySQL config
-const mysql = require('mysql');
-const c = new mysql.createConnection(config.mysqlConfig);
 
 // SQL prepared statements
 const createUser = 'INSERT INTO User (email, salt, hash) ' +
@@ -13,7 +7,7 @@ const getUser = 'SELECT * FROM User WHERE email = ?;';
 const getUsers = 'SELECT email FROM User;';
 
 
-module.exports = {
+module.exports = (db) => {
 
 
     /**
@@ -54,11 +48,9 @@ module.exports = {
      *
      * @apiVersion 0.1.0
      */
-    postUser: (req, res) => {
+    const postUser = (req, res) => {
 
-        console.dir(req);
-
-        if (!req.query || !req.query.email || !req.query.pass) {
+        if (req.query && !req.query.email || !req.query.pass) {
             return res.status(400).json({ error: 'Some parameters were missing.' });
         }
 
@@ -74,7 +66,7 @@ module.exports = {
             bcrypt.hash(req.query.pass, salt, (err, hash) => {
                 if (err) return res.status(500).json({ error: 'Internal server error.' });
 
-                c.query(createUser, [req.query.email, salt, hash], (err, rows) => {
+                db.query(createUser, [req.query.email, salt, hash], (err, rows) => {
                     if (err) {
 
                         // duplicate
@@ -84,7 +76,7 @@ module.exports = {
 
                         console.dir(err);
 
-                        return res.status(409).json({ error: 'User could not be created.' });
+                        return res.status(500).json({ error: 'User could not be created.' });
                     } else {
                         console.log(rows);
                         return res.status(201).json({ email: req.query.email });
@@ -92,7 +84,7 @@ module.exports = {
                 });
             });
         });
-    },
+    };
 
     /**
      * @api {GET} /api/users Get all users' information.
@@ -109,21 +101,21 @@ module.exports = {
      *
      * @apiVersion 0.1.0
      */
-    getUser: (req, res, next) => {
+    const getUser = (req, res, next) => {
 
-        // email not supplied,  gets all users
+        // email not supplied, gets all users
         if (!req.query || !req.query.email) {
             next();
         }
         // email supplied, gets individual user
         else {
-            c.query(getUser, [req.query.email], (err, rows) => {
+            db.query(getUser, [req.query.email], (err, rows) => {
                     if (err) return res.status(500).json({ 'error': 'Error fetching user.' });
-                    res.send(JSON.stringify({ 'email': rows[0].email }));
+                    res.json({ 'email': rows[0].email });
                 }
             );
         }
-    },
+    };
 
     /**
      * @api {GET} /api/users Get user's information.
@@ -144,15 +136,22 @@ module.exports = {
      *
      * @apiVersion 0.1.0
      */
-    getUsers: (req, res) => {
-        c.query(getUsers, (err, rows) => {
+    const getUsers = (req, res) => {
+        db.query(getUsers, (err, rows) => {
             if (err) {
                 return res.status(400).json({ 'error': 'Could not get users.' });
             } else {
                 console.dir(rows);
-                return res.send(rows);
+                return res.json(rows);
             }
         });
+    };
+
+
+    return {
+        getUser: getUser,
+        getUsers: getUsers,
+        postUser: postUser
     }
 };
 
